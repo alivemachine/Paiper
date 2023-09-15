@@ -1,6 +1,6 @@
 <div align="center">
 <h1 align="center">
-<img src="https://raw.githubusercontent.com/PKief/vscode-material-icon-theme/ec559a9f6bfd399b82bb44393651661b08aaf7ba/icons/folder-markdown-open.svg"  />
+<img src="https://raw.githubusercontent.com/alivemachine/Paiper/01/ogthumb.png"  />
 <br>Paiper
 </h1>
 <h3>◦ Code smarter, unleash your Paiper power!</h3>
