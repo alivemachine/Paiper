@@ -2,31 +2,37 @@
 <html lang="en">
 
 <head>
-    <title>HyperObjectWeb</title>
+    <title>HyperObjectWeb09</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
-    <meta itemprop="name" content="HyperObjectWeb">
-    <meta itemprop="description" content="Freefrom expression, freeform navigation, freeform sharing.">
+    <meta itemprop="name" content="HyperObjectWeb09">
+    <meta itemprop="description" content="made with cables">
     <meta itemprop="image" content="screenshot.png">
-    <meta name="description" content="Freefrom expression, freeform navigation, freeform sharing." />
-	
-<meta property="og:title" content="H y p e r O b j e c t W e b">
-<meta property="og:description" content="Freefrom expression, freeform navigation, freeform sharing.">
-<meta property="og:image" content="https://alivemachine.io/how/screenshot.png">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
+    <meta name="description" content="made with cables" />
+
     <style>
         body {
             margin: 0;
             background-color: #000;
             color: #fff;
             font-family: Helvetica, Arial, sans-serif;
+            overflow: hidden; /* disable scrolling / rubberband effect on mobile */
         }
 
         canvas {
             display: block;
             position: absolute;
             outline:0;
+        }
+
+        * {
+            /* disable on touch highlights of html elements, especially on mobile! */
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         footer {
@@ -63,28 +69,16 @@
 
     <script>
 
-		function patchInitialized(patch) {
-			//text is activated by default
-			
-            //patch.setVariable("action","paiper");
-			
+        // disable rubberband effect on mobile devices
+        document.getElementById('glcanvas').addEventListener('touchmove', (e)=>{ e.preventDefault(); }, false);
+
+
+        function patchInitialized(patch) {
+            // You can now access the patch object (patch), register variable watchers and so on
         }
-		var block = 0;
+
         function patchFinishedLoading(patch) {
-			if(block==0){
-				//patch.setVariable("command","image");
-			setTimeout(function(){
-					//patch.setVariable("action","meta");
-					//alert();
-				},10000);
-				setTimeout(function(){
-					//patch.setVariable("action","twitter");
-					//alert();
-				},5000);
-				//patch.setVariable("command","meta");
-				//patch.setVariable("probe"," ");
-				block=1;
-			}
+            // The patch is ready now, all assets have been loaded
         }
 
         document.addEventListener('CABLES.jsLoaded', function (event) {
