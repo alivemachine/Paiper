@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>HyperObjectWeb04</title>
     <meta charset="utf-8">
@@ -16,10 +17,13 @@
             color: #fff;
             font-family: Helvetica, Arial, sans-serif;
         }
+
         canvas {
             display: block;
             position: absolute;
+            outline:0;
         }
+
         footer {
             position: absolute;
             bottom: 0;
@@ -31,14 +35,18 @@
             font-size: 18px;
             color: #24baa7;
         }
-        footer a, footer a:hover, footer a:active {
+
+        footer a,
+        footer a:hover,
+        footer a:active {
             color: #24baa7;
         }
     </style>
 
 </head>
+
 <body>
-    <canvas id="glcanvas" width="100vw" height="100vh"></canvas>
+    <canvas id="glcanvas" width="100vw" height="100vh" tabindex="1"></canvas>
     <footer>
         made with <a href='https://cables.gl'>cables</a>
         <!-- we would greatly appreciate if you link cables somewhere on your site! and tell us your website! thanks <3 :) -->
@@ -64,15 +72,15 @@
             alert('An error occured: ' + errId + ', ' + errMsg);
         }
 
-        function patchInitialized() {
-            // You can now access the patch object (CABLES.patch), register variable watchers and so on
+        function patchInitialized(patch) {
+            // You can now access the patch object (patch), register variable watchers and so on
         }
 
-        function patchFinishedLoading() {
+        function patchFinishedLoading(patch) {
             // The patch is ready now, all assets have been loaded
         }
 
-        document.addEventListener('CABLES.jsLoaded', function(event) {
+        document.addEventListener('CABLES.jsLoaded', function (event) {
             CABLES.patch = new CABLES.Patch({
                 patchFile: 'js/HyperObjectWeb04.json',
                 prefixAssetPath: '',
@@ -85,4 +93,5 @@
         });
     </script>
 </body>
+
 </html>

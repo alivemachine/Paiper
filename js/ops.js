@@ -95,7 +95,7 @@ const
     inText = op.inString("Text", "Hello Div"),
     inId = op.inString("Id"),
     inClass = op.inString("Class"),
-    inStyle = op.inValueEditor("Style", "position:absolute;z-index:9999;", "none"),
+    inStyle = op.inValueEditor("Style", "position:absolute;z-index:9999;", "css"),
     inInteractive = op.inValueBool("Interactive", false),
     inVisible = op.inValueBool("Visible", true),
     inBreaks = op.inValueBool("Convert Line Breaks", false),
@@ -150,11 +150,9 @@ function updateVisibility()
     setCSSVisible(inVisible.get());
 }
 
-
 function updateText()
 {
     let str = inText.get();
-    // console.log(oldStr,str);
 
     if (oldStr === str) return;
     oldStr = str;
@@ -170,6 +168,7 @@ function removeElement()
 {
     if (div && div.parentNode) div.parentNode.removeChild(div);
 }
+
 // inline css inisde div
 function updateStyle()
 {
@@ -180,6 +179,14 @@ function updateStyle()
         outElement.set(null);
         outElement.set(div);
     }
+
+    if (!div.parentElement)
+    {
+        canvas.appendChild(div);
+
+        // console.log("parent:", div.parentElement);
+    }
+
     warning();
 }
 
@@ -326,7 +333,6 @@ function reload(addCachebuster)
     isLoading.set(true);
 
     op.setUiAttrib({ "extendTitle": CABLES.basename(filename.get()) });
-
     op.setUiError("jsonerr", null);
 
     let httpClient = CABLES.ajax;
@@ -335,46 +341,52 @@ function reload(addCachebuster)
     let url = op.patch.getFilePath(filename.get());
     if (addCachebuster)url += "?rnd=" + CABLES.generateUUID();
 
-    const body = inBody.get();
-    httpClient(
-        url,
-        (err, _data, xhr) =>
-        {
-            if (err)
+    op.patch.loading.addAssetLoadingTask(() =>
+    {
+        const body = inBody.get();
+        httpClient(
+            url,
+            (err, _data, xhr) =>
             {
-                op.error(err);
-                return;
-            }
-            try
-            {
-                let data = _data;
-                outData.set(null);
-                if (typeof data === "string" && inParseJson.get())
+                if (err)
                 {
-                    data = JSON.parse(_data);
-                    outData.set(data);
+                    op.patch.loading.finished(loadingId);
+                    isLoading.set(false);
+
+                    op.error(err);
+                    return;
                 }
-                outString.set(null);
-                outString.set(_data);
-                op.uiAttr({ "error": null });
-                op.patch.loading.finished(loadingId);
-                outTrigger.trigger();
-                isLoading.set(false);
-            }
-            catch (e)
-            {
-                op.error(e);
-                op.setUiError("jsonerr", "Problem while loading json:<br/>" + e);
-                op.patch.loading.finished(loadingId);
-                isLoading.set(false);
-            }
-        },
-        inMethod.get(),
-        (body && body.length > 0) ? body : null,
-        inContentType.get(),
-        null,
-        headers.get() || {}
-    );
+                try
+                {
+                    let data = _data;
+                    outData.set(null);
+                    if (typeof data === "string" && inParseJson.get())
+                    {
+                        data = JSON.parse(_data);
+                        outData.set(data);
+                    }
+                    outString.set(null);
+                    outString.set(_data);
+                    op.uiAttr({ "error": null });
+                    op.patch.loading.finished(loadingId);
+                    outTrigger.trigger();
+                    isLoading.set(false);
+                }
+                catch (e)
+                {
+                    op.error(e);
+                    op.setUiError("jsonerr", "Problem while loading json:<br/>" + e);
+                    op.patch.loading.finished(loadingId);
+                    isLoading.set(false);
+                }
+            },
+            inMethod.get(),
+            (body && body.length > 0) ? body : null,
+            inContentType.get(),
+            null,
+            headers.get() || {}
+        );
+    });
 }
 
 
@@ -611,43 +623,43 @@ CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={};
 const
-    str=op.inStringEditor("JSON String",'{}',"json"),
-    outObj=op.outObject("Result"),
-    isValid=op.outValue("Valid");
+    str = op.inStringEditor("JSON String", "{}", "json"),
+    outObj = op.outObject("Result"),
+    isValid = op.outValue("Valid");
 
-str.onChange=parse;
+str.onChange = parse;
 parse();
 
 function parse()
 {
     try
     {
-        var obj=JSON.parse(str.get());
+        const obj = JSON.parse(str.get());
         outObj.set(null);
         outObj.set(obj);
         isValid.set(true);
-        op.setUiError("invalidjson",null);
+        op.setUiError("invalidjson", null);
     }
-    catch(ex)
+    catch (ex)
     {
-        console.log(JSON.stringify(ex));
+        op.error(ex);
         isValid.set(false);
 
-        var outStr="";
-        var parts=ex.message.split(" ");
-        for(var i=0;i<parts.length-1;i++)
+        let outStr = "";
+        const parts = ex.message.split(" ");
+        for (let i = 0; i < parts.length - 1; i++)
         {
-            var num=parseFloat(parts[i+1]);
-            if(num && parts[i]=="position")
+            const num = parseFloat(parts[i + 1]);
+            if (num && parts[i] == "position")
             {
-                const outStrA=str.get().substring(num-15, num);
-                const outStrB=str.get().substring(num, num+1);
-                const outStrC=str.get().substring(num+1, num+15);
-                outStr='<span style="font-family:monospace;background-color:black;">'+outStrA+'<span style="font-weight:bold;background-color:red;">'+outStrB+"</span>"+outStrC+" </span>";
+                const outStrA = str.get().substring(num - 15, num);
+                const outStrB = str.get().substring(num, num + 1);
+                const outStrC = str.get().substring(num + 1, num + 15);
+                outStr = "<span style=\"font-family:monospace;background-color:black;\">" + outStrA + "<span style=\"font-weight:bold;background-color:red;\">" + outStrB + "</span>" + outStrC + " </span>";
             }
         }
 
-        op.setUiError("invalidjson","INVALID JSON<br/>can not parse string to object:<br/><b> "+ex.message+'</b><br/>'+outStr);
+        op.setUiError("invalidjson", "INVALID JSON<br/>can not parse string to object:<br/><b> " + ex.message + "</b><br/>" + outStr);
     }
 }
 
@@ -1257,9 +1269,10 @@ Ops.Value.TriggerOnChangeNumber = function()
 CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={};
-const inval = op.inValue("Value");
-const next = op.outTrigger("Next");
-const number = op.outValue("Number");
+const
+    inval = op.inFloat("Value"),
+    next = op.outTrigger("Next"),
+    number = op.outNumber("Number");
 
 inval.onChange = function ()
 {
@@ -1369,14 +1382,15 @@ CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={};
 const
-    inStr=op.inString("String"),
-    result=op.outValue("Result");
+    inStr = op.inString("String"),
+    result = op.outValue("Result");
 
-inStr.onChange=function()
+inStr.onChange = function ()
 {
-    if(!inStr.get()) result.set(-1);
-        else result.set( inStr.get().length );
+    if (!inStr.get()) result.set(0);
+    else result.set(String(inStr.get()).length);
 };
+
 
 };
 
@@ -1546,7 +1560,7 @@ const op=this;
 const attachments={};
 const
     v = op.inValueEditor("value", ""),
-    syntax = op.inValueSelect("Syntax", ["text", "glsl", "css", "html", "xml"], "text"),
+    syntax = op.inValueSelect("Syntax", ["text", "glsl", "css", "html", "xml", "json"], "text"),
     result = op.outString("Result");
 
 v.setUiAttribs({ "hidePort": true });
@@ -1581,49 +1595,47 @@ Ops.Html.CSS_v2 = function()
 CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={};
-var code=op.inStringEditor("css code");
+const code = op.inStringEditor("css code");
 
-code.setUiAttribs({editorSyntax:'css'});
+code.setUiAttribs({ "editorSyntax": "css" });
 
+let styleEle = null;
+const eleId = "css_" + CABLES.uuid();
 
-var styleEle=null;
-var eleId='css_'+CABLES.uuid();
-
-code.onChange=update;
+code.onChange = update;
 update();
-
 
 function getCssContent()
 {
-    var css=code.get();
+    let css = code.get();
     css = css.replace(/{{ASSETPATH}}/g, op.patch.getAssetPath());
     return css;
 }
 
 function update()
 {
-    styleEle=document.getElementById(eleId);
+    styleEle = document.getElementById(eleId);
 
-    if(styleEle)
+    if (styleEle)
     {
-        styleEle.textContent=getCssContent();
+        styleEle.textContent = getCssContent();
     }
     else
     {
-        styleEle  = document.createElement('style');
-        styleEle.type = 'text/css';
+        styleEle = document.createElement("style");
+        styleEle.type = "text/css";
         styleEle.id = eleId;
-        styleEle.textContent=getCssContent();
+        styleEle.textContent = attachments.css_spinner;
 
-        var head  = document.getElementsByTagName('body')[0];
+        const head = document.getElementsByTagName("body")[0];
         head.appendChild(styleEle);
     }
 }
 
-op.onDelete=function()
+op.onDelete = function ()
 {
-    styleEle=document.getElementById(eleId);
-    if(styleEle)styleEle.remove();
+    styleEle = document.getElementById(eleId);
+    if (styleEle)styleEle.remove();
 };
 
 
@@ -1865,7 +1877,7 @@ function update()
         }
         catch (e)
         {
-            console.log(e);
+            op.error(e);
         }
     }
 
@@ -2002,12 +2014,10 @@ const
     inEle = op.inObject("Element"),
     active = op.inValueBool("active", true),
     filename = op.inUrl("image file"),
-    inSize = op.inValueSelect("Size", ["auto", "length", "cover", "contain", "initial", "inherit", "75%", "50%", "25%"], "cover"),
+    inSize = op.inValueSelect("Size", ["auto", "length", "cover", "contain", "initial", "inherit", "75%", "50%", "25%", "20%", "10%"], "cover"),
     inRepeat = op.inValueSelect("Repeat", ["no-repeat", "repeat", "repeat-x", "repeat-y"], "no-repeat"),
     inPosition = op.inValueSelect("Position", ["left top", "left center", "left bottom", "right top", "right center", "right bottom", "center top", "center center", "center bottom"], "center center"),
-
     outEle = op.outObject("HTML Element");
-
 
 op.onLoadedValueSet =
 op.onLoaded =
@@ -2019,6 +2029,17 @@ active.onChange =
 filename.onChange = update;
 
 let ele = null;
+let cacheBust = null;
+
+op.onFileChanged = function (fn)
+{
+    if (filename.get() && filename.get().indexOf(fn) > -1)
+    {
+        if (ele)ele.style["background-image"] = "none";
+        cacheBust = CABLES.uuid();
+        update();
+    }
+};
 
 function remove()
 {
@@ -2043,7 +2064,6 @@ function update()
 
     ele = inEle.get();
 
-
     if (ele && ele.style && filename.get())
     {
         if (!active.get())
@@ -2052,7 +2072,10 @@ function update()
         }
         else
         {
-            ele.style["background-image"] = "url(" + op.patch.getFilePath(String(filename.get())) + ")";
+            let cb = "";
+            if (cacheBust)cb = "?cb=" + cacheBust;
+
+            ele.style["background-image"] = "url(" + op.patch.getFilePath(String(filename.get())) + cb + ")";
             ele.style["background-size"] = inSize.get();
             ele.style["background-position"] = inPosition.get();
             ele.style["background-repeat"] = inRepeat.get();
@@ -2204,26 +2227,25 @@ CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={};
 const
-    trigger=op.inTriggerButton("trigger"),
-    reset=op.inTriggerButton("reset"),
-    outBool=op.outValue("result");
+    trigger = op.inTriggerButton("trigger"),
+    reset = op.inTriggerButton("reset"),
+    outBool = op.outBool("result");
 
-var theBool=false;
+let theBool = false;
 outBool.set(theBool);
-outBool.ignoreValueSerialize=true;
+outBool.ignoreValueSerialize = true;
 
-trigger.onTriggered=function()
+trigger.onTriggered = function ()
 {
-    theBool=!theBool;
+    theBool = !theBool;
     outBool.set(theBool);
 };
 
-reset.onTriggered=function()
+reset.onTriggered = function ()
 {
-    theBool=false;
+    theBool = false;
     outBool.set(theBool);
 };
-
 
 
 };
@@ -2246,71 +2268,67 @@ CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={};
 const
-    src=op.inString("URL",'https://undev.studio'),
-    elId=op.inString("ID"),
-    active=op.inBool("Active",true),
-    inStyle=op.inStringEditor("Style","position:absolute;\nz-index:9999;\nborder:0;\nwidth:50%;\nheight:50%;"),
-    outEle=op.outObject("Element");
+    src = op.inString("URL", "https://undev.studio"),
+    elId = op.inString("ID"),
+    active = op.inBool("Active", true),
+    inStyle = op.inStringEditor("Style", "position:absolute;\nz-index:9999;\nborder:0;\nwidth:50%;\nheight:50%;"),
+    outEle = op.outObject("Element");
 
-op.setPortGroup('Attributes',[src,elId]);
+op.setPortGroup("Attributes", [src, elId]);
 
-let element=null;
+let element = null;
 
-op.onDelete=removeEle;
+op.onDelete = removeEle;
 
-op.onLoaded=()=>
+op.onLoaded = () =>
 {
-    console.log("init!");
     addElement();
     updateSoon();
 
-    inStyle.onChange=
-    src.onChange=
-    elId.onChange=updateSoon;
+    inStyle.onChange =
+        src.onChange =
+        elId.onChange = updateSoon;
 
-    active.onChange=updateActive;
+    active.onChange = updateActive;
 };
-
 
 function addElement()
 {
-    if(!active.get()) return;
-    if(element) removeEle();
-    element = document.createElement('iframe');
+    if (!active.get()) return;
+    if (element) removeEle();
+    element = document.createElement("iframe");
     updateAttribs();
     const parent = op.patch.cgl.canvas.parentElement;
     parent.appendChild(element);
     outEle.set(element);
 }
 
-let timeOut=null;
+let timeOut = null;
 
 function updateSoon()
 {
     clearTimeout(timeOut);
-    timeOut=setTimeout(updateAttribs,30);
+    timeOut = setTimeout(updateAttribs, 30);
 }
 
 function updateAttribs()
 {
-    if(!element)return;
-    element.setAttribute("style",inStyle.get());
-    element.setAttribute('src',src.get());
-    element.setAttribute('id',elId.get());
-
-    console.log(src.get(),elId.get(),active.get());
+    if (!element) return;
+    element.setAttribute("style", inStyle.get());
+    element.setAttribute("src", src.get());
+    element.setAttribute("id", elId.get());
 }
 
 function removeEle()
 {
-    if(element && element.parentNode)element.parentNode.removeChild(element);
-    element=null;
+    if (element && element.parentNode)element.parentNode.removeChild(element);
+    element = null;
     outEle.set(element);
 }
 
 function updateActive()
 {
-    if(!active.get())
+    if (!active.get())
     {
         removeEle();
         return;
@@ -2318,13 +2336,6 @@ function updateActive()
 
     addElement();
 }
-
-
-
-
-
-
-
 
 
 };
@@ -2346,32 +2357,32 @@ Ops.Trigger.TriggerLimiter = function()
 CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={};
-var inTriggerPort = op.inTrigger("In Trigger");
-var timePort = op.inValue("Milliseconds", 300);
-var outTriggerPort = op.outTrigger("Out Trigger");
-var progress=op.outValue("Progress");
+const
+    inTriggerPort = op.inTrigger("In Trigger"),
+    timePort = op.inValue("Milliseconds", 300),
+    outTriggerPort = op.outTrigger("Out Trigger"),
+    progress = op.outValue("Progress");
 
-var lastTriggerTime = 0;
+let lastTriggerTime = 0;
 
 // change listeners
-inTriggerPort.onTriggered = function()
+inTriggerPort.onTriggered = function ()
 {
-    var now = CABLES.now();
-    var prog=(now-lastTriggerTime )/timePort.get();
+    const now = CABLES.now();
+    let prog = (now - lastTriggerTime) / timePort.get();
 
-    if(prog>1.0)prog=1.0;
-    if(prog<0.0)prog=0.0;
+    if (prog > 1.0)prog = 1.0;
+    if (prog < 0.0)prog = 0.0;
 
-    // console.log(prog);
     progress.set(prog);
 
-    if(now >=lastTriggerTime + timePort.get())
+    if (now >= lastTriggerTime + timePort.get())
     {
         lastTriggerTime = now;
-        // progress.set(1.0);
         outTriggerPort.trigger();
     }
 };
+
 
 };
 
@@ -2468,27 +2479,36 @@ CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={};
 const
-    trigger=op.inTriggerButton("Trigger"),
-    duration=op.inValue("Duration",1),
-    valueTrue=op.inValue("Value True",1),
-    valueFalse=op.inValue("Value False",0),
-    outAct=op.outTrigger("Activated"),
-    result=op.outValue("Result",false);
+    trigger = op.inTriggerButton("Trigger"),
+    duration = op.inValue("Duration", 1),
+    valueTrue = op.inValue("Value True", 1),
+    valueFalse = op.inValue("Value False", 0),
+    resetButton = op.inTriggerButton("Reset"),
+    outAct = op.outTrigger("Activated"),
+    result = op.outValue("Result", false);
 
-var lastTimeout=-1;
+let lastTimeout = -1;
 
-trigger.onTriggered=function()
+resetButton.onTriggered = function ()
 {
-    if(result.get()==valueFalse.get())outAct.trigger();
-    result.set(valueTrue.get());
+    result.set(valueFalse.get());
 
     clearTimeout(lastTimeout);
-    lastTimeout=setTimeout(function()
+};
+
+trigger.onTriggered = function ()
+{
+    if (result.get() == valueFalse.get())outAct.trigger();
+    result.set(valueTrue.get());
+
+
+    clearTimeout(lastTimeout);
+    lastTimeout = setTimeout(function ()
     {
         result.set(valueFalse.get());
-    },duration.get()*1000);
-
+    }, duration.get() * 1000);
 };
+
 
 };
 
@@ -2547,13 +2567,12 @@ function update()
         const str = inValue.get() + inValueSuffix.get();
         try
         {
-            // console.log("css",inProperty.get(),str);
             if (ele.style[inProperty.get()] != str)
                 ele.style[inProperty.get()] = str;
         }
         catch (e)
         {
-            console.log(e);
+            op.error(e);
         }
     }
 
@@ -2784,57 +2803,49 @@ Ops.Ui.SubPatch = function()
 CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={};
-op.dyn=op.addInPort(new CABLES.Port(op,"create port",CABLES.OP_PORT_TYPE_DYNAMIC));
-op.dynOut=op.addOutPort(new CABLES.Port(op,"create port out",CABLES.OP_PORT_TYPE_DYNAMIC));
+op.dyn = op.addInPort(new CABLES.Port(op, "create port", CABLES.OP_PORT_TYPE_DYNAMIC));
+op.dynOut = op.addOutPort(new CABLES.Port(op, "create port out", CABLES.OP_PORT_TYPE_DYNAMIC));
 
-var dataStr=op.addInPort(new CABLES.Port(op,"dataStr",CABLES.OP_PORT_TYPE_VALUE,{ display:'readonly' }));
-op.patchId=op.addInPort(new CABLES.Port(op,"patchId",CABLES.OP_PORT_TYPE_VALUE,{ display:'readonly' }));
+const dataStr = op.addInPort(new CABLES.Port(op, "dataStr", CABLES.OP_PORT_TYPE_VALUE, { "display": "readonly" }));
+op.patchId = op.addInPort(new CABLES.Port(op, "patchId", CABLES.OP_PORT_TYPE_VALUE, { "display": "readonly" }));
 
+dataStr.setUiAttribs({ "hideParam": true });
+op.patchId.setUiAttribs({ "hideParam": true });
 
-
-dataStr.setUiAttribs({hideParam:true});
-op.patchId.setUiAttribs({hideParam:true});
-
-var data={"ports":[],"portsOut":[]};
+let data = { "ports": [], "portsOut": [] };
 
 // Ops.Ui.Patch.maxPatchId=CABLES.generateUUID();
 
-op.patchId.onChange=function()
+op.patchId.onChange = function ()
 {
-    // console.log("subpatch changed...");
-    // clean up old subpatch if empty
-    var oldPatchOps=op.patch.getSubPatchOps(oldPatchId);
+    const oldPatchOps = op.patch.getSubPatchOps(oldPatchId);
 
-    // console.log("subpatch has childs ",oldPatchOps.length);
-
-    if(oldPatchOps.length==2)
+    if (oldPatchOps.length == 2)
     {
-        for(var i=0;i<oldPatchOps.length;i++)
+        for (let i = 0; i < oldPatchOps.length; i++)
         {
-            // console.log("delete ",oldPatchOps[i]);
             op.patch.deleteOp(oldPatchOps[i].id);
         }
     }
     else
     {
-        // console.log("old subpatch has ops.,...");
     }
 };
 
-var oldPatchId=CABLES.generateUUID();
+var oldPatchId = CABLES.generateUUID();
 op.patchId.set(oldPatchId);
 
-op.onLoaded=function()
+op.onLoaded = function ()
 {
     // op.patchId.set(CABLES.generateUUID());
 };
 
-op.onLoadedValueSet=function()
+op.onLoadedValueSet = function ()
 {
-    data=JSON.parse(dataStr.get());
-    if(!data)
+    data = JSON.parse(dataStr.get());
+    if (!data)
     {
-        data={"ports":[],"portsOut":[]};
+        data = { "ports": [], "portsOut": [] };
     }
     setupPorts();
 };
@@ -2846,21 +2857,20 @@ function loadData()
 getSubPatchInputOp();
 getSubPatchOutputOp();
 
-var dataLoaded=false;
-dataStr.onChange=function()
+let dataLoaded = false;
+dataStr.onChange = function ()
 {
-    if(dataLoaded)return;
+    if (dataLoaded) return;
 
-    if(!dataStr.get())return;
+    if (!dataStr.get()) return;
     try
     {
-        // console.log('parse subpatch data');
         loadData();
     }
-    catch(e)
+    catch (e)
     {
-        // op.log('cannot load subpatch data...');
-        console.log(e);
+        op.error("cannot load subpatch data...");
+        op.error(e);
     }
 };
 
@@ -2869,44 +2879,38 @@ function saveData()
     dataStr.set(JSON.stringify(data));
 }
 
-function addPortListener(newPort,newPortInPatch)
+function addPortListener(newPort, newPortInPatch)
 {
-    //console.log('newPort',newPort.name);
-
-    newPort.addEventListener("onUiAttrChange",function(attribs)
+    newPort.addEventListener("onUiAttrChange", function (attribs)
     {
-        console.log("onUiAttrChange!!!");
-
-        if(attribs.title)
+        if (attribs.title)
         {
-            var i=0;
-            for(i=0;i<data.portsOut.length;i++)
-                if(data.portsOut[i].name==newPort.name)
-                    data.portsOut[i].title=attribs.title;
+            let i = 0;
+            for (i = 0; i < data.portsOut.length; i++)
+                if (data.portsOut[i].name == newPort.name)
+                    data.portsOut[i].title = attribs.title;
 
-            for(i=0;i<data.ports.length;i++)
-                if(data.ports[i].name==newPort.name)
-                    data.ports[i].title=attribs.title;
+            for (i = 0; i < data.ports.length; i++)
+                if (data.ports[i].name == newPort.name)
+                    data.ports[i].title = attribs.title;
 
             saveData();
         }
-
     });
 
-
-    if(newPort.direction==CABLES.PORT_DIR_IN)
+    if (newPort.direction == CABLES.PORT_DIR_IN)
     {
-        if(newPort.type==CABLES.OP_PORT_TYPE_FUNCTION)
+        if (newPort.type == CABLES.OP_PORT_TYPE_FUNCTION)
         {
-            newPort.onTriggered=function()
+            newPort.onTriggered = function ()
             {
-                if(newPortInPatch.isLinked())
+                if (newPortInPatch.isLinked())
                     newPortInPatch.trigger();
             };
         }
         else
         {
-            newPort.onChange=function()
+            newPort.onChange = function ()
             {
                 newPortInPatch.set(newPort.get());
             };
@@ -2916,122 +2920,99 @@ function addPortListener(newPort,newPortInPatch)
 
 function setupPorts()
 {
-    if(!op.patchId.get())return;
-    var ports=data.ports||[];
-    var portsOut=data.portsOut||[];
-    var i=0;
+    if (!op.patchId.get()) return;
+    const ports = data.ports || [];
+    const portsOut = data.portsOut || [];
+    let i = 0;
 
-    for(i=0;i<ports.length;i++)
+    for (i = 0; i < ports.length; i++)
     {
-        if(!op.getPortByName(ports[i].name))
+        if (!op.getPortByName(ports[i].name))
         {
-            // console.log("ports[i].name",ports[i].name);
+            const newPort = op.addInPort(new CABLES.Port(op, ports[i].name, ports[i].type));
+            const patchInputOp = getSubPatchInputOp();
+            const newPortInPatch = patchInputOp.addOutPort(new CABLES.Port(patchInputOp, ports[i].name, ports[i].type));
 
-            var newPort=op.addInPort(new CABLES.Port(op,ports[i].name,ports[i].type));
-            var patchInputOp=getSubPatchInputOp();
-
-
-
-
-
-            // console.log(patchInputOp);
-
-            var newPortInPatch=patchInputOp.addOutPort(new CABLES.Port(patchInputOp,ports[i].name,ports[i].type));
-
-// console.log('newPortInPatch',newPortInPatch);
-
-
-            newPort.ignoreValueSerialize=true;
-            newPort.setUiAttribs({"editableTitle":true});
-            if(ports[i].title)
+            newPort.ignoreValueSerialize = true;
+            newPort.setUiAttribs({ "editableTitle": true });
+            if (ports[i].title)
             {
-                newPort.setUiAttribs({"title":ports[i].title});
-                newPortInPatch.setUiAttribs({"title":ports[i].title});
+                newPort.setUiAttribs({ "title": ports[i].title });
+                newPortInPatch.setUiAttribs({ "title": ports[i].title });
             }
-            addPortListener(newPort,newPortInPatch);
-
+            addPortListener(newPort, newPortInPatch);
         }
     }
 
-    for(i=0;i<portsOut.length;i++)
+    for (i = 0; i < portsOut.length; i++)
     {
-        if(!op.getPortByName(portsOut[i].name))
+        if (!op.getPortByName(portsOut[i].name))
         {
-            var newPortOut=op.addOutPort(new CABLES.Port(op,portsOut[i].name,portsOut[i].type));
-            var patchOutputOp=getSubPatchOutputOp();
-            var newPortOutPatch=patchOutputOp.addInPort(new CABLES.Port(patchOutputOp,portsOut[i].name,portsOut[i].type));
+            const newPortOut = op.addOutPort(new CABLES.Port(op, portsOut[i].name, portsOut[i].type));
+            const patchOutputOp = getSubPatchOutputOp();
+            const newPortOutPatch = patchOutputOp.addInPort(new CABLES.Port(patchOutputOp, portsOut[i].name, portsOut[i].type));
 
-            newPortOut.ignoreValueSerialize=true;
-            newPortOut.setUiAttribs({"editableTitle":true});
+            newPortOut.ignoreValueSerialize = true;
+            newPortOut.setUiAttribs({ "editableTitle": true });
 
-            if(portsOut[i].title)
+            if (portsOut[i].title)
             {
-                newPortOut.setUiAttribs({"title":portsOut[i].title});
-                newPortOutPatch.setUiAttribs({"title":portsOut[i].title});
+                newPortOut.setUiAttribs({ "title": portsOut[i].title });
+                newPortOutPatch.setUiAttribs({ "title": portsOut[i].title });
             }
-
 
             // addPortListener(newPortOut,newPortOutPatch);
-            addPortListener(newPortOutPatch,newPortOut);
-
+            addPortListener(newPortOutPatch, newPortOut);
         }
     }
 
-    dataLoaded=true;
-
+    dataLoaded = true;
 }
 
-
-
-op.dyn.onLinkChanged=function()
+op.dyn.onLinkChanged = function ()
 {
-    if(op.dyn.isLinked())
+    if (op.dyn.isLinked())
     {
-        var otherPort=op.dyn.links[0].getOtherPort(op.dyn);
+        const otherPort = op.dyn.links[0].getOtherPort(op.dyn);
         op.dyn.removeLinks();
         otherPort.removeLinkTo(op.dyn);
 
+        const newName = "in" + data.ports.length + " " + otherPort.parent.name + " " + otherPort.name;
 
-        var newName="in"+data.ports.length+" "+otherPort.parent.name+" "+otherPort.name;
-
-        data.ports.push({"name":newName,"type":otherPort.type});
+        data.ports.push({ "name": newName, "type": otherPort.type });
 
         setupPorts();
 
-        var l=gui.scene().link(
+        const l = gui.scene().link(
             otherPort.parent,
             otherPort.getName(),
             op,
             newName
-            );
+        );
 
-        // console.log('-----+===== ',otherPort.getName(),otherPort.get() );
-        // l._setValue();
-        // l.setValue(otherPort.get());
-
-        dataLoaded=true;
+        dataLoaded = true;
         saveData();
     }
     else
     {
-        setTimeout(function()
+        setTimeout(function ()
         {
             op.dyn.removeLinks();
             gui.patch().removeDeadLinks();
-        },100);
+        }, 100);
     }
 };
 
-op.dynOut.onLinkChanged=function()
+op.dynOut.onLinkChanged = function ()
 {
-    if(op.dynOut.isLinked())
+    if (op.dynOut.isLinked())
     {
-        var otherPort=op.dynOut.links[0].getOtherPort(op.dynOut);
+        const otherPort = op.dynOut.links[0].getOtherPort(op.dynOut);
         op.dynOut.removeLinks();
         otherPort.removeLinkTo(op.dynOut);
-        var newName="out"+data.ports.length+" "+otherPort.parent.name+" "+otherPort.name;
+        const newName = "out" + data.ports.length + " " + otherPort.parent.name + " " + otherPort.name;
 
-        data.portsOut.push({"name":newName,"type":otherPort.type});
+        data.portsOut.push({ "name": newName, "type": otherPort.type });
 
         setupPorts();
 
@@ -3040,95 +3021,84 @@ op.dynOut.onLinkChanged=function()
             otherPort.getName(),
             op,
             newName
-            );
+        );
 
-        dataLoaded=true;
+        dataLoaded = true;
         saveData();
     }
     else
     {
-        setTimeout(function()
+        setTimeout(function ()
         {
             op.dynOut.removeLinks();
             gui.patch().removeDeadLinks();
-        },100);
+        }, 100);
 
-
-        op.log('dynOut unlinked...');
+        op.log("dynOut unlinked...");
     }
     gui.patch().removeDeadLinks();
 };
 
-
-
 function getSubPatchOutputOp()
 {
-    var patchOutputOP=op.patch.getSubPatchOp(op.patchId.get(),'Ops.Ui.PatchOutput');
+    let patchOutputOP = op.patch.getSubPatchOp(op.patchId.get(), "Ops.Ui.PatchOutput");
 
-    if(!patchOutputOP)
+    if (!patchOutputOP)
     {
-        // console.log("Creating output for ",op.patchId.get());
-        op.patch.addOp('Ops.Ui.PatchOutput',{'subPatch':op.patchId.get()} );
-        patchOutputOP=op.patch.getSubPatchOp(op.patchId.get(),'Ops.Ui.PatchOutput');
+        op.patch.addOp("Ops.Ui.PatchOutput", { "subPatch": op.patchId.get() });
+        patchOutputOP = op.patch.getSubPatchOp(op.patchId.get(), "Ops.Ui.PatchOutput");
 
-        if(!patchOutputOP) console.warn('no patchinput2!');
+        if (!patchOutputOP) op.warn("no patchinput2!");
     }
     return patchOutputOP;
-
 }
 
 function getSubPatchInputOp()
 {
-    var patchInputOP=op.patch.getSubPatchOp(op.patchId.get(),'Ops.Ui.PatchInput');
+    let patchInputOP = op.patch.getSubPatchOp(op.patchId.get(), "Ops.Ui.PatchInput");
 
-    if(!patchInputOP)
+    if (!patchInputOP)
     {
-        op.patch.addOp('Ops.Ui.PatchInput',{'subPatch':op.patchId.get()} );
-        patchInputOP=op.patch.getSubPatchOp(op.patchId.get(),'Ops.Ui.PatchInput');
-        if(!patchInputOP) console.warn('no patchinput2!');
+        op.patch.addOp("Ops.Ui.PatchInput", { "subPatch": op.patchId.get() });
+        patchInputOP = op.patch.getSubPatchOp(op.patchId.get(), "Ops.Ui.PatchInput");
+        if (!patchInputOP) op.warn("no patchinput2!");
     }
-
 
     return patchInputOP;
 }
 
-op.addSubLink=function(p,p2)
+op.addSubLink = function (p, p2)
 {
-    var num=data.ports.length;
+    const num = data.ports.length;
+    const sublPortname = "in" + (num - 1) + " " + p2.parent.name + " " + p2.name;
 
-    var sublPortname="in"+(num-1)+" "+p2.parent.name+" "+p2.name;
-    console.log('sublink! ',sublPortname);
-
-    if(p.direction==CABLES.PORT_DIR_IN)
+    if (p.direction == CABLES.PORT_DIR_IN)
     {
-        var l=gui.scene().link(
+        var l = gui.scene().link(
             p.parent,
             p.getName(),
             getSubPatchInputOp(),
             sublPortname
-            );
-
-        // console.log('- ----=====EEE ',p.getName(),p.get() );
-        // console.log('- ----=====EEE ',l.getOtherPort(p).getName() ,l.getOtherPort(p).get() );
+        );
     }
     else
     {
-        var l=gui.scene().link(
+        var l = gui.scene().link(
             p.parent,
             p.getName(),
             getSubPatchOutputOp(),
-            "out"+(num)+" "+p2.parent.name+" "+p2.name
-            );
+            "out" + (num) + " " + p2.parent.name + " " + p2.name
+        );
     }
 
-    var bounds=gui.patch().getSubPatchBounds(op.patchId.get());
+    const bounds = gui.patch().getSubPatchBounds(op.patchId.get());
 
     getSubPatchInputOp().uiAttr(
         {
             "translate":
             {
-                "x":bounds.minx,
-                "y":bounds.miny-100
+                "x": bounds.minx,
+                "y": bounds.miny - 100
             }
         });
 
@@ -3136,29 +3106,23 @@ op.addSubLink=function(p,p2)
         {
             "translate":
             {
-                "x":bounds.minx,
-                "y":bounds.maxy+100
+                "x": bounds.minx,
+                "y": bounds.maxy + 100
             }
         });
     saveData();
     return sublPortname;
 };
 
-
-
-op.onDelete=function()
+op.onDelete = function ()
 {
-    for (var i = op.patch.ops.length-1; i >=0 ; i--)
+    for (let i = op.patch.ops.length - 1; i >= 0; i--)
     {
-        if(op.patch.ops[i].uiAttribs && op.patch.ops[i].uiAttribs.subPatch==op.patchId.get())
+        if (op.patch.ops[i].uiAttribs && op.patch.ops[i].uiAttribs.subPatch == op.patchId.get())
         {
-            // console.log(op.patch.ops[i].objName);
             op.patch.deleteOp(op.patch.ops[i].id);
         }
     }
-
-
-
 };
 
 
@@ -3462,27 +3426,35 @@ CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={};
 const
-    exe=op.inTrigger("exe"),
-    delay=op.inValueFloat("delay",1),
-    next=op.outTrigger("next"),
-    outDelaying=op.outBool("Delaying");
+    exe = op.inTrigger("exe"),
+    delay = op.inValueFloat("delay", 1),
+    cancel = op.inTriggerButton("Cancel"),
+    next = op.outTrigger("next"),
+    outDelaying = op.outBool("Delaying");
 
-var lastTimeout=null;
+let lastTimeout = null;
 
-exe.onTriggered=function()
+cancel.onTriggered = function ()
+{
+    if (lastTimeout)clearTimeout(lastTimeout);
+    lastTimeout = null;
+};
+
+exe.onTriggered = function ()
 {
     outDelaying.set(true);
-    if(lastTimeout)clearTimeout(lastTimeout);
+    if (lastTimeout)clearTimeout(lastTimeout);
 
-    lastTimeout=setTimeout(
-        function()
+    lastTimeout = setTimeout(
+        function ()
         {
             outDelaying.set(false);
-            lastTimeout=null;
+            lastTimeout = null;
             next.trigger();
         },
-        delay.get()*1000);
+        delay.get() * 1000);
 };
+
 
 };
 
@@ -4616,41 +4588,42 @@ CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={style_css:"/*\n * SIDEBAR\n  http://danielstern.ca/range.css/#/\n  https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-progress-value\n */\n\n\n.icon-chevron-down {\n    top: 2px;\n    right: 9px;\n}\n\n.iconsidebar-chevron-up {\n\tbackground-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM4ODg4ODgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0iZmVhdGhlciBmZWF0aGVyLWNoZXZyb24tdXAiPjxwb2x5bGluZSBwb2ludHM9IjE4IDE1IDEyIDkgNiAxNSI+PC9wb2x5bGluZT48L3N2Zz4=);\n    top: 2px;\n    right: 9px;\n}\n\n.sidebar-cables-right\n{\n    right: 0px;\n    left: initial !important;\n}\n\n.sidebar-cables {\n    position: absolute;\n    top: 15px;\n    left: 15px;\n    border-radius: 10px;\n    /*border:10px solid #1a1a1a;*/\n    z-index: 100000;\n    color: #BBBBBB;\n    width: 220px;\n    max-height: 100%;\n    box-sizing: border-box;\n    overflow-y: auto;\n    overflow-x: hidden;\n    font-size: 13px;\n    font-family: Arial;\n    line-height: 1em; /* prevent emojis from breaking height of the title */\n    --sidebar-border-radius: 4px;\n    --sidebar-monospace-font-stack: \"SFMono-Regular\", Consolas, \"Liberation Mono\", Menlo, Courier, monospace;\n    --sidebar-hover-transition-time: .2s;\n}\n\n.sidebar-cables::selection {\n    background-color: #24baa7;\n    color: #EEEEEE;\n}\n\n.sidebar-cables::-webkit-scrollbar {\n    background-color: transparent;\n    --cables-scrollbar-width: 8px;\n    width: var(--cables-scrollbar-width);\n}\n\n.sidebar-cables::-webkit-scrollbar-track {\n    background-color: transparent;\n    width: var(--cables-scrollbar-width);\n}\n\n.sidebar-cables::-webkit-scrollbar-thumb {\n    background-color: #333333;\n    border-radius: 4px;\n    width: var(--cables-scrollbar-width);\n}\n\n.sidebar-cables--closed {\n    width: auto;\n}\n\n.sidebar__close-button {\n    background-color: #222;\n    -webkit-user-select: none;  /* Chrome all / Safari all */\n    -moz-user-select: none;     /* Firefox all */\n    -ms-user-select: none;      /* IE 10+ */\n    user-select: none;          /* Likely future */\n    transition: background-color var(--sidebar-hover-transition-time);\n    color: #CCCCCC;\n    height: 12px;\n    box-sizing: border-box;\n    padding-top: 2px;\n    text-align: center;\n    cursor: pointer;\n    /*border-top: 1px solid #272727;*/\n    border-radius: 0 0 var(--sidebar-border-radius) var(--sidebar-border-radius);\n    opacity: 1.0;\n    transition: opacity 0.3s;\n    overflow: hidden;\n}\n\n.sidebar__close-button-icon {\n    display: inline-block;\n    /*opacity: 0;*/\n    width: 21px;\n    height: 20px;\n    position: relative;\n    top: -1px;\n    /*background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM4ODg4ODgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0iZmVhdGhlciBmZWF0aGVyLWNoZXZyb24tdXAiPjxwb2x5bGluZSBwb2ludHM9IjE4IDE1IDEyIDkgNiAxNSI+PC9wb2x5bGluZT48L3N2Zz4=);*/\n    /*background-size: cover;*/\n    /*background-repeat: no-repeat;*/\n    /*background-repeat: no-repeat;*/\n    /*background-position: 0 -1px;*/\n}\n\n.sidebar--closed {\n    width: auto;\n    margin-right: 20px;\n}\n\n.sidebar--closed .sidebar__close-button {\n    margin-top: 8px;\n    margin-left: 8px;\n    padding-top: 13px;\n    padding-left: 11px;\n    padding-right: 11px;\n    width: 46px;\n    height: 46px;\n    border-radius: 50%;\n    cursor: pointer;\n    opacity: 0.3;\n}\n\n.sidebar--closed .sidebar__group\n{\n    display:none;\n\n}\n.sidebar--closed .sidebar__close-button-icon {\n    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHdpZHRoPSIyMnB4IiBoZWlnaHQ9IjE3cHgiIHZpZXdCb3g9IjAgMCAyMiAxNyIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4gICAgICAgIDx0aXRsZT5Hcm91cCAzPC90aXRsZT4gICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+ICAgIDxkZWZzPjwvZGVmcz4gICAgPGcgaWQ9IkNhbnZhcy1TaWRlYmFyIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4gICAgICAgIDxnIGlkPSJEZXNrdG9wLWdyZWVuLWJsdWlzaC1Db3B5LTkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMC4wMDAwMDAsIC0yMi4wMDAwMDApIj4gICAgICAgICAgICA8ZyBpZD0iR3JvdXAtMyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjAuMDAwMDAwLCAyMi4wMDAwMDApIj4gICAgICAgICAgICAgICAgPHBhdGggZD0iTTAuNSwyLjUgTDIuNSwyLjUiIGlkPSJMaW5lLTIiIHN0cm9rZT0iIzk3OTc5NyIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSI+PC9wYXRoPiAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMTAuNSwyLjUgTDIxLjUsMi41IiBpZD0iTGluZS0yIiBzdHJva2U9IiM5Nzk3OTciIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiPjwvcGF0aD4gICAgICAgICAgICAgICAgPHBhdGggZD0iTTAuNSw4LjUgTDExLjUsOC41IiBpZD0iTGluZS0yIiBzdHJva2U9IiM5Nzk3OTciIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiPjwvcGF0aD4gICAgICAgICAgICAgICAgPHBhdGggZD0iTTE5LjUsOC41IEwyMS41LDguNSIgaWQ9IkxpbmUtMiIgc3Ryb2tlPSIjOTc5Nzk3IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIj48L3BhdGg+ICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0wLjUsMTQuNSBMNS41LDE0LjUiIGlkPSJMaW5lLTIiIHN0cm9rZT0iIzk3OTc5NyIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSI+PC9wYXRoPiAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMTMuNSwxNC41IEwyMS41LDE0LjUiIGlkPSJMaW5lLTIiIHN0cm9rZT0iIzk3OTc5NyIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSI+PC9wYXRoPiAgICAgICAgICAgICAgICA8Y2lyY2xlIGlkPSJPdmFsLTMiIGZpbGw9IiM5Nzk3OTciIGN4PSI2LjUiIGN5PSIyLjUiIHI9IjIuNSI+PC9jaXJjbGU+ICAgICAgICAgICAgICAgIDxjaXJjbGUgaWQ9Ik92YWwtMyIgZmlsbD0iIzk3OTc5NyIgY3g9IjE1LjUiIGN5PSI4LjUiIHI9IjIuNSI+PC9jaXJjbGU+ICAgICAgICAgICAgICAgIDxjaXJjbGUgaWQ9Ik92YWwtMyIgZmlsbD0iIzk3OTc5NyIgY3g9IjkuNSIgY3k9IjE0LjUiIHI9IjIuNSI+PC9jaXJjbGU+ICAgICAgICAgICAgPC9nPiAgICAgICAgPC9nPiAgICA8L2c+PC9zdmc+);\n    background-position: 0px 0px;\n}\n\n.sidebar__close-button:hover {\n    background-color: #111111;\n    opacity: 1.0 !important;\n}\n\n/*\n * SIDEBAR ITEMS\n */\n\n.sidebar__items {\n    /* max-height: 1000px; */\n    /* transition: max-height 0.5;*/\n    background-color: #222;\n}\n\n.sidebar--closed .sidebar__items {\n    /* max-height: 0; */\n    height: 0;\n    display: none;\n    pointer-interactions: none;\n}\n\n.sidebar__item__right {\n    float: right;\n}\n\n/*\n * SIDEBAR GROUP\n */\n\n.sidebar__group {\n    /*background-color: #1A1A1A;*/\n    overflow: hidden;\n    box-sizing: border-box;\n    animate: height;\n    /* max-height: 1000px; */\n    /* transition: max-height 0.5s; */\n    --sidebar-group-header-height: 28px;\n}\n\n.sidebar__group--closed {\n    /* max-height: 13px; */\n    height: var(--sidebar-group-header-height);\n}\n\n.sidebar__group-header {\n    box-sizing: border-box;\n    color: #EEEEEE;\n    background-color: #151515;\n    -webkit-user-select: none;  /* Chrome all / Safari all */\n    -moz-user-select: none;     /* Firefox all */\n    -ms-user-select: none;      /* IE 10+ */\n    user-select: none;          /* Likely future */\n    height: var(--sidebar-group-header-height);\n    padding-top: 7px;\n    text-transform: uppercase;\n    letter-spacing: 0.08em;\n    cursor: pointer;\n    transition: background-color var(--sidebar-hover-transition-time);\n    position: relative;\n}\n\n.sidebar__group-header:hover {\n  background-color: #111111;\n}\n\n.sidebar__group-header-title {\n  /*text-align: center;*/\n  overflow: hidden;\n  padding: 0 15px;\n  padding-top:2px;\n  font-weight:bold;\n}\n\n.sidebar__group-header-icon {\n    width: 17px;\n    height: 14px;\n    background-repeat: no-repeat;\n    display: inline-block;\n    position: absolute;\n    background-size: cover;\n\n    /* icon open */\n    /* feather icon: chevron up */\n    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM4ODg4ODgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0iZmVhdGhlciBmZWF0aGVyLWNoZXZyb24tdXAiPjxwb2x5bGluZSBwb2ludHM9IjE4IDE1IDEyIDkgNiAxNSI+PC9wb2x5bGluZT48L3N2Zz4=);\n    top: 4px;\n    right: 5px;\n    opacity: 0.0;\n    transition: opacity 0.3;\n}\n\n.sidebar__group-header:hover .sidebar__group-header-icon {\n    opacity: 1.0;\n}\n\n/* icon closed */\n.sidebar__group--closed .sidebar__group-header-icon {\n    /* feather icon: chevron down */\n    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM4ODg4ODgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0iZmVhdGhlciBmZWF0aGVyLWNoZXZyb24tZG93biI+PHBvbHlsaW5lIHBvaW50cz0iNiA5IDEyIDE1IDE4IDkiPjwvcG9seWxpbmU+PC9zdmc+);\n    top: 4px;\n    right: 5px;\n}\n\n/*\n * SIDEBAR ITEM\n */\n\n.sidebar__item\n{\n    box-sizing: border-box;\n    padding: 7px;\n    padding-left:15px;\n    padding-right:15px;\n\n    overflow: hidden;\n    position: relative;\n}\n\n.sidebar__item-label {\n    display: inline-block;\n    -webkit-user-select: none;  /* Chrome all / Safari all */\n    -moz-user-select: none;     /* Firefox all */\n    -ms-user-select: none;      /* IE 10+ */\n    user-select: none;          /* Likely future */\n    width: calc(50% - 7px);\n    margin-right: 7px;\n    margin-top: 2px;\n    text-overflow: ellipsis;\n    /* overflow: hidden; */\n}\n\n.sidebar__item-value-label {\n    font-family: var(--sidebar-monospace-font-stack);\n    display: inline-block;\n    text-overflow: ellipsis;\n    overflow: hidden;\n    white-space: nowrap;\n    max-width: 60%;\n}\n\n.sidebar__item-value-label::selection {\n    background-color: #24baa7;\n    color: #EEEEEE;\n}\n\n.sidebar__item + .sidebar__item,\n.sidebar__item + .sidebar__group,\n.sidebar__group + .sidebar__item,\n.sidebar__group + .sidebar__group {\n    border-top: 1px solid #272727;\n}\n\n/*\n * SIDEBAR ITEM TOGGLE\n */\n\n.sidebar__toggle {\n    cursor: pointer;\n}\n\n.sidebar__toggle-input {\n    --sidebar-toggle-input-color: #CCCCCC;\n    --sidebar-toggle-input-color-hover: #EEEEEE;\n    --sidebar-toggle-input-border-size: 2px;\n    display: inline;\n    float: right;\n    box-sizing: border-box;\n    border-radius: 50%;\n    cursor: pointer;\n    --toggle-size: 11px;\n    margin-top: 2px;\n    background-color: transparent !important;\n    border: var(--sidebar-toggle-input-border-size) solid var(--sidebar-toggle-input-color);\n    width: var(--toggle-size);\n    height: var(--toggle-size);\n    transition: background-color var(--sidebar-hover-transition-time);\n    transition: border-color var(--sidebar-hover-transition-time);\n}\n.sidebar__toggle:hover .sidebar__toggle-input {\n    border-color: var(--sidebar-toggle-input-color-hover);\n}\n\n.sidebar__toggle .sidebar__item-value-label {\n    -webkit-user-select: none;  /* Chrome all / Safari all */\n    -moz-user-select: none;     /* Firefox all */\n    -ms-user-select: none;      /* IE 10+ */\n    user-select: none;          /* Likely future */\n    max-width: calc(50% - 12px);\n}\n.sidebar__toggle-input::after { clear: both; }\n\n.sidebar__toggle--active .icon_toggle\n{\n\n    background-image: url(data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjE1cHgiIHdpZHRoPSIzMHB4IiBmaWxsPSIjMDZmNzhiIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTAwIDEwMCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PGcgZGlzcGxheT0ibm9uZSI+PGcgZGlzcGxheT0iaW5saW5lIj48Zz48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZmlsbD0iIzA2Zjc4YiIgZD0iTTMwLDI3QzE3LjM1LDI3LDcsMzcuMzUsNyw1MGwwLDBjMCwxMi42NSwxMC4zNSwyMywyMywyM2g0MCBjMTIuNjUsMCwyMy0xMC4zNSwyMy0yM2wwLDBjMC0xMi42NS0xMC4zNS0yMy0yMy0yM0gzMHogTTcwLDY3Yy05LjM4OSwwLTE3LTcuNjEtMTctMTdzNy42MTEtMTcsMTctMTdzMTcsNy42MSwxNywxNyAgICAgUzc5LjM4OSw2Nyw3MCw2N3oiPjwvcGF0aD48L2c+PC9nPjwvZz48Zz48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMwLDI3QzE3LjM1LDI3LDcsMzcuMzUsNyw1MGwwLDBjMCwxMi42NSwxMC4zNSwyMywyMywyM2g0MCAgIGMxMi42NSwwLDIzLTEwLjM1LDIzLTIzbDAsMGMwLTEyLjY1LTEwLjM1LTIzLTIzLTIzSDMweiBNNzAsNjdjLTkuMzg5LDAtMTctNy42MS0xNy0xN3M3LjYxMS0xNywxNy0xN3MxNyw3LjYxLDE3LDE3ICAgUzc5LjM4OSw2Nyw3MCw2N3oiPjwvcGF0aD48L2c+PGcgZGlzcGxheT0ibm9uZSI+PGcgZGlzcGxheT0iaW5saW5lIj48cGF0aCBmaWxsPSIjMDZmNzhiIiBzdHJva2U9IiMwNmY3OGIiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBkPSJNNyw1MGMwLDEyLjY1LDEwLjM1LDIzLDIzLDIzaDQwICAgIGMxMi42NSwwLDIzLTEwLjM1LDIzLTIzbDAsMGMwLTEyLjY1LTEwLjM1LTIzLTIzLTIzSDMwQzE3LjM1LDI3LDcsMzcuMzUsNyw1MEw3LDUweiI+PC9wYXRoPjwvZz48Y2lyY2xlIGRpc3BsYXk9ImlubGluZSIgZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGZpbGw9IiMwNmY3OGIiIHN0cm9rZT0iIzA2Zjc4YiIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIGN4PSI3MCIgY3k9IjUwIiByPSIxNyI+PC9jaXJjbGU+PC9nPjxnIGRpc3BsYXk9Im5vbmUiPjxwYXRoIGRpc3BsYXk9ImlubGluZSIgZD0iTTcwLDI1SDMwQzE2LjIxNSwyNSw1LDM2LjIxNSw1LDUwczExLjIxNSwyNSwyNSwyNWg0MGMxMy43ODUsMCwyNS0xMS4yMTUsMjUtMjVTODMuNzg1LDI1LDcwLDI1eiBNNzAsNzEgICBIMzBDMTguNDIxLDcxLDksNjEuNTc5LDksNTBzOS40MjEtMjEsMjEtMjFoNDBjMTEuNTc5LDAsMjEsOS40MjEsMjEsMjFTODEuNTc5LDcxLDcwLDcxeiBNNzAsMzFjLTEwLjQ3NywwLTE5LDguNTIzLTE5LDE5ICAgczguNTIzLDE5LDE5LDE5czE5LTguNTIzLDE5LTE5UzgwLjQ3NywzMSw3MCwzMXogTTcwLDY1Yy04LjI3MSwwLTE1LTYuNzI5LTE1LTE1czYuNzI5LTE1LDE1LTE1czE1LDYuNzI5LDE1LDE1Uzc4LjI3MSw2NSw3MCw2NXoiPjwvcGF0aD48L2c+PC9zdmc+);\n    opacity: 1;\n    transform: rotate(0deg);\n}\n\n\n.icon_toggle\n{\n    float: right;\n    width:40px;\n    height:18px;\n    background-image: url(data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjE1cHgiIHdpZHRoPSIzMHB4IiBmaWxsPSIjYWFhYWFhIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTAwIDEwMCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PGcgZGlzcGxheT0ibm9uZSI+PGcgZGlzcGxheT0iaW5saW5lIj48Zz48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZmlsbD0iI2FhYWFhYSIgZD0iTTMwLDI3QzE3LjM1LDI3LDcsMzcuMzUsNyw1MGwwLDBjMCwxMi42NSwxMC4zNSwyMywyMywyM2g0MCBjMTIuNjUsMCwyMy0xMC4zNSwyMy0yM2wwLDBjMC0xMi42NS0xMC4zNS0yMy0yMy0yM0gzMHogTTcwLDY3Yy05LjM4OSwwLTE3LTcuNjEtMTctMTdzNy42MTEtMTcsMTctMTdzMTcsNy42MSwxNywxNyAgICAgUzc5LjM4OSw2Nyw3MCw2N3oiPjwvcGF0aD48L2c+PC9nPjwvZz48Zz48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMwLDI3QzE3LjM1LDI3LDcsMzcuMzUsNyw1MGwwLDBjMCwxMi42NSwxMC4zNSwyMywyMywyM2g0MCAgIGMxMi42NSwwLDIzLTEwLjM1LDIzLTIzbDAsMGMwLTEyLjY1LTEwLjM1LTIzLTIzLTIzSDMweiBNNzAsNjdjLTkuMzg5LDAtMTctNy42MS0xNy0xN3M3LjYxMS0xNywxNy0xN3MxNyw3LjYxLDE3LDE3ICAgUzc5LjM4OSw2Nyw3MCw2N3oiPjwvcGF0aD48L2c+PGcgZGlzcGxheT0ibm9uZSI+PGcgZGlzcGxheT0iaW5saW5lIj48cGF0aCBmaWxsPSIjYWFhYWFhIiBzdHJva2U9IiNhYWFhYWEiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBkPSJNNyw1MGMwLDEyLjY1LDEwLjM1LDIzLDIzLDIzaDQwICAgIGMxMi42NSwwLDIzLTEwLjM1LDIzLTIzbDAsMGMwLTEyLjY1LTEwLjM1LTIzLTIzLTIzSDMwQzE3LjM1LDI3LDcsMzcuMzUsNyw1MEw3LDUweiI+PC9wYXRoPjwvZz48Y2lyY2xlIGRpc3BsYXk9ImlubGluZSIgZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGZpbGw9IiNhYWFhYWEiIHN0cm9rZT0iI2FhYWFhYSIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIGN4PSI3MCIgY3k9IjUwIiByPSIxNyI+PC9jaXJjbGU+PC9nPjxnIGRpc3BsYXk9Im5vbmUiPjxwYXRoIGRpc3BsYXk9ImlubGluZSIgZD0iTTcwLDI1SDMwQzE2LjIxNSwyNSw1LDM2LjIxNSw1LDUwczExLjIxNSwyNSwyNSwyNWg0MGMxMy43ODUsMCwyNS0xMS4yMTUsMjUtMjVTODMuNzg1LDI1LDcwLDI1eiBNNzAsNzEgICBIMzBDMTguNDIxLDcxLDksNjEuNTc5LDksNTBzOS40MjEtMjEsMjEtMjFoNDBjMTEuNTc5LDAsMjEsOS40MjEsMjEsMjFTODEuNTc5LDcxLDcwLDcxeiBNNzAsMzFjLTEwLjQ3NywwLTE5LDguNTIzLTE5LDE5ICAgczguNTIzLDE5LDE5LDE5czE5LTguNTIzLDE5LTE5UzgwLjQ3NywzMSw3MCwzMXogTTcwLDY1Yy04LjI3MSwwLTE1LTYuNzI5LTE1LTE1czYuNzI5LTE1LDE1LTE1czE1LDYuNzI5LDE1LDE1Uzc4LjI3MSw2NSw3MCw2NXoiPjwvcGF0aD48L2c+PC9zdmc+);\n    background-size: 50px 37px;\n    background-position: -6px -10px;\n    transform: rotate(180deg);\n    opacity: 0.4;\n}\n\n\n\n/*.sidebar__toggle--active .sidebar__toggle-input {*/\n/*    transition: background-color var(--sidebar-hover-transition-time);*/\n/*    background-color: var(--sidebar-toggle-input-color);*/\n/*}*/\n/*.sidebar__toggle--active .sidebar__toggle-input:hover*/\n/*{*/\n/*    background-color: var(--sidebar-toggle-input-color-hover);*/\n/*    border-color: var(--sidebar-toggle-input-color-hover);*/\n/*    transition: background-color var(--sidebar-hover-transition-time);*/\n/*    transition: border-color var(--sidebar-hover-transition-time);*/\n/*}*/\n\n/*\n * SIDEBAR ITEM BUTTON\n */\n\n.sidebar__button {}\n\n.sidebar__button-input {\n    -webkit-user-select: none;  /* Chrome all / Safari all */\n    -moz-user-select: none;     /* Firefox all */\n    -ms-user-select: none;      /* IE 10+ */\n    user-select: none;          /* Likely future */\n    height: 24px;\n    background-color: transparent;\n    color: #CCCCCC;\n    box-sizing: border-box;\n    padding-top: 3px;\n    text-align: center;\n    border-radius: 125px;\n    border:2px solid #555;\n    cursor: pointer;\n}\n\n.sidebar__button-input.plus, .sidebar__button-input.minus {\n    display: inline-block;\n    min-width: 20px;\n}\n\n.sidebar__button-input:hover {\n  background-color: #333;\n  border:2px solid #07f78c;\n}\n\n/*\n * VALUE DISPLAY (shows a value)\n */\n\n.sidebar__value-display {}\n\n/*\n * SLIDER\n */\n\n.sidebar__slider {\n    --sidebar-slider-input-height: 3px;\n}\n\n.sidebar__slider-input-wrapper {\n    width: 100%;\n    margin-top: 8px;\n    position: relative;\n}\n\n.sidebar__slider-input {\n    -webkit-appearance: none;\n    appearance: none;\n    margin: 0;\n    width: 100%;\n    height: var(--sidebar-slider-input-height);\n    background: #555;\n    cursor: pointer;\n    outline: 0;\n\n    -webkit-transition: .2s;\n    transition: background-color .2s;\n    border: none;\n}\n\n.sidebar__slider-input:focus, .sidebar__slider-input:hover {\n    border: none;\n}\n\n.sidebar__slider-input-active-track {\n    user-select: none;\n    position: absolute;\n    z-index: 11;\n    top: 0;\n    left: 0;\n    background-color: #07f78c;\n    pointer-events: none;\n    height: var(--sidebar-slider-input-height);\n\n    /* width: 10px; */\n}\n\n/* Mouse-over effects */\n.sidebar__slider-input:hover {\n    /*background-color: #444444;*/\n}\n\n/*.sidebar__slider-input::-webkit-progress-value {*/\n/*    background-color: green;*/\n/*    color:green;*/\n\n/*    }*/\n\n/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */\n\n.sidebar__slider-input::-moz-range-thumb\n{\n    position: absolute;\n    height: 15px;\n    width: 15px;\n    z-index: 900 !important;\n    border-radius: 20px !important;\n    cursor: pointer;\n    background: #07f78c !important;\n    user-select: none;\n\n}\n\n.sidebar__slider-input::-webkit-slider-thumb\n{\n    position: relative;\n    appearance: none;\n    -webkit-appearance: none;\n    user-select: none;\n    height: 15px;\n    width: 15px;\n    display: block;\n    z-index: 900 !important;\n    border: 0;\n    border-radius: 20px !important;\n    cursor: pointer;\n    background: #777 !important;\n}\n\n.sidebar__slider-input:hover ::-webkit-slider-thumb {\n    background-color: #EEEEEE !important;\n}\n\n/*.sidebar__slider-input::-moz-range-thumb {*/\n\n/*    width: 0 !important;*/\n/*    height: var(--sidebar-slider-input-height);*/\n/*    background: #EEEEEE;*/\n/*    cursor: pointer;*/\n/*    border-radius: 0 !important;*/\n/*    border: none;*/\n/*    outline: 0;*/\n/*    z-index: 100 !important;*/\n/*}*/\n\n.sidebar__slider-input::-moz-range-track {\n    background-color: transparent;\n    z-index: 11;\n}\n\n/*.sidebar__slider-input::-moz-range-thumb:hover {*/\n  /* background-color: #EEEEEE; */\n/*}*/\n\n\n/*.sidebar__slider-input-wrapper:hover .sidebar__slider-input-active-track {*/\n/*    background-color: #EEEEEE;*/\n/*}*/\n\n/*.sidebar__slider-input-wrapper:hover .sidebar__slider-input::-moz-range-thumb {*/\n/*    background-color: #fff !important;*/\n/*}*/\n\n/*.sidebar__slider-input-wrapper:hover .sidebar__slider-input::-webkit-slider-thumb {*/\n/*    background-color: #EEEEEE;*/\n/*}*/\n\n.sidebar__slider input[type=text] {\n    box-sizing: border-box;\n    /*background-color: #333333;*/\n    text-align: right;\n    color: #BBBBBB;\n    display: inline-block;\n    background-color: transparent !important;\n\n    width: 40%;\n    height: 18px;\n    outline: none;\n    border: none;\n    border-radius: 0;\n    padding: 0 0 0 4px !important;\n    margin: 0;\n}\n\n.sidebar__slider input[type=text]:active,\n.sidebar__slider input[type=text]:focus,\n.sidebar__slider input[type=text]:hover {\n\n    color: #EEEEEE;\n}\n\n/*\n * TEXT / DESCRIPTION\n */\n\n.sidebar__text .sidebar__item-label {\n    width: auto;\n    display: block;\n    max-height: none;\n    margin-right: 0;\n    line-height: 1.1em;\n}\n\n/*\n * SIDEBAR INPUT\n */\n.sidebar__text-input textarea,\n.sidebar__text-input input[type=text] {\n    box-sizing: border-box;\n    background-color: #333333;\n    color: #BBBBBB;\n    display: inline-block;\n    width: 50%;\n    height: 18px;\n    outline: none;\n    border: none;\n    border-radius: 0;\n    border:1px solid #666;\n    padding: 0 0 0 4px !important;\n    margin: 0;\n}\n\n.sidebar__color-picker .sidebar__item-label\n{\n    width:45%;\n}\n\n.sidebar__text-input textarea,\n.sidebar__text-input input[type=text]:active,\n.sidebar__text-input input[type=text]:focus,\n.sidebar__text-input input[type=text]:hover {\n    background-color: transparent;\n    color: #EEEEEE;\n}\n\n.sidebar__text-input textarea\n{\n    margin-top:10px;\n    height:60px;\n    width:100%;\n}\n\n/*\n * SIDEBAR SELECT\n */\n\n\n\n .sidebar__select {}\n .sidebar__select-select {\n    color: #BBBBBB;\n    /*-webkit-appearance: none;*/\n    /*-moz-appearance: none;*/\n    appearance: none;\n    /*box-sizing: border-box;*/\n    width: 50%;\n    height: 20px;\n    background-color: #333333;\n    /*background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM4ODg4ODgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0iZmVhdGhlciBmZWF0aGVyLWNoZXZyb24tZG93biI+PHBvbHlsaW5lIHBvaW50cz0iNiA5IDEyIDE1IDE4IDkiPjwvcG9seWxpbmU+PC9zdmc+);*/\n    background-repeat: no-repeat;\n    background-position: right center;\n    background-size: 16px 16px;\n    margin: 0;\n    /*padding: 0 2 2 6px;*/\n    border-radius: 5px;\n    border: 1px solid #777;\n    background-color: #444;\n    cursor: pointer;\n    outline: none;\n\n }\n\n.sidebar__select-select:hover,\n.sidebar__select-select:active,\n.sidebar__select-select:active {\n    background-color: #444444;\n    color: #EEEEEE;\n}\n\n/*\n * COLOR PICKER\n */\n\n .sidebar__color-picker-color-input {}\n\n .sidebar__color-picker input[type=text] {\n    box-sizing: border-box;\n    background-color: #333333;\n    color: #BBBBBB;\n    display: inline-block;\n    width: calc(50% - 21px); /* 50% minus space of picker circle */\n    height: 18px;\n    outline: none;\n    border: none;\n    border-radius: 0;\n    padding: 0 0 0 4px !important;\n    margin: 0;\n    margin-right: 7px;\n}\n\n.sidebar__color-picker input[type=text]:active,\n.sidebar__color-picker input[type=text]:focus,\n.sidebar__color-picker input[type=text]:hover {\n    background-color: #444444;\n    color: #EEEEEE;\n}\n\n.sidebar__color-picker input[type=color],\n.sidebar__palette-picker input[type=color] {\n    display: inline-block;\n    border-radius: 100%;\n    height: 14px;\n    width: 14px;\n    padding: 0;\n    border: none;\n    border-color: transparent;\n    outline: none;\n    background: none;\n    appearance: none;\n    -moz-appearance: none;\n    -webkit-appearance: none;\n    cursor: pointer;\n    position: relative;\n    top: 3px;\n}\n.sidebar__color-picker input[type=color]:focus,\n.sidebar__palette-picker input[type=color]:focus {\n    outline: none;\n}\n.sidebar__color-picker input[type=color]::-moz-color-swatch,\n.sidebar__palette-picker input[type=color]::-moz-color-swatch {\n    border: none;\n}\n.sidebar__color-picker input[type=color]::-webkit-color-swatch-wrapper,\n.sidebar__palette-picker input[type=color]::-webkit-color-swatch-wrapper {\n    padding: 0;\n}\n.sidebar__color-picker input[type=color]::-webkit-color-swatch,\n.sidebar__palette-picker input[type=color]::-webkit-color-swatch {\n    border: none;\n    border-radius: 100%;\n}\n\n/*\n * Palette Picker\n */\n.sidebar__palette-picker .sidebar__palette-picker-color-input.first {\n    margin-left: 0;\n}\n.sidebar__palette-picker .sidebar__palette-picker-color-input.last {\n    margin-right: 0;\n}\n.sidebar__palette-picker .sidebar__palette-picker-color-input {\n    margin: 0 4px;\n}\n\n.sidebar__palette-picker .circlebutton {\n    width: 14px;\n    height: 14px;\n    border-radius: 1em;\n    display: inline-block;\n    top: 3px;\n    position: relative;\n}\n\n/*\n * Preset\n */\n.sidebar__item-presets-preset\n{\n    padding:4px;\n    cursor:pointer;\n    padding-left:8px;\n    padding-right:8px;\n    margin-right:4px;\n    background-color:#444;\n}\n\n.sidebar__item-presets-preset:hover\n{\n    background-color:#666;\n}\n\n.sidebar__greyout\n{\n    background: #222;\n    opacity: 0.8;\n    width: 100%;\n    height: 100%;\n    position: absolute;\n    z-index: 1000;\n    right: 0;\n    top: 0;\n}\n",};
 // vars
-const CSS_ELEMENT_CLASS = 'cables-sidebar-style'; /* class for the style element to be generated */
-const CSS_ELEMENT_DYNAMIC_CLASS = 'cables-sidebar-dynamic-style'; /* things which can be set via op-port, but not attached to the elements themselves, e.g. minimized opacity */
-const SIDEBAR_CLASS = 'sidebar-cables';
-const SIDEBAR_ID = 'sidebar'+CABLES.uuid();
-const SIDEBAR_ITEMS_CLASS = 'sidebar__items';
-const SIDEBAR_OPEN_CLOSE_BTN_CLASS = 'sidebar__close-button';
-const SIDEBAR_OPEN_CLOSE_BTN_ICON_CLASS = 'sidebar__close-button-icon';
-const BTN_TEXT_OPEN = ''; // 'Close';
-const BTN_TEXT_CLOSED = ''; // 'Show Controls';
+const CSS_ELEMENT_CLASS = "cables-sidebar-style"; /* class for the style element to be generated */
+const CSS_ELEMENT_DYNAMIC_CLASS = "cables-sidebar-dynamic-style"; /* things which can be set via op-port, but not attached to the elements themselves, e.g. minimized opacity */
+const SIDEBAR_CLASS = "sidebar-cables";
+const SIDEBAR_ID = "sidebar" + CABLES.uuid();
+const SIDEBAR_ITEMS_CLASS = "sidebar__items";
+const SIDEBAR_OPEN_CLOSE_BTN_CLASS = "sidebar__close-button";
+const SIDEBAR_OPEN_CLOSE_BTN_ICON_CLASS = "sidebar__close-button-icon";
+const BTN_TEXT_OPEN = ""; // 'Close';
+const BTN_TEXT_CLOSED = ""; // 'Show Controls';
 
 let openCloseBtn = null;
 let openCloseBtnIcon = null;
-var headerTitleText=null;
+let headerTitleText = null;
 
 // inputs
-var visiblePort = op.inValueBool("Visible", true);
-var opacityPort = op.inValueSlider('Opacity', 1);
-var defaultMinimizedPort = op.inValueBool('Default Minimized');
-var minimizedOpacityPort = op.inValueSlider('Minimized Opacity', 0.5);
+const visiblePort = op.inValueBool("Visible", true);
+const opacityPort = op.inValueSlider("Opacity", 1);
+const defaultMinimizedPort = op.inValueBool("Default Minimized");
+const minimizedOpacityPort = op.inValueSlider("Minimized Opacity", 0.5);
 
-var inTitle = op.inString('Title','Sidebar');
-var side = op.inValueBool('Side');
+const inTitle = op.inString("Title", "Sidebar");
+const side = op.inValueBool("Side");
 
 // outputs
-var childrenPort = op.outObject('childs');
+const childrenPort = op.outObject("childs");
 
-var sidebarEl = document.querySelector('.' + SIDEBAR_ID);
-if(!sidebarEl) {
+let sidebarEl = document.querySelector("." + SIDEBAR_ID);
+if (!sidebarEl)
+{
     sidebarEl = initSidebarElement();
 }
 // if(!sidebarEl) return;
-var sidebarItemsEl = sidebarEl.querySelector('.' + SIDEBAR_ITEMS_CLASS);
+const sidebarItemsEl = sidebarEl.querySelector("." + SIDEBAR_ITEMS_CLASS);
 childrenPort.set({
-    parentElement: sidebarItemsEl,
-    parentOp: op,
+    "parentElement": sidebarItemsEl,
+    "parentOp": op,
 });
 onDefaultMinimizedPortChanged();
 initSidebarCss();
@@ -4665,43 +4638,51 @@ op.onDelete = onDelete;
 
 // functions
 
-function onMinimizedOpacityPortChanged() {
+function onMinimizedOpacityPortChanged()
+{
     updateDynamicStyles();
 }
 
-side.onChange=function()
+side.onChange = function ()
 {
-    if(side.get()) sidebarEl.classList.add('sidebar-cables-right');
-        else sidebarEl.classList.remove('sidebar-cables-right');
+    if (side.get()) sidebarEl.classList.add("sidebar-cables-right");
+    else sidebarEl.classList.remove("sidebar-cables-right");
 };
 
-
-function onDefaultMinimizedPortChanged() {
-    if(!openCloseBtn) { return; }
-    if(defaultMinimizedPort.get()) {
-        sidebarEl.classList.add('sidebar--closed');
+function onDefaultMinimizedPortChanged()
+{
+    if (!openCloseBtn) { return; }
+    if (defaultMinimizedPort.get())
+    {
+        sidebarEl.classList.add("sidebar--closed");
         // openCloseBtn.textContent = BTN_TEXT_CLOSED;
-    } else {
-        sidebarEl.classList.remove('sidebar--closed');
+    }
+    else
+    {
+        sidebarEl.classList.remove("sidebar--closed");
         // openCloseBtn.textContent = BTN_TEXT_OPEN;
     }
 }
 
 function onOpacityPortChange()
 {
-    var opacity = opacityPort.get();
+    const opacity = opacityPort.get();
     sidebarEl.style.opacity = opacity;
 }
 
-function onVisiblePortChange() {
-    if(visiblePort.get()) {
-        sidebarEl.style.display = 'block';
-    } else {
-        sidebarEl.style.display = 'none';
+function onVisiblePortChange()
+{
+    if (visiblePort.get())
+    {
+        sidebarEl.style.display = "block";
+    }
+    else
+    {
+        sidebarEl.style.display = "none";
     }
 }
 
-side.onChanged=function()
+side.onChanged = function ()
 {
 
 };
@@ -4712,74 +4693,73 @@ side.onChanged=function()
  */
 function updateDynamicStyles()
 {
-    let dynamicStyles = document.querySelectorAll('.' + CSS_ELEMENT_DYNAMIC_CLASS);
-    if(dynamicStyles)
+    const dynamicStyles = document.querySelectorAll("." + CSS_ELEMENT_DYNAMIC_CLASS);
+    if (dynamicStyles)
     {
-        dynamicStyles.forEach(function(e)
+        dynamicStyles.forEach(function (e)
         {
             e.parentNode.removeChild(e);
         });
     }
-    let newDynamicStyle = document.createElement('style');
+    const newDynamicStyle = document.createElement("style");
     newDynamicStyle.classList.add(CSS_ELEMENT_DYNAMIC_CLASS);
-    let cssText = '.sidebar--closed .sidebar__close-button { ';
-    cssText +=         'opacity: ' + minimizedOpacityPort.get();
-    cssText +=     '}';
-    let cssTextEl = document.createTextNode(cssText);
+    let cssText = ".sidebar--closed .sidebar__close-button { ";
+    cssText += "opacity: " + minimizedOpacityPort.get();
+    cssText += "}";
+    const cssTextEl = document.createTextNode(cssText);
     newDynamicStyle.appendChild(cssTextEl);
     document.body.appendChild(newDynamicStyle);
 }
 
 function initSidebarElement()
 {
-    var element = document.createElement('div');
+    const element = document.createElement("div");
     element.classList.add(SIDEBAR_CLASS);
     element.classList.add(SIDEBAR_ID);
-    var canvasWrapper = op.patch.cgl.canvas.parentElement; /* maybe this is bad outside cables!? */
+    const canvasWrapper = op.patch.cgl.canvas.parentElement; /* maybe this is bad outside cables!? */
 
     // header...
-    var headerGroup = document.createElement('div');
-    headerGroup.classList.add('sidebar__group');
+    const headerGroup = document.createElement("div");
+    headerGroup.classList.add("sidebar__group");
     element.appendChild(headerGroup);
-    var header = document.createElement('div');
-    header.classList.add('sidebar__group-header');
+    const header = document.createElement("div");
+    header.classList.add("sidebar__group-header");
     element.appendChild(header);
-    var headerTitle = document.createElement('div');
-    headerTitle.classList.add('sidebar__group-header-title');
-    headerTitleText = document.createElement('span');
-    headerTitleText.classList.add('sidebar__group-header-title-text');
-    headerTitleText.innerHTML=inTitle.get();
+    const headerTitle = document.createElement("div");
+    headerTitle.classList.add("sidebar__group-header-title");
+    headerTitleText = document.createElement("span");
+    headerTitleText.classList.add("sidebar__group-header-title-text");
+    headerTitleText.innerHTML = inTitle.get();
     headerTitle.appendChild(headerTitleText);
     header.appendChild(headerTitle);
     headerGroup.appendChild(header);
     element.appendChild(headerGroup);
-    headerGroup.addEventListener('click', onOpenCloseBtnClick);
+    headerGroup.addEventListener("click", onOpenCloseBtnClick);
 
-    if(!canvasWrapper)
+    if (!canvasWrapper)
     {
-        console.warn("[sidebar] no canvas parentelement found...");
+        op.warn("[sidebar] no canvas parentelement found...");
         return;
     }
     canvasWrapper.appendChild(element);
-    var items = document.createElement('div');
+    const items = document.createElement("div");
     items.classList.add(SIDEBAR_ITEMS_CLASS);
     element.appendChild(items);
-    openCloseBtn = document.createElement('div');
+    openCloseBtn = document.createElement("div");
     openCloseBtn.classList.add(SIDEBAR_OPEN_CLOSE_BTN_CLASS);
-    openCloseBtn.addEventListener('click', onOpenCloseBtnClick);
+    openCloseBtn.addEventListener("click", onOpenCloseBtnClick);
     // openCloseBtn.textContent = BTN_TEXT_OPEN;
     element.appendChild(openCloseBtn);
-    openCloseBtnIcon = document.createElement('span');
+    openCloseBtnIcon = document.createElement("span");
     openCloseBtnIcon.classList.add(SIDEBAR_OPEN_CLOSE_BTN_ICON_CLASS);
     openCloseBtn.appendChild(openCloseBtnIcon);
 
     return element;
 }
 
-inTitle.onChange=function()
+inTitle.onChange = function ()
 {
-    if(headerTitleText)headerTitleText.innerHTML=inTitle.get();
-
+    if (headerTitleText)headerTitleText.innerHTML = inTitle.get();
 };
 
 function setClosed(b)
@@ -4790,36 +4770,40 @@ function setClosed(b)
 function onOpenCloseBtnClick(ev)
 {
     ev.stopPropagation();
-    if(!sidebarEl) { console.error('Sidebar could not be closed...'); return; }
-    sidebarEl.classList.toggle('sidebar--closed');
+    if (!sidebarEl) { op.error("Sidebar could not be closed..."); return; }
+    sidebarEl.classList.toggle("sidebar--closed");
     const btn = ev.target;
     let btnText = BTN_TEXT_OPEN;
-    if(sidebarEl.classList.contains('sidebar--closed')) btnText = BTN_TEXT_CLOSED;
+    if (sidebarEl.classList.contains("sidebar--closed")) btnText = BTN_TEXT_CLOSED;
 }
 
-function initSidebarCss() {
-    //var cssEl = document.getElementById(CSS_ELEMENT_ID);
-    var cssElements = document.querySelectorAll('.' + CSS_ELEMENT_CLASS);
+function initSidebarCss()
+{
+    // var cssEl = document.getElementById(CSS_ELEMENT_ID);
+    const cssElements = document.querySelectorAll("." + CSS_ELEMENT_CLASS);
     // remove old script tag
-    if(cssElements) {
-        cssElements.forEach(function(e) {
+    if (cssElements)
+    {
+        cssElements.forEach(function (e)
+        {
             e.parentNode.removeChild(e);
         });
     }
-    var newStyle = document.createElement('style');
+    const newStyle = document.createElement("style");
     newStyle.innerHTML = attachments.style_css;
     newStyle.classList.add(CSS_ELEMENT_CLASS);
     document.body.appendChild(newStyle);
 }
 
-function onDelete() {
+function onDelete()
+{
     removeElementFromDOM(sidebarEl);
 }
 
-function removeElementFromDOM(el) {
-    if(el && el.parentNode && el.parentNode.removeChild) el.parentNode.removeChild(el);
+function removeElementFromDOM(el)
+{
+    if (el && el.parentNode && el.parentNode.removeChild) el.parentNode.removeChild(el);
 }
-
 
 
 };
@@ -4972,20 +4956,20 @@ CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={};
 // inputs
-var parentPort = op.inObject('link');
-var labelPort = op.inString('Text', 'Value');
-var inId = op.inValueString('Id', '');
+const parentPort = op.inObject("link");
+const labelPort = op.inString("Text", "Value");
+const inId = op.inValueString("Id", "");
 
 // outputs
-var siblingsPort = op.outObject('childs');
+const siblingsPort = op.outObject("childs");
 
 // vars
-var el = document.createElement('div');
-el.classList.add('sidebar__item');
-el.classList.add('sidebar__text');
-var label = document.createElement('div');
-label.classList.add('sidebar__item-label');
-var labelText = document.createTextNode(labelPort.get());
+const el = document.createElement("div");
+el.classList.add("sidebar__item");
+el.classList.add("sidebar__text");
+const label = document.createElement("div");
+label.classList.add("sidebar__item-label");
+const labelText = document.createTextNode(labelPort.get());
 label.appendChild(labelText);
 el.appendChild(label);
 
@@ -4995,58 +4979,75 @@ labelPort.onChange = onLabelTextChanged;
 inId.onChange = onIdChanged;
 op.onDelete = onDelete;
 
-op.toWorkNeedsParent('Ops.Sidebar.Sidebar');
+op.toWorkNeedsParent("Ops.Sidebar.Sidebar");
 
 // functions
 
 function onIdChanged()
 {
-    el.id=inId.get();
+    el.id = inId.get();
 }
 
-function onLabelTextChanged() {
-    var labelText = labelPort.get();
+function onLabelTextChanged()
+{
+    const labelText = labelPort.get();
     label.textContent = labelText;
-    if(CABLES.UI) {
-        if(labelText && typeof labelText === 'string') {
-            op.setTitle('Text: ' + labelText.substring(0, 10)); // display first 10 characters of text in op title
-        } else {
-            op.setTitle('Text');
+    if (CABLES.UI)
+    {
+        if (labelText && typeof labelText === "string")
+        {
+            op.setTitle("Text: " + labelText.substring(0, 10)); // display first 10 characters of text in op title
+        }
+        else
+        {
+            op.setTitle("Text");
         }
     }
 }
 
-function onParentChanged() {
-    var parent = parentPort.get();
-    if(parent && parent.parentElement) {
+function onParentChanged()
+{
+    const parent = parentPort.get();
+    if (parent && parent.parentElement)
+    {
         parent.parentElement.appendChild(el);
         siblingsPort.set(null);
         siblingsPort.set(parent);
-    } else { // detach
-        if(el.parentElement) {
+    }
+    else
+    { // detach
+        if (el.parentElement)
+        {
             el.parentElement.removeChild(el);
         }
     }
 }
 
-function showElement(el) {
-    if(el) {
-        el.style.display = 'block';
+function showElement(el)
+{
+    if (el)
+    {
+        el.style.display = "block";
     }
 }
 
-function hideElement(el) {
-    if(el) {
-        el.style.display = 'none';
+function hideElement(el)
+{
+    if (el)
+    {
+        el.style.display = "none";
     }
 }
 
-function onDelete() {
+function onDelete()
+{
     removeElementFromDOM(el);
 }
 
-function removeElementFromDOM(el) {
-    if(el && el.parentNode && el.parentNode.removeChild) {
+function removeElementFromDOM(el)
+{
+    if (el && el.parentNode && el.parentNode.removeChild)
+    {
         el.parentNode.removeChild(el);
     }
 }
@@ -5453,7 +5454,7 @@ function onValuesPortChange()
         {
             const optionEl = document.createElement("option");
             optionEl.setAttribute("value", option);
-            if (option === defaultValue)
+            if (option === defaultValue || option === valuePort.get())
             {
                 optionEl.setAttribute("selected", "");
             }
@@ -5466,6 +5467,7 @@ function onValuesPortChange()
     {
         valuePort.set("");
     }
+
     setSelectedProperty(); /* set the selected property for the default value */
 }
 
@@ -5475,7 +5477,7 @@ function setSelectedProperty()
     const optionElements = input.querySelectorAll("option");
     optionElements.forEach(function (optionElement, index)
     {
-        if (optionElement.value === defaultItem)
+        if (optionElement.value.trim() === defaultItem.trim() || optionElement.value.trim() === valuePort.get())
         {
             optionElement.setAttribute("selected", "");
             outIndex.set(index);
@@ -5599,7 +5601,10 @@ function parse()
         return;
     }
 
-    const r = text.get().split(separator.get());
+    const sep = separator.get();
+    if (separator.get() == "\\n")sep == "\n";
+    const r = text.get().split(sep);
+
 
     if (r[r.length - 1] === "") r.length -= 1;
 
@@ -5754,211 +5759,6 @@ number.onChange=function()
 
 Ops.Math.Log.prototype = new CABLES.Op();
 CABLES.OPS["7440b1ca-71d9-42a3-a927-d7b45b8857f9"]={f:Ops.Math.Log,objName:"Ops.Math.Log"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.User.alivemachine.MyWebcam
-// 
-// **************************************************************
-
-Ops.User.alivemachine.MyWebcam = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-// todo: https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints/facingMode
-loadDaFun();
-function loadDaFun() {
-   var script = document.createElement('script');
-   script.src = 'https://webrtc.github.io/adapter/adapter-latest.js';
-   var head = document.getElementsByTagName("head")[0];
-   head.appendChild(script);
-}
-const
-    inFacing = op.inSwitch("Facing", ["environment", "user"], "user"),
-    flip = op.inValueBool("flip"),
-    fps = op.inValueInt("fps"),
-    width = op.inValueInt("Width", 640),
-    height = op.inValueInt("Height", 480),
-    inActive = op.inValueBool("Active", true),
-    inStyle = op.inValueEditor("Style", "position:absolute;z-index:9999;", "none"),
-    inCap = op.inTriggerButton("Capture"),
-    textureOut = op.outTexture("texture"),
-    outRatio = op.outValue("Ratio"),
-    available = op.outValue("Available"),
-    outWidth = op.outNumber("Width"),
-    outHeight = op.outNumber("Height"),
-    outEleId = op.outString("Element Id"),
-    outObj = op.outObject("Element"),
-    outClicked = op.outTrigger("Clicked"),
-    outCap = op.outString("Captured");
-
-width.onChange =
-    height.onChange =
-    inFacing.onChange = startWebcam;
-inStyle.onChange = updateStyle;
-inCap.onTriggered=onMouseClick;
-fps.set(30);
-flip.set(true);
-
-const cgl = op.patch.cgl;
-const videoElement = document.createElement("video");
-const eleId = "webcam" + CABLES.uuid();
-if(inActive.get()===false){
-    videoElement.style.display = "none";
-}else{
-    videoElement.style.display = "block";
-}
-videoElement.setAttribute("id", eleId);
-videoElement.setAttribute("autoplay", "");
-videoElement.setAttribute("muted", "");
-videoElement.setAttribute("playsinline", "");
-videoElement.addEventListener("click", onMouseClick);
-
-op.patch.cgl.canvas.parentElement.appendChild(videoElement);
-
-const tex = new CGL.Texture(cgl);
-tex.setSize(8, 8);
-textureOut.set(tex);
-let timeout = null;
-
-let canceled = false;
-
-op.onDelete = removeElement;
-
-function removeElement()
-{
-    if (videoElement) videoElement.remove();
-    clearTimeout(timeout);
-}
-
-
-inActive.onChange = function ()
-{
-    if (inActive.get())
-    {
-        canceled = false;
-        videoElement.style.display = "block";
-        updateTexture();
-    }
-    else
-    {
-        videoElement.style.display = "none";
-        canceled = true;
-    }
-};
-
-fps.onChange = function ()
-{
-    if (fps.get() < 1)fps.set(1);
-    clearTimeout(timeout);
-    timeout = setTimeout(updateTexture, 1000 / fps.get());
-};
-
-function updateTexture()
-{
-    cgl.gl.bindTexture(cgl.gl.TEXTURE_2D, tex.tex);
-    cgl.gl.pixelStorei(cgl.gl.UNPACK_FLIP_Y_WEBGL, flip.get());
-
-    cgl.gl.texImage2D(cgl.gl.TEXTURE_2D, 0, cgl.gl.RGBA, cgl.gl.RGBA, cgl.gl.UNSIGNED_BYTE, videoElement);
-    cgl.gl.bindTexture(cgl.gl.TEXTURE_2D, null);
-
-    if (!canceled) timeout = setTimeout(updateTexture, 1000 / fps.get());
-}
-
-function camInitComplete(stream)
-{
-    tex.videoElement = videoElement;
-    // videoElement.src = window.URL.createObjectURL(stream);
-    videoElement.srcObject = stream;
-    // tex.videoElement=stream;
-    videoElement.onloadedmetadata = function (e)
-    {
-        available.set(true);
-
-        outHeight.set(videoElement.videoHeight);
-        outWidth.set(videoElement.videoWidth);
-
-        tex.setSize(videoElement.videoWidth, videoElement.videoHeight);
-
-        outRatio.set(videoElement.videoWidth / videoElement.videoHeight);
-
-        videoElement.play();
-        outObj.set(videoElement);
-        updateTexture();
-    };
-}
-
-function startWebcam()
-{
-    //removeElement();
-    const constraints = { "audio": false, "video": {} };
-
-    constraints.video.facingMode = inFacing.get();
-    constraints.video.width = width.get();
-    constraints.video.height = height.get();
-
-    //navigator.getUserMedia = navigator.getUserMedia || navigator.mediaDevices.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-/*
-    if (navigator.getUserMedia)
-    {
-        navigator.getUserMedia(constraints, camInitComplete,
-            function ()
-            {
-                available.set(false);
-                // console.log('error webcam');
-            });
-    }
-    else
-    {
-        // the ios way...
-*/
-        navigator.mediaDevices.getUserMedia(constraints)
-            .then(camInitComplete)
-            .catch(function (error)
-            {
-                console.log(error.name + ": " + error.message);
-            });
-//    }
-}
-function updateStyle()
-{
-    if (inStyle.get() != videoElement.style)
-    {
-        videoElement.setAttribute("style", inStyle.get());
-        outObj.set(null);
-        outObj.set(videoElement);
-    }
-}
-var canvas = document.createElement('canvas');
-var ctx = canvas.getContext('2d');
-function onMouseClick()
-{
-   //if(inActive.get()){
-    canvas.width = width.get();
-    canvas.height = height.get();
-    ctx.drawImage(videoElement, 0, 0, width.get(),height.get());
-    var b64webcam = canvas.toDataURL('image/png', .1);
-	outCap.set(b64webcam);
-
-    outClicked.trigger();
-    //}else{
-    //    outCap.set('');
-    //}
-}
-
-
-updateStyle();
-startWebcam();
-
-
-};
-
-Ops.User.alivemachine.MyWebcam.prototype = new CABLES.Op();
-
 
 
 
@@ -6257,133 +6057,6 @@ CABLES.OPS["6387bcb0-6091-4199-8ab7-f96ad4aa3c7d"]={f:Ops.Boolean.TriggerChanged
 
 // **************************************************************
 // 
-// Ops.User.alivemachine.MySpeech
-// 
-// **************************************************************
-
-Ops.User.alivemachine.MySpeech = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const
-    inLang=op.inString("Language","us-US"),
-    active=op.inBool("Active",true),
-    result=op.outString("Result"),
-    confidence=op.outNumber("Confidence"),
-    outSupported=op.outBool("Supported",false),
-    outResult=op.outTrigger("New Result",""),
-    outActive=op.outBool("Started",false);
-
-
-active.onChange=startStop;
-
-window.SpeechRecognition = window.SpeechRecognition||window.webkitSpeechRecognition || window.mozSpeechRecognition;
-
-var recognition=null;
-
-inLang.onChange=changeLang;
-
-function startStop(){
-    if(!recognition) return;
-
-    try{
-
-        if(active.get()!=outActive.get())
-        {
-            if(active.get()) {
-                console.log("start");
-                recognition.start();
-                console.log("started");
-            }
-            else {
-                console.log("aborting");
-                recognition.stop();
-                outActive.set(false);
-                console.log("aborted");
-            }
-        }
-
-    }
-    catch(e)
-    {
-        console.log(e);
-    }
-}
-
-
-op.init=function()
-{
-   // startStop();
-};
-
-function changeLang()
-{
-    if(!recognition)return;
-
-    recognition.lang = inLang.get();
-    recognition.stop();
-
-    setTimeout(function(){
-        try{recognition.start();}catch(e){}},500);
-
-
-
-}
-
-startAPI();
-
-function startAPI()
-{
-    if(window.SpeechRecognition)
-    {
-        outSupported.set(true);
-
-        if(recognition) recognition.abort();
-
-        recognition=new SpeechRecognition();
-
-        recognition.lang = inLang.get();
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 0;
-        recognition.continuous=true;
-        SpeechRecognition.interimResults=true;
-
-
-        recognition.onstart = function() { outActive.set(true); console.log("Listenning to you");};
-        recognition.onstop = function() { outActive.set(false); };
-        recognition.onend = function() { outActive.set(false);console.log("Not listenning");recognition.stop(); /*if(active===true){startStop();}*/ };
-
-        recognition.onresult = function(event) { op.log('recognition result'); };
-        //recognition.onerror = function(event) { op.log('recognition error',result); };
-
-
-        recognition.onresult = function(event)
-        {
-            const idx=event.results.length-1;
-
-            result.set(event.results[idx][0].transcript);
-            confidence.set(event.results[idx][0].confidence);
-            op.log('', event.results[idx][0].transcript);
-            outResult.trigger();
-        };
-
-    }
-
-}
-
-
-
-};
-
-Ops.User.alivemachine.MySpeech.prototype = new CABLES.Op();
-
-
-
-
-
-// **************************************************************
-// 
 // Ops.User.alivemachine.MyConsole
 // 
 // **************************************************************
@@ -6565,6 +6238,211 @@ Ops.User.alivemachine.GetHighlighted.prototype = new CABLES.Op();
 
 // **************************************************************
 // 
+// Ops.User.alivemachine.MyWebcam
+// 
+// **************************************************************
+
+Ops.User.alivemachine.MyWebcam = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+// todo: https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints/facingMode
+loadDaFun();
+function loadDaFun() {
+   var script = document.createElement('script');
+   script.src = 'https://webrtc.github.io/adapter/adapter-latest.js';
+   var head = document.getElementsByTagName("head")[0];
+   head.appendChild(script);
+}
+const
+    inFacing = op.inSwitch("Facing", ["environment", "user"], "user"),
+    flip = op.inValueBool("flip"),
+    fps = op.inValueInt("fps"),
+    width = op.inValueInt("inWidth", 640),
+    height = op.inValueInt("inHeight", 480),
+    inActive = op.inValueBool("Active", true),
+    inStyle = op.inValueEditor("Style", "position:absolute;z-index:9999;", "none"),
+    inCap = op.inTriggerButton("Capture"),
+    textureOut = op.outTexture("texture"),
+    outRatio = op.outValue("Ratio"),
+    available = op.outValue("Available"),
+    outWidth = op.outNumber("outWidth"),
+    outHeight = op.outNumber("outHeight"),
+    outEleId = op.outString("Element Id"),
+    outObj = op.outObject("Element"),
+    outClicked = op.outTrigger("Clicked"),
+    outCap = op.outString("Captured");
+
+width.onChange =
+    height.onChange =
+    inFacing.onChange = startWebcam;
+inStyle.onChange = updateStyle;
+inCap.onTriggered=onMouseClick;
+fps.set(30);
+flip.set(true);
+
+const cgl = op.patch.cgl;
+const videoElement = document.createElement("video");
+const eleId = "webcam" + CABLES.uuid();
+if(inActive.get()===false){
+    videoElement.style.display = "none";
+}else{
+    videoElement.style.display = "block";
+}
+videoElement.setAttribute("id", eleId);
+videoElement.setAttribute("autoplay", "");
+videoElement.setAttribute("muted", "");
+videoElement.setAttribute("playsinline", "");
+videoElement.addEventListener("click", onMouseClick);
+
+op.patch.cgl.canvas.parentElement.appendChild(videoElement);
+
+const tex = new CGL.Texture(cgl);
+tex.setSize(8, 8);
+textureOut.set(tex);
+let timeout = null;
+
+let canceled = false;
+
+op.onDelete = removeElement;
+
+function removeElement()
+{
+    if (videoElement) videoElement.remove();
+    clearTimeout(timeout);
+}
+
+
+inActive.onChange = function ()
+{
+    if (inActive.get())
+    {
+        canceled = false;
+        videoElement.style.display = "block";
+        updateTexture();
+    }
+    else
+    {
+        videoElement.style.display = "none";
+        canceled = true;
+    }
+};
+
+fps.onChange = function ()
+{
+    if (fps.get() < 1)fps.set(1);
+    clearTimeout(timeout);
+    timeout = setTimeout(updateTexture, 1000 / fps.get());
+};
+
+function updateTexture()
+{
+    cgl.gl.bindTexture(cgl.gl.TEXTURE_2D, tex.tex);
+    cgl.gl.pixelStorei(cgl.gl.UNPACK_FLIP_Y_WEBGL, flip.get());
+
+    cgl.gl.texImage2D(cgl.gl.TEXTURE_2D, 0, cgl.gl.RGBA, cgl.gl.RGBA, cgl.gl.UNSIGNED_BYTE, videoElement);
+    cgl.gl.bindTexture(cgl.gl.TEXTURE_2D, null);
+
+    if (!canceled) timeout = setTimeout(updateTexture, 1000 / fps.get());
+}
+
+function camInitComplete(stream)
+{
+    tex.videoElement = videoElement;
+    // videoElement.src = window.URL.createObjectURL(stream);
+    videoElement.srcObject = stream;
+    // tex.videoElement=stream;
+    videoElement.onloadedmetadata = function (e)
+    {
+        available.set(true);
+
+        outHeight.set(videoElement.videoHeight);
+        outWidth.set(videoElement.videoWidth);
+
+        tex.setSize(videoElement.videoWidth, videoElement.videoHeight);
+
+        outRatio.set(videoElement.videoWidth / videoElement.videoHeight);
+
+        videoElement.play();
+        outObj.set(videoElement);
+        updateTexture();
+    };
+}
+
+function startWebcam()
+{
+    //removeElement();
+    const constraints = { "audio": false, "video": {} };
+
+    constraints.video.facingMode = inFacing.get();
+    constraints.video.width = width.get();
+    constraints.video.height = height.get();
+
+    //navigator.getUserMedia = navigator.getUserMedia || navigator.mediaDevices.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+/*
+    if (navigator.getUserMedia)
+    {
+        navigator.getUserMedia(constraints, camInitComplete,
+            function ()
+            {
+                available.set(false);
+                // console.log('error webcam');
+            });
+    }
+    else
+    {
+        // the ios way...
+*/
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(camInitComplete)
+            .catch(function (error)
+            {
+                console.log(error.name + ": " + error.message);
+            });
+//    }
+}
+function updateStyle()
+{
+    if (inStyle.get() != videoElement.style)
+    {
+        videoElement.setAttribute("style", inStyle.get());
+        outObj.set(null);
+        outObj.set(videoElement);
+    }
+}
+var canvas = document.createElement('canvas');
+var ctx = canvas.getContext('2d');
+function onMouseClick()
+{
+   //if(inActive.get()){
+    canvas.width = width.get();
+    canvas.height = height.get();
+    ctx.drawImage(videoElement, 0, 0, width.get(),height.get());
+    var b64webcam = canvas.toDataURL('image/png', .1);
+	outCap.set(b64webcam);
+
+    outClicked.trigger();
+    //}else{
+    //    outCap.set('');
+    //}
+}
+
+
+updateStyle();
+startWebcam();
+
+
+};
+
+Ops.User.alivemachine.MyWebcam.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
 // Ops.User.alivemachine.Isotope
 // 
 // **************************************************************
@@ -6604,8 +6482,9 @@ var pardiv;
 var iso;
 var order = op.inTriggerButton("order");
 var outTrig=op.outTrigger("new data");
+var contentLength =op.outNumber("content Length");
 order.onTriggered=reorder;
-
+var page;
 parentin.onChange= update;
 
 var boards = [];
@@ -6618,6 +6497,7 @@ function update(data, typ)
 {
     if(pardiv==null){
         pardiv = document.getElementById(parentin.get());
+        page = pardiv.parentElement;
         iso = new Isotope(pardiv,{
         itemSelector: '.cell',
         layoutMode: 'fitRows',
@@ -6629,7 +6509,7 @@ function update(data, typ)
         }
         });
     }
-    if(pardiv!=null && data!=null && data!=''){
+    if(pardiv!=null && data!=null && data!='' && data!='null'){
         outContent.set(data);
         let element = document.createElement("div");
         addClass(element, 'cell');
@@ -6643,6 +6523,16 @@ function update(data, typ)
                 element.innerHTML = '<textarea style="font-size:50px;" id="'+getRandomInt()+'">'+data+'</textarea>';
             }
         }else if(typ=='img'){
+            var i = document.createElement("img");
+            i.onload = function(){
+                //alert( i.width+", "+i.height );
+                //i.setAttribute("class", "imgClass")
+            };
+            //i.src = data;
+            //i.setAttribute("class","imgClass");
+            //i.id = getRandomInt();
+            //element.appendChild(i);
+            //i.setAttribute("class","imgClass");
             element.innerHTML = '<img class="imgclass" id="'+getRandomInt()+'" src="'+data+'"/>';
 
         }
@@ -6653,8 +6543,19 @@ function update(data, typ)
             iso.layout();
             var ta = element.getElementsByTagName("textarea")[0];
             if(ta!=null){
-            resize(ta);
+                resize(ta);
+            }
+            var im = element.getElementsByTagName("img")[0];
+            if(im!=null){
+                //console.log("img height :"+im.naturalHeight);
+                //if(im.height>=256){element.style.height='256px';element.style.width='256px';}
+            }
         }
+        contentLength.set(element.innerHTML.length);
+        //alert(page.scrollTop+" "+page.scrollHeight+" "+page.offsetHeight);
+        //console.log(page.scrollTop+" === "+page.scrollHeight+" - "+page.offsetHeight);
+        if( page.scrollTop >= (page.scrollHeight - page.offsetHeight-300)){
+            pardiv.parentElement.scrollBy(0, 300);
         }
         outTrig.trigger();
     }
@@ -6712,81 +6613,31 @@ Ops.User.alivemachine.Isotope.prototype = new CABLES.Op();
 
 // **************************************************************
 // 
-// Ops.WebAudio.Output
+// Ops.Trigger.GateTrigger
 // 
 // **************************************************************
 
-Ops.WebAudio.Output = function()
+Ops.Trigger.GateTrigger = function()
 {
 CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={};
-op.requirements=[CABLES.Requirements.WEBAUDIO];
+const
+    exe = op.inTrigger('Execute'),
+    passThrough = op.inValueBool('Pass Through',true),
+    triggerOut = op.outTrigger('Trigger out');
 
-var audioCtx = CABLES.WEBAUDIO.createAudioContext(op);
-
-// constants
-var VOLUME_DEFAULT = 1.0;
-var VOLUME_MIN = 0;
-var VOLUME_MAX = 1;
-
-// vars
-var gainNode = audioCtx.createGain();
-var destinationNode = audioCtx.destination;
-gainNode.connect(destinationNode);
-var masterVolume = 1;
-
-// inputs
-var audioInPort = CABLES.WEBAUDIO.createAudioInPort(op, "Audio In", gainNode);
-var volumePort = op.inValueSlider("Volume", VOLUME_DEFAULT);
-var mutePort = op.inValueBool("Mute", false);
-
-// functions
-// sets the volume, multiplied by master volume
-function setVolume() {
-    var volume = volumePort.get() * masterVolume;
-    if(volume >= VOLUME_MIN && volume <= VOLUME_MAX) {
-        // gainNode.gain.value = volume;
-        gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
-    } else {
-        // gainNode.gain.value = VOLUME_DEFAULT * masterVolume;
-        gainNode.gain.setValueAtTime(VOLUME_DEFAULT * masterVolume, audioCtx.currentTime);
-    }
+exe.onTriggered = function()
+{
+    if(passThrough.get())
+        triggerOut.trigger();
 }
 
-function mute(b) {
-    if(b) {
-        // gainNode.gain.value = 0;
-        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-    } else {
-        setVolume();
-    }
-}
-
-// change listeners
-mutePort.onChange = function() {
-    mute(mutePort.get());
-};
-
-volumePort.onChange = function() {
-    if(mutePort.get()) {
-        return;
-    }
-    setVolume();
-};
-
-op.onMasterVolumeChanged = function(v) {
-    masterVolume = v;
-    setVolume();
-};
-
-
-
 
 };
 
-Ops.WebAudio.Output.prototype = new CABLES.Op();
-CABLES.OPS["53fdbf4a-bc8d-4c5d-a698-f34fdeb53827"]={f:Ops.WebAudio.Output,objName:"Ops.WebAudio.Output"};
+Ops.Trigger.GateTrigger.prototype = new CABLES.Op();
+CABLES.OPS["65e8b8a2-ba13-485f-883a-2bcf377989da"]={f:Ops.Trigger.GateTrigger,objName:"Ops.Trigger.GateTrigger"};
 
 
 
@@ -6824,6 +6675,7 @@ const synchronizedPlayer = this.addInPort(new CABLES.Port(this, "Synchronized Pl
 this.audioOut = this.addOutPort(new CABLES.Port(this, "audio out", CABLES.OP_PORT_TYPE_OBJECT));
 const outPlaying = this.addOutPort(new CABLES.Port(this, "playing", CABLES.OP_PORT_TYPE_VALUE));
 const outEnded = this.addOutPort(new CABLES.Port(this, "ended", CABLES.OP_PORT_TYPE_FUNCTION));
+var rate = op.inFloat("playback rate",1);
 var triggeronce = op.inTriggerButton("play once");
 triggeronce.onTriggered=playonce;
 
@@ -6854,7 +6706,16 @@ playing = true;
         if (prom instanceof Promise)
             prom.then(null, function (e) {});
 }
-
+rate.onChange=function(){
+    if (!self.audio)
+    {
+        op.uiAttr({ "error": "No audio file selected" });
+        return;
+    }
+    else{
+        self.audio.playbackRate = rate.get();
+    }
+}
 play.onChange = function ()
 {
     if (!self.audio)
@@ -7065,6 +6926,490 @@ this.file.onChange = function ()
 };
 
 Ops.User.alivemachine.MyAudioPlayer02.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.WebAudio.Output
+// 
+// **************************************************************
+
+Ops.WebAudio.Output = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+op.requirements=[CABLES.Requirements.WEBAUDIO];
+
+var audioCtx = CABLES.WEBAUDIO.createAudioContext(op);
+
+// constants
+var VOLUME_DEFAULT = 1.0;
+var VOLUME_MIN = 0;
+var VOLUME_MAX = 1;
+
+// vars
+var gainNode = audioCtx.createGain();
+var destinationNode = audioCtx.destination;
+gainNode.connect(destinationNode);
+var masterVolume = 1;
+
+// inputs
+var audioInPort = CABLES.WEBAUDIO.createAudioInPort(op, "Audio In", gainNode);
+var volumePort = op.inValueSlider("Volume", VOLUME_DEFAULT);
+var mutePort = op.inValueBool("Mute", false);
+
+// functions
+// sets the volume, multiplied by master volume
+function setVolume() {
+    var volume = volumePort.get() * masterVolume;
+    if(volume >= VOLUME_MIN && volume <= VOLUME_MAX) {
+        // gainNode.gain.value = volume;
+        gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+    } else {
+        // gainNode.gain.value = VOLUME_DEFAULT * masterVolume;
+        gainNode.gain.setValueAtTime(VOLUME_DEFAULT * masterVolume, audioCtx.currentTime);
+    }
+}
+
+function mute(b) {
+    if(b) {
+        // gainNode.gain.value = 0;
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+    } else {
+        setVolume();
+    }
+}
+
+// change listeners
+mutePort.onChange = function() {
+    mute(mutePort.get());
+};
+
+volumePort.onChange = function() {
+    if(mutePort.get()) {
+        return;
+    }
+    setVolume();
+};
+
+op.onMasterVolumeChanged = function(v) {
+    masterVolume = v;
+    setVolume();
+};
+
+
+
+
+};
+
+Ops.WebAudio.Output.prototype = new CABLES.Op();
+CABLES.OPS["53fdbf4a-bc8d-4c5d-a698-f34fdeb53827"]={f:Ops.WebAudio.Output,objName:"Ops.WebAudio.Output"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.WebAudio.WebAudioContextRunner
+// 
+// **************************************************************
+
+Ops.WebAudio.WebAudioContextRunner = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+CABLES.WEBAUDIO.createAudioContext = function(op) {
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    if(!AudioContext) return;
+    if(!window.audioContext)
+        window.audioContext = new AudioContext({sampleRate:44100});
+    // check if tone.js lib is being used
+    if(window.Tone && !CABLES.WEBAUDIO.toneJsInitialized) {
+      // set current audio context in tone.js
+      Tone.setContext(window.audioContext);
+      CABLES.WEBAUDIO.toneJsInitialized = true;
+    }
+    return window.audioContext;
+};
+
+
+const context = CABLES.WEBAUDIO.createAudioContext(op);
+context.addEventListener('statechange', onContextStateChange);
+const canvasWrapper = op.patch.cgl.canvas.parentElement;
+const showOverlayPort = op.inValueBool('Show Overlay', true);
+let overlay = null;
+let button = null;
+
+// inputs
+const inTrigger = op.inTriggerButton('Resume');
+
+// outputs
+const currentStatePort = op.outValueString('Current State');
+currentStatePort.set(context.state);
+
+inTrigger.onTriggered = checkState;
+showOverlayPort.onChange = onShowOverlayPortChange;
+
+if(showOverlayPort.get()) {
+    checkOverlay();
+}
+
+function onShowOverlayPortChange() {
+    if(showOverlayPort.get()) {
+        checkOverlay();
+    } else {
+        removeOverlay();
+    }
+}
+
+function checkState() {
+    if(context.state !== 'running') {
+        context.resume();
+    }
+    if(showOverlayPort.get()) {
+        checkOverlay();
+    }
+}
+
+function removeOverlay() {
+    if(overlay) {
+        overlay.parentNode.removeChild(overlay);
+    }
+    if(button) {
+        button.parentNode.removeChild(button);
+        button.removeEventListener('click', onButtonClick);
+    }
+    overlay = null;
+    button = null;
+}
+
+function checkOverlay() {
+    if(context.state !== 'running') {
+        initElements();
+    } else { /* context is running */
+        removeOverlay();
+    }
+}
+
+function onButtonClick(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    checkState();
+}
+
+function onContextStateChange(event) {
+    currentStatePort.set(event.target.state);
+    // console.log('Web Audio State changed to: ', event.target.state);
+    checkOverlay();
+}
+
+function initElements() {
+    if(!overlay) {
+        overlay = document.createElement('div');
+            overlay.style.display = 'flex';
+            overlay.style.alignItems = 'center';
+            overlay.style.justifyContent = 'center';
+            overlay.style.zIndex = '100000000';
+            overlay.style.position = 'absolute';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'white';
+            overlay.style.opacity = '0.7';
+        canvasWrapper.appendChild(overlay);
+    }
+    if(!button) {
+        button = document.createElement('div');
+            button.style.backgroundImage = 'url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMyNGJhYTciIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0iZmVhdGhlciBmZWF0aGVyLXBsYXktY2lyY2xlIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCI+PC9jaXJjbGU+PHBvbHlnb24gcG9pbnRzPSIxMCA4IDE2IDEyIDEwIDE2IDEwIDgiPjwvcG9seWdvbj48L3N2Zz4=)';
+            button.style.width = '20vh';
+            button.style.height = '20vh';
+            button.style.cursor = 'pointer';
+            button.style.backgroundSize = 'cover';
+        button.addEventListener('click', onButtonClick);
+        overlay.appendChild(button);
+    }
+}
+
+op.onDelete = removeOverlay;
+
+};
+
+Ops.WebAudio.WebAudioContextRunner.prototype = new CABLES.Op();
+CABLES.OPS["9e670541-deda-4eff-89bf-b6c56a917256"]={f:Ops.WebAudio.WebAudioContextRunner,objName:"Ops.WebAudio.WebAudioContextRunner"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Math.Clamp
+// 
+// **************************************************************
+
+Ops.Math.Clamp = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const val=op.inValueFloat("val",0.5);
+const min=op.inValueFloat("min",0);
+const max=op.inValueFloat("max",1);
+const ignore=op.inValueBool("ignore outside values");
+const result=op.outValue("result");
+
+val.onChange=min.onChange=max.onChange=clamp;
+
+function clamp()
+{
+    if(ignore.get())
+    {
+        if(val.get()>max.get()) return;
+        if(val.get()<min.get()) return;
+    }
+    result.set( Math.min(Math.max(val.get(), min.get()), max.get()));
+}
+
+
+
+};
+
+Ops.Math.Clamp.prototype = new CABLES.Op();
+CABLES.OPS["cda1a98e-5e16-40bd-9b18-a67e9eaad5a1"]={f:Ops.Math.Clamp,objName:"Ops.Math.Clamp"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Math.MathExpression
+// 
+// **************************************************************
+
+Ops.Math.MathExpression = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const inA = op.inFloat("A", 0);
+const inB = op.inFloat("B", 1);
+const inC = op.inFloat("C", 2);
+const inD = op.inFloat("D", 3);
+op.setPortGroup("Parameters", [inA, inB, inC, inD]);
+const inExpression = op.inString("Expression", "a*(b+c+d)");
+op.setPortGroup("Expression", [inExpression]);
+const outResult = op.outNumber("Result");
+const outExpressionIsValid = op.outBool("Expression Valid");
+
+let currentFunction = inExpression.get();
+let functionValid = false;
+
+const createFunction = () =>
+{
+    try
+    {
+        currentFunction = new Function("m", "a", "b", "c", "d", `with(m) { return ${inExpression.get()} }`);
+        functionValid = true;
+        evaluateFunction();
+        outExpressionIsValid.set(functionValid);
+    }
+    catch (e)
+    {
+        functionValid = false;
+        outExpressionIsValid.set(functionValid);
+        if (e instanceof ReferenceError || e instanceof SyntaxError) return;
+    }
+};
+
+const evaluateFunction = () =>
+{
+    if (functionValid)
+    {
+        outResult.set(currentFunction(Math, inA.get(), inB.get(), inC.get(), inD.get()));
+        if (!inExpression.get()) outResult.set(0);
+    }
+
+    outExpressionIsValid.set(functionValid);
+};
+
+
+inA.onChange = inB.onChange = inC.onChange = inD.onChange = evaluateFunction;
+inExpression.onChange = createFunction;
+createFunction();
+
+
+};
+
+Ops.Math.MathExpression.prototype = new CABLES.Op();
+CABLES.OPS["d2343a1e-64ea-45b2-99ed-46e167bbdcd3"]={f:Ops.Math.MathExpression,objName:"Ops.Math.MathExpression"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.MyLogger
+// 
+// **************************************************************
+
+Ops.User.alivemachine.MyLogger = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const
+    inNumber=op.inFloat("Number",0),
+    inString=op.inString("String","");
+const intrig=op.inTriggerButton("trigger message"),
+    inMsg=op.inString("Message");
+
+intrig.onTriggered=function(){console.log(inMsg.get());}
+inMsg.onChange=function(){console.log(inMsg.get());}
+inNumber.onChange=function()
+{
+    console.log(inNumber.get());
+};
+
+inString.onChange=function()
+{
+    console.log(inString.get());
+};
+
+};
+
+Ops.User.alivemachine.MyLogger.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.MySpeech
+// 
+// **************************************************************
+
+Ops.User.alivemachine.MySpeech = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const
+    inLang=op.inString("Language","us-US"),
+    active=op.inBool("Active",true),
+    result=op.outString("Result"),
+    confidence=op.outNumber("Confidence"),
+    outSupported=op.outBool("Supported",false),
+    outResult=op.outTrigger("New Result",""),
+    outActive=op.outBool("Started",false);
+
+
+active.onChange=startStop;
+
+window.SpeechRecognition = window.SpeechRecognition||window.webkitSpeechRecognition || window.mozSpeechRecognition;
+
+var recognition=null;
+
+inLang.onChange=changeLang;
+
+function startStop(){
+    if(!recognition) return;
+
+    try{
+
+        if(active.get()!=outActive.get())
+        {
+            if(active.get()) {
+                //console.log("start");
+                recognition.start();
+                //console.log("started");
+            }
+            else {
+                //console.log("aborting");
+                recognition.stop();
+                outActive.set(false);
+                //console.log("aborted");
+            }
+        }
+
+    }
+    catch(e)
+    {
+        console.log(e);
+    }
+}
+
+
+op.init=function()
+{
+   // startStop();
+};
+
+function changeLang()
+{
+    if(!recognition)return;
+
+    recognition.lang = inLang.get();
+    recognition.stop();
+
+    setTimeout(function(){
+        try{recognition.start();}catch(e){}},500);
+
+
+
+}
+
+startAPI();
+
+function startAPI()
+{
+    if(window.SpeechRecognition)
+    {
+        outSupported.set(true);
+
+        if(recognition) recognition.abort();
+
+        recognition=new SpeechRecognition();
+
+        recognition.lang = inLang.get();
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 0;
+        recognition.continuous=true;
+        SpeechRecognition.interimResults=true;
+
+
+        recognition.onstart = function() { outActive.set(true); console.log("Listenning to you");};
+        recognition.onstop = function() { outActive.set(false); };
+        recognition.onend = function() { outActive.set(false);console.log("Not listenning");recognition.stop(); /*if(active===true){startStop();}*/ };
+
+        recognition.onresult = function(event) { op.log('recognition result'); };
+        //recognition.onerror = function(event) { op.log('recognition error',result); };
+
+
+        recognition.onresult = function(event)
+        {
+            const idx=event.results.length-1;
+
+            result.set(event.results[idx][0].transcript);
+            confidence.set(event.results[idx][0].confidence);
+            op.log('', event.results[idx][0].transcript);
+            outResult.trigger();
+        };
+
+    }
+
+}
+
+
+
+};
+
+Ops.User.alivemachine.MySpeech.prototype = new CABLES.Op();
 
 
 
