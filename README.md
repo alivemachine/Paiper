@@ -4,7 +4,7 @@
 <br>Paiper
 </h1>
 <h3>◦ Reimagine collaboration with Paiper!</h3>
-  <img src="https://github.com/alivemachine/Paiper/blob/04/ogthumb.png" />
+  
 <h3>◦ Developed with the software and tools listed below.</h3>
 
 <p><img width="100" src="https://alivemachine.io/image/fronthand/openai.png" alt="OpenAI logo" /></p>
@@ -44,7 +44,7 @@
 ## 📍 Overview
 
 The Paiper project is a web-based application that utilizes the CABLES.js library and cables.gl, a visual programming tool, to create a webpage with a canvas element for graphics rendering. Its core functionalities include loading and running patch files, error handling, and callback functions for initialization and loading. The project provides a user-friendly interface for creating and manipulating visual elements, allowing users to unleash their creative potential and easily build interactive and dynamic graphical experiences on the web.
-
+<img src="https://github.com/alivemachine/Paiper/blob/04/ogthumb.png" />
 ---
 
 ## ⚙️ Features
