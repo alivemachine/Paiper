@@ -5,16 +5,18 @@ CABLES.OPS=CABLES.OPS||{};
 
 var Ops=Ops || {};
 Ops.Gl=Ops.Gl || {};
-Ops.User=Ops.User || {};
+Ops.Ui=Ops.Ui || {};
 Ops.Date=Ops.Date || {};
 Ops.Anim=Ops.Anim || {};
 Ops.Html=Ops.Html || {};
 Ops.Json=Ops.Json || {};
+Ops.User=Ops.User || {};
+Ops.Time=Ops.Time || {};
 Ops.Math=Ops.Math || {};
 Ops.Array=Ops.Array || {};
 Ops.Value=Ops.Value || {};
-Ops.Lottie=Ops.Lottie || {};
 Ops.String=Ops.String || {};
+Ops.Lottie=Ops.Lottie || {};
 Ops.Trigger=Ops.Trigger || {};
 Ops.Boolean=Ops.Boolean || {};
 Ops.Math.Compare=Ops.Math.Compare || {};
@@ -1087,113 +1089,6 @@ CABLES.OPS["55285d4a-f542-4c8b-9839-02b33b15c916"]={f:Ops.String.RandomString_v2
 
 // **************************************************************
 // 
-// Ops.User.alivemachine.Runway
-// 
-// **************************************************************
-
-Ops.User.alivemachine.Runway = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-// your new op
-// have a look at the documentation at:
-// https://docs.cables.gl/dev_hello_op/dev_hello_op.html
-// inputs
-
-const triggerIn = op.inTrigger("trigger");
-const routeIn = op.inString("route","");
-//const filterIn = op.inString("inputkey","");
-const dataIn = op.inString("inputdata","");
-//const filterOut = op.inString("outputkey","");
-
-//const imageIn = op.inTexture("image");
-
-
-// outputs
-
-
-const dataOut = op.outString("outputdata");
-
-
-dataIn.onChange = go;
-triggerIn.onTriggered = go;
-var outputs = ["output_image", "image", "output", "result", "generated_text", "caption", "stylizedImage"]
-
-function  go() {
-    op.log("go")
-    //var xmlHttp = new XMLHttpRequest();
-    //xmlHttp.open( "GET", routeIn.get(), false ); // false for synchronous request
-    //xmlHttp.send( null );
-    //dataOut.set(JSON.parse(xmlHttp.responseText)[filterOut.get])
-
-    httpPostAsync(routeIn.get(), function(result){
-        //dataOut.set(JSON.parse(result)[filterOut.get()])
-
-        for(var i = 0; i<outputs.length; i++){
-            if(JSON.parse(result)[outputs[i]]!="undefined"){
-                dataOut.set(JSON.parse(result)[outputs[i]])
-            }
-        }
-
-        //dataOut.set(JSON.parse(result)[filterOut.get()])
-    })
-}
-/*
-function httpGetAsync(theUrl, callback) {
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = function() {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            callback(xmlHttp.responseText);
-    }
-    xmlHttp.open("GET", theUrl, true); // true for asynchronous
-    xmlHttp.send(null);
-}
-*/
-
-function httpPostAsync(theUrl, callback) {
-    var dat = dataIn.get();
-const inputs = {
-  "caption":dat,
-  "input_image":dat,
-  "contentImage":dat,
-  "image":dat,
-  "num_octaves": 2,
-  "iterations": 50,
-  "octave_scale": 1,
-  "features_mixed_2": 1.8,
-  "features_mixed_3": 1.7,
-  "features_mixed_4": 1.4,
-  "features_mixed_5": 1.9,
-  "alpha_normal": 1,
-  "prompt": dat,
-  "max_characters": 128,
-  "top_p": .5,
-  "seed": 54,
-  "semantic_map":dat
-};
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("POST", theUrl, true);
-    xmlHttp.setRequestHeader("Content-Type", "application/json");
-    xmlHttp.onreadystatechange = function() {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            callback(xmlHttp.responseText);
-    }
-
-    xmlHttp.send(JSON.stringify(inputs));
-}
-
-
-};
-
-Ops.User.alivemachine.Runway.prototype = new CABLES.Op();
-
-
-
-
-
-// **************************************************************
-// 
 // Ops.String.StringContains_v2
 // 
 // **************************************************************
@@ -2099,49 +1994,6 @@ CABLES.OPS["6e994ba8-01d1-4da6-98b4-af7e822a2e6c"]={f:Ops.String.SubString_v2,ob
 
 // **************************************************************
 // 
-// Ops.User.alivemachine.EncodeURI
-// 
-// **************************************************************
-
-Ops.User.alivemachine.EncodeURI = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const
-    en=op.inString("Encode",""),
-    de=op.inString("Decode",""),
-    blr=op.inString("Linebreak Remove",""),
-    ended=op.outString("Encoded"),
-    deded=op.outString("Decoded"),
-    blred=op.outString("Lb Removed");
-blr.onChange=
-en.onChange=
-de.onChange=update;
-
-function update()
-{
-    var str = blr.get();
-    str = str.replace(/\/n|\\n/g,"");
-    blred.set(str);
-
-    ended.set(encodeURIComponent(en.get()));
-    deded.set(decodeURIComponent(de.get()));
-
-}
-
-
-
-};
-
-Ops.User.alivemachine.EncodeURI.prototype = new CABLES.Op();
-
-
-
-
-
-// **************************************************************
-// 
 // Ops.String.StringLength_v2
 // 
 // **************************************************************
@@ -2341,90 +2193,6 @@ bool.onChange=function()
 
 Ops.Boolean.BoolToNumber.prototype = new CABLES.Op();
 CABLES.OPS["2591c495-fceb-4f6e-937f-11b190c72ee5"]={f:Ops.Boolean.BoolToNumber,objName:"Ops.Boolean.BoolToNumber"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.String.Concat_v2
-// 
-// **************************************************************
-
-Ops.String.Concat_v2 = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-var string1=op.inString("string1","ABC");
-var string2=op.inString("string2","XYZ");
-var newLine=op.inValueBool("New Line",false);
-var result=op.outString("result");
-
-newLine.onChange=string2.onChange=string1.onChange=exec;
-exec();
-
-function exec()
-{
-    var s1=string1.get();
-    var s2=string2.get();
-    if(!s1 && !s2)
-    {
-        result.set('');
-        return;
-    }
-    if(!s1)s1='';
-    if(!s2)s2='';
-
-    var nl='';
-    if(s1 && s2 && newLine.get())nl='\n';
-    result.set( String(s1)+nl+String(s2));
-}
-
-
-
-
-};
-
-Ops.String.Concat_v2.prototype = new CABLES.Op();
-CABLES.OPS["a52722aa-0ca9-402c-a844-b7e98a6c6e60"]={f:Ops.String.Concat_v2,objName:"Ops.String.Concat_v2"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.String.SwitchStringBoolean
-// 
-// **************************************************************
-
-Ops.String.SwitchStringBoolean = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const
-    inBool=op.inValueBool("Boolean"),
-    inStrTrue=op.inString("True","Yes"),
-    inStrFalse=op.inString("False","No"),
-    result=op.outString("Result");
-
-inBool.onChange=
-inStrFalse.onChange=
-inStrTrue.onChange=update;
-
-function update()
-{
-    if(inBool.get())result.set(inStrTrue.get());
-        else result.set(inStrFalse.get());
-}
-
-update();
-
-};
-
-Ops.String.SwitchStringBoolean.prototype = new CABLES.Op();
-CABLES.OPS["19e3c428-22ce-45a3-b903-fddfc46fc0a3"]={f:Ops.String.SwitchStringBoolean,objName:"Ops.String.SwitchStringBoolean"};
 
 
 
@@ -3277,6 +3045,43 @@ CABLES.OPS["c26e6ce0-8047-44bb-9bc8-5a4f911ed8ad"]={f:Ops.Boolean.And,objName:"O
 
 // **************************************************************
 // 
+// Ops.String.SwitchStringBoolean
+// 
+// **************************************************************
+
+Ops.String.SwitchStringBoolean = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const
+    inBool=op.inValueBool("Boolean"),
+    inStrTrue=op.inString("True","Yes"),
+    inStrFalse=op.inString("False","No"),
+    result=op.outString("Result");
+
+inBool.onChange=
+inStrFalse.onChange=
+inStrTrue.onChange=update;
+
+function update()
+{
+    if(inBool.get())result.set(inStrTrue.get());
+        else result.set(inStrFalse.get());
+}
+
+update();
+
+};
+
+Ops.String.SwitchStringBoolean.prototype = new CABLES.Op();
+CABLES.OPS["19e3c428-22ce-45a3-b903-fddfc46fc0a3"]={f:Ops.String.SwitchStringBoolean,objName:"Ops.String.SwitchStringBoolean"};
+
+
+
+
+// **************************************************************
+// 
 // Ops.Boolean.ToggleBool
 // 
 // **************************************************************
@@ -3414,132 +3219,6 @@ function updateActive()
 
 Ops.Html.IFrame_v3.prototype = new CABLES.Op();
 CABLES.OPS["9e74b275-a1ed-4d10-aba4-4b3311363a99"]={f:Ops.Html.IFrame_v3,objName:"Ops.Html.IFrame_v3"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.User.alivemachine.MySpeech
-// 
-// **************************************************************
-
-Ops.User.alivemachine.MySpeech = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const
-    inLang=op.inString("Language","us-US"),
-    active=op.inBool("Active",true),
-    result=op.outString("Result"),
-    confidence=op.outNumber("Confidence"),
-    outSupported=op.outBool("Supported",false),
-    outResult=op.outTrigger("New Result",""),
-    outActive=op.outBool("Started",false);
-
-
-active.onChange=startStop;
-
-window.SpeechRecognition = window.SpeechRecognition||window.webkitSpeechRecognition || window.mozSpeechRecognition;
-
-var recognition=null;
-
-inLang.onChange=changeLang;
-
-function startStop(){
-    if(!recognition) return;
-
-    try{
-
-        if(active.get()!=outActive.get())
-        {
-            if(active.get()) {
-                console.log("start");
-                recognition.start();
-                console.log("started");
-            }
-            else {
-                console.log("aborting");
-                recognition.stop();
-                outActive.set(false);
-                console.log("aborted");
-            }
-        }
-
-    }
-    catch(e)
-    {
-        console.log(e);
-    }
-}
-
-
-op.init=function()
-{
-    startStop();
-};
-
-function changeLang()
-{
-    if(!recognition)return;
-
-    recognition.lang = inLang.get();
-    recognition.stop();
-
-    setTimeout(function(){
-        try{recognition.start();}catch(e){}},500);
-
-
-
-}
-
-startAPI();
-
-function startAPI()
-{
-    if(window.SpeechRecognition)
-    {
-        outSupported.set(true);
-
-        if(recognition) recognition.abort();
-
-        recognition=new SpeechRecognition();
-
-        recognition.lang = inLang.get();
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 0;
-        recognition.continuous=true;
-        SpeechRecognition.interimResults=true;
-
-
-        recognition.onstart = function() { outActive.set(true); };
-        recognition.onstop = function() { outActive.set(false); };
-
-        recognition.onresult = function(event) { op.log('recognition result'); };
-        //recognition.onerror = function(event) { op.log('recognition error',result); };
-
-
-        recognition.onresult = function(event)
-        {
-            const idx=event.results.length-1;
-
-            result.set(event.results[idx][0].transcript);
-            confidence.set(event.results[idx][0].confidence);
-            op.log('You said: ', event.results[idx][0].transcript);
-            outResult.trigger();
-        };
-
-    }
-
-}
-
-
-
-};
-
-Ops.User.alivemachine.MySpeech.prototype = new CABLES.Op();
-
 
 
 
@@ -3938,6 +3617,1705 @@ startWebcam();
 
 Ops.User.alivemachine.MyWebcam.prototype = new CABLES.Op();
 
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.FileIn
+// 
+// **************************************************************
+
+Ops.User.alivemachine.FileIn = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+// inputs
+var parentPort = op.inObject('link');
+var labelPort = op.inString('Text', 'Select File:');
+var inId = op.inValueString('Id', '');
+var inBrowse = op.inTriggerButton("browse");
+inBrowse.onTriggered=goBrowse;
+function goBrowse(){
+    fileInputEle.click();
+}
+
+// outputs
+var siblingsPort = op.outObject('childs');
+const outTex=op.outTexture("Texture");
+var outFile=op.outString("b64image");
+
+// vars
+var el = document.createElement('div');
+el.classList.add('sidebar__item');
+el.classList.add('sidebar__text');
+var label = document.createElement('div');
+label.classList.add('sidebar__item-label');
+var labelText = document.createTextNode(labelPort.get());
+label.appendChild(labelText);
+el.appendChild(label);
+
+const fileInputEle = document.createElement('input');
+fileInputEle.type="file";
+fileInputEle.id="file";
+fileInputEle.name="file";
+fileInputEle.style.width="100%";
+fileInputEle.style.margin="0";
+el.appendChild(fileInputEle);
+
+const imgEl = document.createElement('img');
+
+fileInputEle.addEventListener('change', handleFileSelect, false);
+
+function handleFileSelect(evt)
+{
+
+    const reader = new FileReader();
+
+    reader.onabort = function(e) {
+        op.log('File read cancelled');
+    };
+
+    reader.onload = function(e)
+    {
+        var image = new Image();
+        image.onerror=function(e)
+        {
+            op.log("image error",e);
+        };
+        image.onload=function(e)
+        {
+            var tex=CGL.Texture.createFromImage(op.patch.cgl,image,{});
+            var canvas = document.createElement('canvas');
+        canvas.width = 1024;
+        canvas.height = 1024;
+        canvas.getContext('2d').drawImage(image, 0, 0, 1024,1024);
+        var b64img = canvas.toDataURL('image/png', .1);
+	    outFile.set(b64img);
+            outTex.set(tex);
+        };
+        image.src = e.target.result;
+
+    };
+
+    reader.readAsDataURL(evt.target.files[0]);
+}
+
+
+// events
+parentPort.onChange = onParentChanged;
+labelPort.onChange = onLabelTextChanged;
+inId.onChange = onIdChanged;
+op.onDelete = onDelete;
+
+op.toWorkNeedsParent('Ops.Sidebar.Sidebar');
+
+// functions
+
+function onIdChanged()
+{
+    el.id=inId.get();
+}
+
+function onLabelTextChanged() {
+    var labelText = labelPort.get();
+    label.textContent = labelText;
+}
+
+function onParentChanged() {
+    var parent = parentPort.get();
+    if(parent && parent.parentElement) {
+        parent.parentElement.appendChild(el);
+        siblingsPort.set(null);
+        siblingsPort.set(parent);
+    } else { // detach
+        if(el.parentElement) {
+            el.parentElement.removeChild(el);
+        }
+    }
+}
+
+function showElement(el) {
+    if(el) {
+        el.style.display = 'block';
+    }
+}
+
+function hideElement(el) {
+    if(el) {
+        el.style.display = 'none';
+    }
+}
+
+function onDelete() {
+    removeElementFromDOM(el);
+}
+
+function removeElementFromDOM(el) {
+    if(el && el.parentNode && el.parentNode.removeChild) {
+        el.parentNode.removeChild(el);
+    }
+}
+
+
+};
+
+Ops.User.alivemachine.FileIn.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.Ui.PatchInput
+// 
+// **************************************************************
+
+Ops.Ui.PatchInput = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+
+op.getPatchOp=function()
+{
+    for(var i in op.patch.ops)
+    {
+        if(op.patch.ops[i].patchId)
+        {
+            if(op.patch.ops[i].patchId.get()==op.uiAttribs.subPatch)
+            {
+                return op.patch.ops[i];
+            }
+        }
+    }
+};
+
+
+};
+
+Ops.Ui.PatchInput.prototype = new CABLES.Op();
+CABLES.OPS["e3f68bc3-892a-4c78-9974-aca25c27025d"]={f:Ops.Ui.PatchInput,objName:"Ops.Ui.PatchInput"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Ui.PatchOutput
+// 
+// **************************************************************
+
+Ops.Ui.PatchOutput = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+
+// empty
+
+};
+
+Ops.Ui.PatchOutput.prototype = new CABLES.Op();
+CABLES.OPS["851b44cb-5667-4140-9800-5aeb7031f1d7"]={f:Ops.Ui.PatchOutput,objName:"Ops.Ui.PatchOutput"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Ui.SubPatch
+// 
+// **************************************************************
+
+Ops.Ui.SubPatch = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+op.dyn=op.addInPort(new CABLES.Port(op,"create port",CABLES.OP_PORT_TYPE_DYNAMIC));
+op.dynOut=op.addOutPort(new CABLES.Port(op,"create port out",CABLES.OP_PORT_TYPE_DYNAMIC));
+
+var dataStr=op.addInPort(new CABLES.Port(op,"dataStr",CABLES.OP_PORT_TYPE_VALUE,{ display:'readonly' }));
+op.patchId=op.addInPort(new CABLES.Port(op,"patchId",CABLES.OP_PORT_TYPE_VALUE,{ display:'readonly' }));
+
+
+
+dataStr.setUiAttribs({hideParam:true});
+op.patchId.setUiAttribs({hideParam:true});
+
+var data={"ports":[],"portsOut":[]};
+
+// Ops.Ui.Patch.maxPatchId=CABLES.generateUUID();
+
+op.patchId.onChange=function()
+{
+    // console.log("subpatch changed...");
+    // clean up old subpatch if empty
+    var oldPatchOps=op.patch.getSubPatchOps(oldPatchId);
+
+    // console.log("subpatch has childs ",oldPatchOps.length);
+
+    if(oldPatchOps.length==2)
+    {
+        for(var i=0;i<oldPatchOps.length;i++)
+        {
+            // console.log("delete ",oldPatchOps[i]);
+            op.patch.deleteOp(oldPatchOps[i].id);
+        }
+    }
+    else
+    {
+        // console.log("old subpatch has ops.,...");
+    }
+};
+
+var oldPatchId=CABLES.generateUUID();
+op.patchId.set(oldPatchId);
+
+op.onLoaded=function()
+{
+    // op.patchId.set(CABLES.generateUUID());
+};
+
+op.onLoadedValueSet=function()
+{
+    data=JSON.parse(dataStr.get());
+    if(!data)
+    {
+        data={"ports":[],"portsOut":[]};
+    }
+    setupPorts();
+};
+
+function loadData()
+{
+}
+
+getSubPatchInputOp();
+getSubPatchOutputOp();
+
+var dataLoaded=false;
+dataStr.onChange=function()
+{
+    if(dataLoaded)return;
+
+    if(!dataStr.get())return;
+    try
+    {
+        // console.log('parse subpatch data');
+        loadData();
+    }
+    catch(e)
+    {
+        // op.log('cannot load subpatch data...');
+        console.log(e);
+    }
+};
+
+function saveData()
+{
+    dataStr.set(JSON.stringify(data));
+}
+
+function addPortListener(newPort,newPortInPatch)
+{
+    //console.log('newPort',newPort.name);
+
+    newPort.addEventListener("onUiAttrChange",function(attribs)
+    {
+        console.log("onUiAttrChange!!!");
+
+        if(attribs.title)
+        {
+            var i=0;
+            for(i=0;i<data.portsOut.length;i++)
+                if(data.portsOut[i].name==newPort.name)
+                    data.portsOut[i].title=attribs.title;
+
+            for(i=0;i<data.ports.length;i++)
+                if(data.ports[i].name==newPort.name)
+                    data.ports[i].title=attribs.title;
+
+            saveData();
+        }
+
+    });
+
+
+    if(newPort.direction==CABLES.PORT_DIR_IN)
+    {
+        if(newPort.type==CABLES.OP_PORT_TYPE_FUNCTION)
+        {
+            newPort.onTriggered=function()
+            {
+                if(newPortInPatch.isLinked())
+                    newPortInPatch.trigger();
+            };
+        }
+        else
+        {
+            newPort.onChange=function()
+            {
+                newPortInPatch.set(newPort.get());
+            };
+        }
+    }
+}
+
+function setupPorts()
+{
+    if(!op.patchId.get())return;
+    var ports=data.ports||[];
+    var portsOut=data.portsOut||[];
+    var i=0;
+
+    for(i=0;i<ports.length;i++)
+    {
+        if(!op.getPortByName(ports[i].name))
+        {
+            // console.log("ports[i].name",ports[i].name);
+
+            var newPort=op.addInPort(new CABLES.Port(op,ports[i].name,ports[i].type));
+            var patchInputOp=getSubPatchInputOp();
+
+
+
+
+
+            // console.log(patchInputOp);
+
+            var newPortInPatch=patchInputOp.addOutPort(new CABLES.Port(patchInputOp,ports[i].name,ports[i].type));
+
+// console.log('newPortInPatch',newPortInPatch);
+
+
+            newPort.ignoreValueSerialize=true;
+            newPort.setUiAttribs({"editableTitle":true});
+            if(ports[i].title)
+            {
+                newPort.setUiAttribs({"title":ports[i].title});
+                newPortInPatch.setUiAttribs({"title":ports[i].title});
+            }
+            addPortListener(newPort,newPortInPatch);
+
+        }
+    }
+
+    for(i=0;i<portsOut.length;i++)
+    {
+        if(!op.getPortByName(portsOut[i].name))
+        {
+            var newPortOut=op.addOutPort(new CABLES.Port(op,portsOut[i].name,portsOut[i].type));
+            var patchOutputOp=getSubPatchOutputOp();
+            var newPortOutPatch=patchOutputOp.addInPort(new CABLES.Port(patchOutputOp,portsOut[i].name,portsOut[i].type));
+
+            newPortOut.ignoreValueSerialize=true;
+            newPortOut.setUiAttribs({"editableTitle":true});
+
+            if(portsOut[i].title)
+            {
+                newPortOut.setUiAttribs({"title":portsOut[i].title});
+                newPortOutPatch.setUiAttribs({"title":portsOut[i].title});
+            }
+
+
+            // addPortListener(newPortOut,newPortOutPatch);
+            addPortListener(newPortOutPatch,newPortOut);
+
+        }
+    }
+
+    dataLoaded=true;
+
+}
+
+
+
+op.dyn.onLinkChanged=function()
+{
+    if(op.dyn.isLinked())
+    {
+        var otherPort=op.dyn.links[0].getOtherPort(op.dyn);
+        op.dyn.removeLinks();
+        otherPort.removeLinkTo(op.dyn);
+
+
+        var newName="in"+data.ports.length+" "+otherPort.parent.name+" "+otherPort.name;
+
+        data.ports.push({"name":newName,"type":otherPort.type});
+
+        setupPorts();
+
+        var l=gui.scene().link(
+            otherPort.parent,
+            otherPort.getName(),
+            op,
+            newName
+            );
+
+        // console.log('-----+===== ',otherPort.getName(),otherPort.get() );
+        // l._setValue();
+        // l.setValue(otherPort.get());
+
+        dataLoaded=true;
+        saveData();
+    }
+    else
+    {
+        setTimeout(function()
+        {
+            op.dyn.removeLinks();
+            gui.patch().removeDeadLinks();
+        },100);
+    }
+};
+
+op.dynOut.onLinkChanged=function()
+{
+    if(op.dynOut.isLinked())
+    {
+        var otherPort=op.dynOut.links[0].getOtherPort(op.dynOut);
+        op.dynOut.removeLinks();
+        otherPort.removeLinkTo(op.dynOut);
+        var newName="out"+data.ports.length+" "+otherPort.parent.name+" "+otherPort.name;
+
+        data.portsOut.push({"name":newName,"type":otherPort.type});
+
+        setupPorts();
+
+        gui.scene().link(
+            otherPort.parent,
+            otherPort.getName(),
+            op,
+            newName
+            );
+
+        dataLoaded=true;
+        saveData();
+    }
+    else
+    {
+        setTimeout(function()
+        {
+            op.dynOut.removeLinks();
+            gui.patch().removeDeadLinks();
+        },100);
+
+
+        op.log('dynOut unlinked...');
+    }
+    gui.patch().removeDeadLinks();
+};
+
+
+
+function getSubPatchOutputOp()
+{
+    var patchOutputOP=op.patch.getSubPatchOp(op.patchId.get(),'Ops.Ui.PatchOutput');
+
+    if(!patchOutputOP)
+    {
+        // console.log("Creating output for ",op.patchId.get());
+        op.patch.addOp('Ops.Ui.PatchOutput',{'subPatch':op.patchId.get()} );
+        patchOutputOP=op.patch.getSubPatchOp(op.patchId.get(),'Ops.Ui.PatchOutput');
+
+        if(!patchOutputOP) console.warn('no patchinput2!');
+    }
+    return patchOutputOP;
+
+}
+
+function getSubPatchInputOp()
+{
+    var patchInputOP=op.patch.getSubPatchOp(op.patchId.get(),'Ops.Ui.PatchInput');
+
+    if(!patchInputOP)
+    {
+        op.patch.addOp('Ops.Ui.PatchInput',{'subPatch':op.patchId.get()} );
+        patchInputOP=op.patch.getSubPatchOp(op.patchId.get(),'Ops.Ui.PatchInput');
+        if(!patchInputOP) console.warn('no patchinput2!');
+    }
+
+
+    return patchInputOP;
+}
+
+op.addSubLink=function(p,p2)
+{
+    var num=data.ports.length;
+
+    var sublPortname="in"+(num-1)+" "+p2.parent.name+" "+p2.name;
+    console.log('sublink! ',sublPortname);
+
+    if(p.direction==CABLES.PORT_DIR_IN)
+    {
+        var l=gui.scene().link(
+            p.parent,
+            p.getName(),
+            getSubPatchInputOp(),
+            sublPortname
+            );
+
+        // console.log('- ----=====EEE ',p.getName(),p.get() );
+        // console.log('- ----=====EEE ',l.getOtherPort(p).getName() ,l.getOtherPort(p).get() );
+    }
+    else
+    {
+        var l=gui.scene().link(
+            p.parent,
+            p.getName(),
+            getSubPatchOutputOp(),
+            "out"+(num)+" "+p2.parent.name+" "+p2.name
+            );
+    }
+
+    var bounds=gui.patch().getSubPatchBounds(op.patchId.get());
+
+    getSubPatchInputOp().uiAttr(
+        {
+            "translate":
+            {
+                "x":bounds.minx,
+                "y":bounds.miny-100
+            }
+        });
+
+    getSubPatchOutputOp().uiAttr(
+        {
+            "translate":
+            {
+                "x":bounds.minx,
+                "y":bounds.maxy+100
+            }
+        });
+    saveData();
+    return sublPortname;
+};
+
+
+
+op.onDelete=function()
+{
+    for (var i = op.patch.ops.length-1; i >=0 ; i--)
+    {
+        if(op.patch.ops[i].uiAttribs && op.patch.ops[i].uiAttribs.subPatch==op.patchId.get())
+        {
+            // console.log(op.patch.ops[i].objName);
+            op.patch.deleteOp(op.patch.ops[i].id);
+        }
+    }
+
+
+
+};
+
+
+};
+
+Ops.Ui.SubPatch.prototype = new CABLES.Op();
+CABLES.OPS["84d9a6f0-ed7a-466d-b386-225ed9e89c60"]={f:Ops.Ui.SubPatch,objName:"Ops.Ui.SubPatch"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Json.ObjectKeys
+// 
+// **************************************************************
+
+Ops.Json.ObjectKeys = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+
+var inObj=op.inObject("Object");
+
+var outNumKeys=op.outValue("Num Keys");
+var outKeys=op.outArray("Keys");
+
+inObj.onChange=function()
+{
+    var o=inObj.get();
+    if(!o)
+    {
+        outNumKeys.set(0);
+        outKeys.set([]);
+        return;
+    }
+    
+    
+    var keys=Object.keys(o);
+    outNumKeys.set(keys.length);
+    outKeys.set(keys);
+
+    
+
+    // result.set(outObject.set(inObject.get()));
+};
+
+
+};
+
+Ops.Json.ObjectKeys.prototype = new CABLES.Op();
+CABLES.OPS["83b4d148-8cb3-4a45-8824-957eeaf02e22"]={f:Ops.Json.ObjectKeys,objName:"Ops.Json.ObjectKeys"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Boolean.ParseBoolean_v2
+// 
+// **************************************************************
+
+Ops.Boolean.ParseBoolean_v2 = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const
+    inVal=op.inString("String"),
+    result=op.outValueBool("Result");
+
+inVal.onChange=function()
+{
+    var v=inVal.get();
+    if( v==="false" || v==false || v===0 || v==null || v==undefined)result.set(false);
+    else result.set(true);
+};
+
+};
+
+Ops.Boolean.ParseBoolean_v2.prototype = new CABLES.Op();
+CABLES.OPS["b436e831-36f5-4e0c-838e-4a82c4b07ec0"]={f:Ops.Boolean.ParseBoolean_v2,objName:"Ops.Boolean.ParseBoolean_v2"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.MasloAnalyzeText
+// 
+// **************************************************************
+
+Ops.User.alivemachine.MasloAnalyzeText = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const jsonp = false,
+    headers = {},
+    inMethod = "POST",
+    inBody = op.inString("body", ""),
+    inContentType = "application/json",
+    inParseJson = true,
+    reloadTrigger = op.inTriggerButton("send"),
+    outData = op.outObject("data"),
+    outString = op.outString("response"),
+    isLoading = op.outValue("Is Loading", false),
+    outTrigger = op.outTrigger("Loaded");
+var filename = "https://cors-anywhere.herokuapp.com/https://maslocompanionserver.wl.r.appspot.com/analyzeText/";
+
+outData.ignoreValueSerialize = true;
+
+reloadTrigger.onTriggered = function ()
+{
+    delayedReload();
+};
+
+let loadingId = 0;
+let reloadTimeout = 0;
+
+function delayedReload()
+{
+    clearTimeout(reloadTimeout);
+    reloadTimeout = setTimeout(reload, 100);
+}
+inBody.onChange = delayedReload;
+
+
+function reload(addCachebuster)
+{
+    if (!filename) return;
+
+    op.patch.loading.finished(loadingId);
+
+    loadingId = op.patch.loading.start("jsonFile", "" + filename);
+    isLoading.set(true);
+
+    op.setUiAttrib({ "extendTitle": CABLES.basename(filename) });
+
+    op.setUiError("jsonerr", null);
+
+    let httpClient = CABLES.ajax;
+    if (jsonp) httpClient = CABLES.jsonp;
+
+    let url = op.patch.getFilePath(filename);
+    if (addCachebuster)url += "?rnd=" + CABLES.generateUUID();
+
+    const body = '{"media":"'+inBody.get()+'","originTextID":"666777999","type":"text"}';
+    httpClient(
+        url,
+        (err, _data, xhr) =>
+        {
+            if (err)
+            {
+                op.error(err);
+                return;
+            }
+            try
+            {
+                let data = _data;
+                outData.set(null);
+                if (typeof data === "string" && inParseJson)
+                {
+                    data = JSON.parse(_data);
+                    outData.set(data);
+                }
+                outString.set(null);
+                outString.set(_data);
+                op.uiAttr({ "error": null });
+                op.patch.loading.finished(loadingId);
+                outTrigger.trigger();
+                isLoading.set(false);
+            }
+            catch (e)
+            {
+                op.error(e);
+                op.setUiError("jsonerr", "Problem while loading json:<br/>" + e);
+                op.patch.loading.finished(loadingId);
+                isLoading.set(false);
+            }
+        },
+        inMethod,
+        (body && body.length > 0) ? body : null,
+        inContentType,
+        null,
+        headers || {}
+    );
+}
+
+
+};
+
+Ops.User.alivemachine.MasloAnalyzeText.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.Json.ObjectGetArray_v2
+// 
+// **************************************************************
+
+Ops.Json.ObjectGetArray_v2 = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const
+    data = op.inObject("data"),
+    key = op.inString("key"),
+    result = op.outArray("result"),
+    arrLength = op.outValue("Length");
+
+result.ignoreValueSerialize = true;
+data.ignoreValueSerialize = true;
+
+data.onChange = update;
+
+key.onChange = function ()
+{
+    op.setUiAttrib({ "extendTitle": key.get() });
+    update();
+};
+
+function update()
+{
+    result.set(null);
+    const dat = data.get();
+    const k = key.get();
+    if (dat && dat.hasOwnProperty(k))
+    {
+        result.set(dat[k]);
+        arrLength.set(result.get().length);
+    }
+    else
+    {
+        arrLength.set(0);
+    }
+}
+
+
+};
+
+Ops.Json.ObjectGetArray_v2.prototype = new CABLES.Op();
+CABLES.OPS["7c06a818-9c07-493a-8c4f-04eb2c7796f5"]={f:Ops.Json.ObjectGetArray_v2,objName:"Ops.Json.ObjectGetArray_v2"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Array.ArrayOfObjectsToString
+// 
+// **************************************************************
+
+Ops.Array.ArrayOfObjectsToString = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const inArray = op.inArray("Array In");
+const outString = op.outString("String");
+
+inArray.onChange = function() {
+    if (!inArray.get()) {
+        outString.set("");
+        return;
+    }
+
+    const arr = inArray.get();
+    let result = "";
+
+    for (let i = 0; i < arr.length; i += 1) {
+        const objToString = JSON.stringify(arr[i]);
+        result += "\n" + objToString;
+    }
+
+    outString.set(result);
+}
+
+};
+
+Ops.Array.ArrayOfObjectsToString.prototype = new CABLES.Op();
+CABLES.OPS["1593cd67-2a90-43ab-b95e-ad6bbe9af37e"]={f:Ops.Array.ArrayOfObjectsToString,objName:"Ops.Array.ArrayOfObjectsToString"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Time.DelayedTrigger
+// 
+// **************************************************************
+
+Ops.Time.DelayedTrigger = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const
+    exe=op.inTrigger("exe"),
+    delay=op.inValueFloat("delay",1),
+    next=op.outTrigger("next"),
+    outDelaying=op.outBool("Delaying");
+
+var lastTimeout=null;
+
+exe.onTriggered=function()
+{
+    outDelaying.set(true);
+    if(lastTimeout)clearTimeout(lastTimeout);
+
+    lastTimeout=setTimeout(
+        function()
+        {
+            outDelaying.set(false);
+            lastTimeout=null;
+            next.trigger();
+        },
+        delay.get()*1000);
+};
+
+};
+
+Ops.Time.DelayedTrigger.prototype = new CABLES.Op();
+CABLES.OPS["f4ff66b0-8500-46f7-9117-832aea0c2750"]={f:Ops.Time.DelayedTrigger,objName:"Ops.Time.DelayedTrigger"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.String.Concat_v2
+// 
+// **************************************************************
+
+Ops.String.Concat_v2 = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+var string1=op.inString("string1","ABC");
+var string2=op.inString("string2","XYZ");
+var newLine=op.inValueBool("New Line",false);
+var result=op.outString("result");
+
+newLine.onChange=string2.onChange=string1.onChange=exec;
+exec();
+
+function exec()
+{
+    var s1=string1.get();
+    var s2=string2.get();
+    if(!s1 && !s2)
+    {
+        result.set('');
+        return;
+    }
+    if(!s1)s1='';
+    if(!s2)s2='';
+
+    var nl='';
+    if(s1 && s2 && newLine.get())nl='\n';
+    result.set( String(s1)+nl+String(s2));
+}
+
+
+
+
+};
+
+Ops.String.Concat_v2.prototype = new CABLES.Op();
+CABLES.OPS["a52722aa-0ca9-402c-a844-b7e98a6c6e60"]={f:Ops.String.Concat_v2,objName:"Ops.String.Concat_v2"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Value.Boolean
+// 
+// **************************************************************
+
+Ops.Value.Boolean = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const v=op.inValueBool("value",false);
+const result=op.outValueBool("result");
+
+result.set(false);
+v.onChange=exec;
+
+function exec()
+{
+    if(result.get()!=v.get()) result.set(v.get());
+}
+
+
+
+};
+
+Ops.Value.Boolean.prototype = new CABLES.Op();
+CABLES.OPS["83e2d74c-9741-41aa-a4d7-1bda4ef55fb3"]={f:Ops.Value.Boolean,objName:"Ops.Value.Boolean"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.EncodeURI
+// 
+// **************************************************************
+
+Ops.User.alivemachine.EncodeURI = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const
+    en=op.inString("Encode",""),
+    de=op.inString("Decode",""),
+    blr=op.inString("Linebreak Remove",""),
+    sc=op.inString("Special Chr Remove",""),
+    ended=op.outString("Encoded"),
+    deded=op.outString("Decoded"),
+    blred=op.outString("Lb Removed"),
+    sced=op.outString("Spe Chr Removed");
+sc.onChange=
+blr.onChange=
+en.onChange=
+de.onChange=update;
+
+function update()
+{
+    var str = blr.get();
+    if(str!==null){
+    str = str.replace(/\/n|\\n/g,"");
+    blred.set(str);
+    }
+    var str2 = sc.get();
+    if(str2!==null){
+    //str2 = str2.replace(/[^\w\s]/gi, '');
+    sced.set(str2);
+    }
+    ended.set(encodeURIComponent(en.get()));
+    deded.set(decodeURIComponent(de.get()));
+
+}
+
+
+
+};
+
+Ops.User.alivemachine.EncodeURI.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.MySpeech
+// 
+// **************************************************************
+
+Ops.User.alivemachine.MySpeech = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const
+    inLang=op.inString("Language","us-US"),
+    active=op.inBool("Active",true),
+    result=op.outString("Result"),
+    confidence=op.outNumber("Confidence"),
+    outSupported=op.outBool("Supported",false),
+    outResult=op.outTrigger("New Result",""),
+    outActive=op.outBool("Started",false);
+
+
+active.onChange=startStop;
+
+window.SpeechRecognition = window.SpeechRecognition||window.webkitSpeechRecognition || window.mozSpeechRecognition;
+
+var recognition=null;
+
+inLang.onChange=changeLang;
+
+function startStop(){
+    if(!recognition) return;
+
+    try{
+
+        if(active.get()!=outActive.get())
+        {
+            if(active.get()) {
+                console.log("start");
+                recognition.start();
+                console.log("started");
+            }
+            else {
+                console.log("aborting");
+                recognition.stop();
+                outActive.set(false);
+                console.log("aborted");
+            }
+        }
+
+    }
+    catch(e)
+    {
+        console.log(e);
+    }
+}
+
+
+op.init=function()
+{
+   // startStop();
+};
+
+function changeLang()
+{
+    if(!recognition)return;
+
+    recognition.lang = inLang.get();
+    recognition.stop();
+
+    setTimeout(function(){
+        try{recognition.start();}catch(e){}},500);
+
+
+
+}
+
+startAPI();
+
+function startAPI()
+{
+    if(window.SpeechRecognition)
+    {
+        outSupported.set(true);
+
+        if(recognition) recognition.abort();
+
+        recognition=new SpeechRecognition();
+
+        recognition.lang = inLang.get();
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 0;
+        recognition.continuous=true;
+        SpeechRecognition.interimResults=true;
+
+
+        recognition.onstart = function() { outActive.set(true); };
+        recognition.onstop = function() { outActive.set(false); };
+        recognition.onend = function() { outActive.set(false);if(active===true){startStop();} };
+
+        recognition.onresult = function(event) { op.log('recognition result'); };
+        //recognition.onerror = function(event) { op.log('recognition error',result); };
+
+
+        recognition.onresult = function(event)
+        {
+            const idx=event.results.length-1;
+
+            result.set(event.results[idx][0].transcript);
+            confidence.set(event.results[idx][0].confidence);
+            op.log('You said: ', event.results[idx][0].transcript);
+            outResult.trigger();
+        };
+
+    }
+
+}
+
+
+
+};
+
+Ops.User.alivemachine.MySpeech.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.Boolean.BoolToString
+// 
+// **************************************************************
+
+Ops.Boolean.BoolToString = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const
+    inBool=op.inBool("Boolean",false),
+    inTrue=op.inString("True","true"),
+    inFalse=op.inString("False","false"),
+    result=op.outString("String","false");
+
+inTrue.onChange=
+    inFalse.onChange=
+    inBool.onChange=update
+
+function update()
+{
+    if(inBool.get()) result.set(inTrue.get());
+    else result.set(inFalse.get());
+}
+
+};
+
+Ops.Boolean.BoolToString.prototype = new CABLES.Op();
+CABLES.OPS["22a734aa-8b08-4db7-929b-393d4704e1d6"]={f:Ops.Boolean.BoolToString,objName:"Ops.Boolean.BoolToString"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.ScrollDownDiv
+// 
+// **************************************************************
+
+Ops.User.alivemachine.ScrollDownDiv = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const
+    inText = op.inString("Text", "Hello Div"),
+    inId = op.inString("Id"),
+    inClass = op.inString("Class"),
+    inStyle = op.inValueEditor("Style", "position:absolute;z-index:9999;", "none"),
+    inInteractive = op.inValueBool("Interactive", false),
+    inVisible = op.inValueBool("Visible", true),
+    inBreaks = op.inValueBool("Convert Line Breaks", false),
+    outElement = op.outObject("DOM Element"),
+    outHover = op.outValue("Hover"),
+    outClicked = op.outTrigger("Clicked");
+
+let listenerElement = null;
+let oldStr = null;
+let prevDisplay = "block";
+
+const div = document.createElement("div");
+div.dataset.op = op.id;
+const canvas = op.patch.cgl.canvas.parentElement;
+
+canvas.appendChild(div);
+outElement.set(div);
+
+inClass.onChange = updateClass;
+inBreaks.onChange = inText.onChange = updateText;
+inStyle.onChange = updateStyle;
+inInteractive.onChange = updateInteractive;
+inVisible.onChange = updateVisibility;
+
+updateText();
+updateStyle();
+warning();
+
+op.onDelete = removeElement;
+
+outElement.onLinkChanged = updateStyle;
+
+function setCSSVisible(visible)
+{
+    if (!visible)
+    {
+        div.style.visibility = "hidden";
+        prevDisplay = div.style.display || "block";
+        div.style.display = "none";
+    }
+    else
+    {
+        // prevDisplay=div.style.display||'block';
+        if (prevDisplay == "none") prevDisplay = "block";
+        div.style.visibility = "visible";
+        div.style.display = prevDisplay;
+    }
+}
+
+function updateVisibility()
+{
+    setCSSVisible(inVisible.get());
+}
+
+
+function updateText()
+{
+    let str = inText.get();
+    // console.log(oldStr,str);
+
+    if (oldStr === str) return;
+    oldStr = str;
+
+    if (str && inBreaks.get()) str = str.replace(/(?:\r\n|\r|\n)/g, "<br>");
+
+    if (div.innerHTML != str) div.innerHTML = str;
+    outElement.set(null);
+    outElement.set(div);
+    div.scrollTo(0,div.scrollHeight);
+
+}
+
+function removeElement()
+{
+    if (div && div.parentNode) div.parentNode.removeChild(div);
+}
+// inline css inisde div
+function updateStyle()
+{
+    if (inStyle.get() != div.style)
+    {
+        div.setAttribute("style", inStyle.get());
+        updateVisibility();
+        outElement.set(null);
+        outElement.set(div);
+    }
+    warning();
+}
+
+function updateClass()
+{
+    div.setAttribute("class", inClass.get());
+    warning();
+}
+
+function onMouseEnter()
+{
+    outHover.set(true);
+}
+
+function onMouseLeave()
+{
+    outHover.set(false);
+}
+
+function onMouseClick()
+{
+    outClicked.trigger();
+}
+
+function updateInteractive()
+{
+    removeListeners();
+    if (inInteractive.get()) addListeners();
+}
+
+inId.onChange = function ()
+{
+    div.id = inId.get();
+};
+
+function removeListeners()
+{
+    if (listenerElement)
+    {
+        listenerElement.removeEventListener("click", onMouseClick);
+        listenerElement.removeEventListener("mouseleave", onMouseLeave);
+        listenerElement.removeEventListener("mouseenter", onMouseEnter);
+        listenerElement = null;
+    }
+}
+
+function addListeners()
+{
+    if (listenerElement)removeListeners();
+
+    listenerElement = div;
+
+    if (listenerElement)
+    {
+        listenerElement.addEventListener("click", onMouseClick);
+        listenerElement.addEventListener("mouseleave", onMouseLeave);
+        listenerElement.addEventListener("mouseenter", onMouseEnter);
+    }
+}
+
+op.addEventListener("onEnabledChange", function (enabled)
+{
+    op.log("css changed");
+    setCSSVisible(div.style.visibility != "visible");
+});
+
+function warning()
+{
+    if (inClass.get() && inStyle.get())
+    {
+        op.setUiError("error", "DIV uses external and inline CSS", 1);
+    }
+    else
+    {
+        op.setUiError("error", null);
+    }
+}
+
+
+};
+
+Ops.User.alivemachine.ScrollDownDiv.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.Storymapr
+// 
+// **************************************************************
+
+Ops.User.alivemachine.Storymapr = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const filename = op.inUrl("file"),
+    jsonp = op.inValueBool("JsonP", false),
+    headers = op.inObject("headers", {}),
+    inBody = op.inStringEditor("body", ""),
+    inMethod = op.inDropDown("HTTP Method", ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "CONNECT", "OPTIONS", "TRACE"], "GET"),
+    inContentType = op.inString("Content-Type", "application/json"),
+    inParseJson = op.inBool("parse json", true),
+    reloadTrigger = op.inTriggerButton("reload"),
+    outData = op.outObject("data"),
+    outString = op.outString("response"),
+    isLoading = op.outValue("Is Loading", false),
+    outTrigger = op.outTrigger("Loaded");
+
+filename.setUiAttribs({ "title": "URL" });
+
+outData.ignoreValueSerialize = true;
+
+filename.onChange = jsonp.onChange = headers.onChange = inMethod.onChange = inParseJson.onChange = delayedReload;
+
+reloadTrigger.onTriggered = function ()
+{
+    delayedReload();
+};
+
+let loadingId = 0;
+let reloadTimeout = 0;
+
+function delayedReload()
+{
+    clearTimeout(reloadTimeout);
+    reloadTimeout = setTimeout(reload, 100);
+}
+
+op.onFileChanged = function (fn)
+{
+    if (filename.get() && filename.get().indexOf(fn) > -1) reload(true);
+};
+
+function reload(addCachebuster)
+{
+    if (!filename.get()) return;
+
+    op.patch.loading.finished(loadingId);
+
+    loadingId = op.patch.loading.start("jsonFile", "" + filename.get());
+    isLoading.set(true);
+
+    op.setUiAttrib({ "extendTitle": CABLES.basename(filename.get()) });
+
+    op.setUiError("jsonerr", null);
+
+    let httpClient = CABLES.ajax;
+    if (jsonp.get()) httpClient = CABLES.jsonp;
+
+    let url = op.patch.getFilePath(filename.get());
+    if (addCachebuster)url += "?rnd=" + CABLES.generateUUID();
+
+    const body = inBody.get();
+    httpClient(
+        url,
+        (err, _data, xhr) =>
+        {
+            if (err)
+            {
+                op.error(err);
+                return;
+            }
+            try
+            {
+                let data = _data;
+                outData.set(null);
+                if (typeof data === "string" && inParseJson.get())
+                {
+                    data = JSON.parse(_data);
+                    outData.set(data);
+                }
+                outString.set(null);
+                outString.set(_data);
+                op.uiAttr({ "error": null });
+                op.patch.loading.finished(loadingId);
+                outTrigger.trigger();
+                isLoading.set(false);
+            }
+            catch (e)
+            {
+                op.error(e);
+                op.setUiError("jsonerr", "Problem while loading json:<br/>" + e);
+                op.patch.loading.finished(loadingId);
+                isLoading.set(false);
+            }
+        },
+        inMethod.get(),
+        (body && body.length > 0) ? body : null,
+        inContentType.get(),
+        null,
+        headers.get() || {}
+    );
+}
+
+
+};
+
+Ops.User.alivemachine.Storymapr.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.Runway
+// 
+// **************************************************************
+
+Ops.User.alivemachine.Runway = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+// your new op
+// have a look at the documentation at:
+// https://docs.cables.gl/dev_hello_op/dev_hello_op.html
+// inputs
+
+const triggerIn = op.inTrigger("trigger");
+const routeIn = op.inString("route","");
+//const filterIn = op.inString("inputkey","");
+const dataIn = op.inString("inputdata","");
+//const filterOut = op.inString("outputkey","");
+
+//const imageIn = op.inTexture("image");
+
+
+// outputs
+
+
+const dataOut = op.outString("outputdata");
+
+
+dataIn.onChange = go;
+triggerIn.onTriggered = go;
+var outputs = ["output_image", "image", "output", "result", "generated_text", "caption", "stylizedImage"]
+
+function  go() {
+    op.log("go")
+    //var xmlHttp = new XMLHttpRequest();
+    //xmlHttp.open( "GET", routeIn.get(), false ); // false for synchronous request
+    //xmlHttp.send( null );
+    //dataOut.set(JSON.parse(xmlHttp.responseText)[filterOut.get])
+
+    httpPostAsync(routeIn.get()+"query", function(result){
+        //dataOut.set(JSON.parse(result)[filterOut.get()])
+
+        for(var i = 0; i<outputs.length; i++){
+            if(JSON.parse(result)[outputs[i]]!="undefined"){
+                dataOut.set(JSON.parse(result)[outputs[i]])
+            }
+        }
+
+        //dataOut.set(JSON.parse(result)[filterOut.get()])
+    })
+}
+/*
+function httpGetAsync(theUrl, callback) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() {
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            callback(xmlHttp.responseText);
+    }
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous
+    xmlHttp.send(null);
+}
+*/
+
+function httpPostAsync(theUrl, callback) {
+    var dat = dataIn.get();
+const inputs = {
+  "caption":dat,
+  "input_image":dat,
+  "contentImage":dat,
+  "image":dat,
+  "num_octaves": 2,
+  "iterations": 50,
+  "octave_scale": 1,
+  "features_mixed_2": 1.8,
+  "features_mixed_3": 1.7,
+  "features_mixed_4": 1.4,
+  "features_mixed_5": 1.9,
+  "alpha_normal": 1,
+  "prompt": dat,
+  "max_characters": 128,
+  "top_p": .5,
+  "seed": 54,
+  "semantic_map":dat
+};
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("POST", theUrl, true);
+    xmlHttp.setRequestHeader("Content-Type", "application/json");
+    xmlHttp.onreadystatechange = function() {
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            callback(xmlHttp.responseText);
+    }
+
+    xmlHttp.send(JSON.stringify(inputs));
+}
+
+
+};
+
+Ops.User.alivemachine.Runway.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.String.RouteString
+// 
+// **************************************************************
+
+Ops.String.RouteString = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const
+    NUM_PORTS = 10,
+    indexPort = op.inInt('Index'),
+    valuePort = op.inString('String in',"cables"),
+    defaultStringPort = op.inString('Default string', ""),
+    valuePorts = createOutPorts();
+
+indexPort.onChange = valuePort.onChange = defaultStringPort.onChange = update;
+
+setDefaultValues();
+update();
+
+function createOutPorts()
+{
+    var arr = [];
+    for(var i=0; i<NUM_PORTS; i++)
+    {
+        var port = op.outString('Index ' + i + ' string');
+        arr.push(port);
+    }
+    return arr;
+};
+
+function setDefaultValues()
+{
+    var defaultValue = defaultStringPort.get();
+    if(!defaultStringPort.get())
+    {
+        defaultValue = "";
+    }
+    valuePorts.forEach(port => port.set(defaultValue));
+};
+
+function update()
+{
+    setDefaultValues();
+    var index = indexPort.get();
+    var value = valuePort.get();
+    index = Math.round(index);
+    index = clamp(index, 0, NUM_PORTS-1);
+    valuePorts[index].set(value);
+};
+
+function clamp(value, min, max)
+{
+  return Math.min(Math.max(value, min), max);
+};
+
+
+};
+
+Ops.String.RouteString.prototype = new CABLES.Op();
+CABLES.OPS["9998ff83-335b-40cd-aa0e-4cae558cb551"]={f:Ops.String.RouteString,objName:"Ops.String.RouteString"};
 
 
 window.addEventListener('load', function(event) {
