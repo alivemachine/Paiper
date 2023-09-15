@@ -1,6 +1,5 @@
 <div align="center">
 <h1 align="center">
-<img src="https://raw.githubusercontent.com/alivemachine/Paiper/01/ogthumb.png"  />
 <br>Paiper
 </h1>
 <h3>◦ Code smarter, unleash your Paiper power!</h3>
