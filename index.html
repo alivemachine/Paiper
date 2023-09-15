@@ -2,14 +2,19 @@
 <html lang="en">
 
 <head>
-    <title>Paiper</title>
+    <title>HyperObjectWeb</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
-    <meta itemprop="name" content="HyperObjectWeb05">
-    <meta itemprop="description" content="made with cables">
+    <meta itemprop="name" content="HyperObjectWeb">
+    <meta itemprop="description" content="Freefrom expression, freeform navigation, freeform sharing.">
     <meta itemprop="image" content="screenshot.png">
-    <meta name="description" content="made with cables" />
-
+    <meta name="description" content="Freefrom expression, freeform navigation, freeform sharing." />
+	
+<meta property="og:title" content="H y p e r O b j e c t W e b">
+<meta property="og:description" content="Freefrom expression, freeform navigation, freeform sharing.">
+<meta property="og:image" content="https://alivemachine.io/how/screenshot.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
         body {
             margin: 0;
@@ -23,34 +28,63 @@
             position: absolute;
             outline:0;
         }
+
+        footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            box-sizing: border-box;
+            width: 100vw;
+            padding: 20px;
+            text-align: right;
+            font-size: 18px;
+            color: #24baa7;
+        }
+
+        footer a,
+        footer a:hover,
+        footer a:active {
+            color: #24baa7;
+        }
     </style>
 
 </head>
 
 <body>
     <canvas id="glcanvas" width="100vw" height="100vh" tabindex="1"></canvas>
+    <footer>
+        <!-- made with <a href='https://cables.gl'>cables</a>
+        we would greatly appreciate if you link cables somewhere on your site! and tell us your website! thanks <3 :) -->
+    </footer>
 
     <libs/>
     <script type="text/javascript" src="js/patch.js" async></script>
     <corelibs/>
 
     <script>
-        /**
-         * Called when there was a cables error.
-         * @param {string} errId - ID of the error, e.g. 'NO_WEBGL' or 'NO_WEBAUDIO'
-         *                         when the browser does not support the used APIs
-         * @param {string} errMsg - The error message
-         */
-        function showError(errId, errMsg) {
-            alert('An error occured: ' + errId + ', ' + errMsg);
-        }
 
-        function patchInitialized(patch) {
-            // You can now access the patch object (patch), register variable watchers and so on
+		function patchInitialized(patch) {
+			//text is activated by default
+			
+            //patch.setVariable("action","paiper");
+			
         }
-
+		var block = 0;
         function patchFinishedLoading(patch) {
-            // The patch is ready now, all assets have been loaded
+			if(block==0){
+				//patch.setVariable("command","image");
+			setTimeout(function(){
+					//patch.setVariable("action","meta");
+					//alert();
+				},10000);
+				setTimeout(function(){
+					//patch.setVariable("action","twitter");
+					//alert();
+				},5000);
+				//patch.setVariable("command","meta");
+				//patch.setVariable("probe"," ");
+				block=1;
+			}
         }
 
         document.addEventListener('CABLES.jsLoaded', function (event) {
@@ -59,7 +93,6 @@
                 prefixAssetPath: '',
                 glCanvasId: 'glcanvas',
                 glCanvasResizeToWindow: true,
-                onError: showError,
                 onPatchLoaded: patchInitialized,
                 onFinishedLoading: patchFinishedLoading,
             });
