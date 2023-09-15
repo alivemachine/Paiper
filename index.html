@@ -2,10 +2,10 @@
 <html lang="en">
 
 <head>
-    <title>HyperObjectWeb04</title>
+    <title>HyperObjectWeb05</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
-    <meta itemprop="name" content="HyperObjectWeb04">
+    <meta itemprop="name" content="HyperObjectWeb05">
     <meta itemprop="description" content="made with cables">
     <meta itemprop="image" content="screenshot.png">
     <meta name="description" content="made with cables" />
@@ -24,42 +24,15 @@
             outline:0;
         }
 
-        footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            box-sizing: border-box;
-            width: 100vw;
-            padding: 20px;
-            text-align: right;
-            font-size: 18px;
-            color: #24baa7;
-        }
-
-        footer a,
-        footer a:hover,
-        footer a:active {
-            color: #24baa7;
-        }
     </style>
 
 </head>
 
 <body>
     <canvas id="glcanvas" width="100vw" height="100vh" tabindex="1"></canvas>
-    <footer>
-        made with <a href='https://cables.gl'>cables</a>
-        <!-- we would greatly appreciate if you link cables somewhere on your site! and tell us your website! thanks <3 :) -->
-    </footer>
-
-    <script type="text/javascript"  src="js/twitterFetcher_min.js"></script>
-
-    <script type="text/javascript" src="js/libs.core.min.js"></script>
-<script type="text/javascript" src="js/cables.min.js"></script>
-<script type="text/javascript" src="js/ops.js"></script>
-
-    <script type="text/javascript"  src="js/vargetset.js"></script>
-
+    <libs/>
+    <script type="text/javascript" src="js/patch.js" async></script>
+    <corelibs/>
 
     <script>
         /**
@@ -82,7 +55,7 @@
 
         document.addEventListener('CABLES.jsLoaded', function (event) {
             CABLES.patch = new CABLES.Patch({
-                patchFile: 'js/HyperObjectWeb04.json',
+                patch: CABLES.exportedPatch,
                 prefixAssetPath: '',
                 glCanvasId: 'glcanvas',
                 glCanvasResizeToWindow: true,
