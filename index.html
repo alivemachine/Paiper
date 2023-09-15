@@ -24,12 +24,34 @@
             outline:0;
         }
 
+        footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            box-sizing: border-box;
+            width: 100vw;
+            padding: 20px;
+            text-align: right;
+            font-size: 18px;
+            color: #24baa7;
+        }
+
+        footer a,
+        footer a:hover,
+        footer a:active {
+            color: #24baa7;
+        }
     </style>
 
 </head>
 
 <body>
     <canvas id="glcanvas" width="100vw" height="100vh" tabindex="1"></canvas>
+    <footer>
+        <!-- made with <a href='https://cables.gl'>cables</a>
+        we would greatly appreciate if you link cables somewhere on your site! and tell us your website! thanks <3 :) -->
+    </footer>
+
     <libs/>
     <script type="text/javascript" src="js/patch.js" async></script>
     <corelibs/>
