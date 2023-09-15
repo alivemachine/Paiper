@@ -1,9 +1,10 @@
 <div align="center">
 <h1 align="center">
-<img src="https://github.com/alivemachine/Paiper/blob/04/ogthumb.png" />
+<img src="https://github.com/alivemachine/Paiper/blob/14/screenshot.png" />
 <br>Paiper
 </h1>
 <h3>◦ Reimagine collaboration with Paiper!</h3>
+  <img src="https://github.com/alivemachine/Paiper/blob/04/ogthumb.png" />
 <h3>◦ Developed with the software and tools listed below.</h3>
 
 <p><img width="100" src="https://alivemachine.io/image/fronthand/openai.png" alt="OpenAI logo" /></p>
