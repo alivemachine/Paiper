@@ -167,3 +167,31 @@ git push origin new-feature-branch
 The project maintainers will review your changes and provide feedback or merge them into the main branch.
 
 ---
+## More
+
+### Demos
+
+- [01](https://alivemachine.io/paiper/)  
+- [02](https://alivemachine.io/paiper02/)  
+- [03](https://alivemachine.io/paiper03/)  
+- [04](https://alivemachine.io/paiper04/)  
+- [05](https://alivemachine.io/paiper05/)  
+- [06](https://alivemachine.io/paiper06/)  
+- [07](https://alivemachine.io/paiper07/)  
+- [08](https://alivemachine.io/paiper08/)  
+- [09](https://alivemachine.io/paiper09/)  
+- [10](https://alivemachine.io/paiper10/)  
+- [12](https://alivemachine.io/paiper12/)  
+- [14](https://alivemachine.io/paiper14/)  
+- [15](https://alivemachine.io/paiper15/)
+
+
+### Additional documentaton
+
+- [Co-Creating with AI](https://medium.com/maslo/co-creating-with-ai-c7c7d488607a)  
+- [Image|ning with AI](https://medium.com/maslo/image-ning-with-ai-2cc3d1cd6cb)  
+- [Computer dream](https://alivemachine.medium.com/computer-dream-ef67c1b2d86b)  
+- [Twitter](https://twitter.com/Orageai)
+
+---
+
