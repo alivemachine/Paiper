@@ -1,20 +1,30 @@
 <div align="center">
 <h1 align="center">
-<img src="https://raw.githubusercontent.com/PKief/vscode-material-icon-theme/ec559a9f6bfd399b82bb44393651661b08aaf7ba/icons/folder-markdown-open.svg" width="100" />
+<img src="https://github.com/alivemachine/Paiper/blob/04/ogthumb.png" />
 <br>Paiper
 </h1>
-<h3>◦ Unleash creativity, effortlessly.</h3>
+<h3>◦ Unleash your code creativity with Paiper!</h3>
 <h3>◦ Developed with the software and tools listed below.</h3>
+
+<img src="https://alivemachine.io/image/fronthand/openai.png" alt="OpenAI logo" />
 
 <p align="center">
 <img src="https://img.shields.io/badge/JavaScript-F7DF1E.svg?style&logo=JavaScript&logoColor=black" alt="JavaScript" />
 <img src="https://img.shields.io/badge/HTML5-E34F26.svg?style&logo=HTML5&logoColor=white" alt="HTML5" />
+<img src="https://img.shields.io/badge/Markdown-000000.svg?style&logo=Markdown&logoColor=white" alt="Markdown" />
 <img src="https://img.shields.io/badge/JSON-000000.svg?style&logo=JSON&logoColor=white" alt="JSON" />
 </p>
 <img src="https://img.shields.io/github/languages/top/alivemachine/Paiper?style&color=5D6D7E" alt="GitHub top language" />
 <img src="https://img.shields.io/github/languages/code-size/alivemachine/Paiper?style&color=5D6D7E" alt="GitHub code size in bytes" />
 <img src="https://img.shields.io/github/commit-activity/m/alivemachine/Paiper?style&color=5D6D7E" alt="GitHub commit activity" />
 <img src="https://img.shields.io/github/license/alivemachine/Paiper?style&color=5D6D7E" alt="GitHub license" />
+<br>
+<img src="https://img.shields.io/github/stars/heymaslo/alivemachine/Paiper?style=social" alt="GitHub stars" />
+<a href="https://github.com/Naereen/badges/">
+<img src="https://badgen.net/badge/Open%20Source%20%3F/Yes%21/blue?icon=github" alt="Open Source? Yes!" />
+</a>
+<img src="https://img.shields.io/twitter/follow/heymaslo?style=social" alt="Twitter Follow" />
+
 </div>
 
 ---
@@ -26,33 +36,31 @@
 - [📂 Project Structure](#project-structure)
 - [🧩 Modules](#modules)
 - [🚀 Getting Started](#-getting-started)
-- [🗺 Roadmap](#-roadmap)
 - [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
-- [👏 Acknowledgments](#-acknowledgments)
 
 ---
 
 
 ## 📍 Overview
 
-The Paiper project is a web-based platform that leverages cables.gl to display and interact with customizable graphic patches. The core functionality revolves around loading a patch from a JSON file and rendering it on a webpage using HTML and JavaScript. Additionally, the project offers error handling, patch initialization callbacks, and asset loading callbacks. This project provides users with an intuitive and visually engaging interface to create, edit, and display interactive graphics, making it valuable for artists, designers, and developers alike.
+The project at https://github.com/alivemachine/Paiper is an HTML page that utilizes the cables.gl framework to create and run interactive visual elements on a canvas. The project also includes JavaScript libraries for fetching and displaying Twitter posts, as well as functionality for creating and managing variables in the cables.gl environment. The core purpose of the project is to provide a platform for designing interactive visualizations and integrating Twitter content, offering a valuable tool for developers in building engaging web experiences.
 
 ---
 
 ## ⚙️ Features
 
-| Feature                | Description                           |
-| ---------------------- | ------------------------------------- |
-| **⚙️ Architecture**     | The codebase follows a client-side architecture, with an HTML file serving as the entry point for a webpage. JavaScript files handle different functionalities, such as configuring the graphics patch, fetching and displaying Twitter posts, and varget/varset operations. The codebase utilizes callbacks and error handling to ensure proper initialization and asset loading. The system leverages cables.gl and other JavaScript libraries for specific functionalities. The codebase appears to rely on modular code organization.    |
-| **📖 Documentation**   | The codebase could benefit from more comprehensive documentation. While some comments are provided within the JavaScript files, a more structured documentation approach can enhance understandability and ease of maintenance.    |
-| **🔗 Dependencies**    | The codebase relies on external libraries to support its features, such as cables.gl, lottie_svg.js, ops.js, and twitterFetcher_min.js. The cables.min.js and libs.core.min.js files might be custom internal libraries related to the architecture. Ensuring version compatibility and stability of these dependencies is crucial for the overall system's functionality.    |
-| **🧩 Modularity**      | The codebase exhibits components that implement specific functionalities, such as handling the graphics patch, Twitter post fetching, and varget/varset operations. This modular approach allows for better organization, maintainability, and potential reusability of individual components. Further decoupling of components could enhance modularity.   |
-| **✔️ Testing**          | The codebase lacks explicit information on testing strategies, tools, or any dedicated testing files. Implementing testing practices, such as unit tests or automated tests, can improve code reliability and maintainability. Regular testing cycles could be introduced to ensure the integrity of the system.    |
-| **⚡️ Performance**      | The codebase's overall performance is dependent on the efficiency of the external libraries used, such as cables.gl and lottie_svg.js. As these libraries handle graphics rendering, animation, and communicating with external services like the Twitter API, optimizing them for speed and resource usage becomes crucial. System-specific optimizations, such as minimizing DOM operations and network requests, can further impact performance.    |
-| **🔐 Security**        | Based on the codebase analysis alone, it is challenging to ascertain specific security measures implemented. Given that the system interacts with external resources, such as patches and Twitter posts, precautions against security vulnerabilities like cross-site scripting (XSS) and data validation should be considered. Implementing secure communication (HTTPS) and following best practices for handling user data is essential.    |
-| **🔀 Version Control** | The codebase uses Git for version control, as observed by the presence of a GitHub repository. However, the specific version control strategies, such as branching models, commit practices, and issue tracking, need further exploration from the codebase alone. Utilizing branching strategies like feature branches, pull requests, and automated CI/CD pipelines can enhance collaboration and maintainability of the codebase.    |
-| **🔌 Integrations**    | The system integrates with external services like cables.gl for displaying graphics patches and the Twitter API for fetching and displaying Twitter posts. Understanding the API integrations,
+| Feature                | Description                                                                 |
+| ---------------------- | --------------------------------------------------------------------------- |
+| **⚙️ Architecture**     | The codebase consists of an HTML page that loads and renders visual and interactive elements created with the cables.gl framework. It follows a client-side architecture design, where the interactions are handled by JavaScript and rendered on a canvas element.                 |
+| **📖 Documentation**   | There is no specific information about documentation in the repository.        |
+| **🔗 Dependencies**    | The code relies on cables.min.js, libs.core.min.js, lottie_svg.js, ops.js, and Twitter Post Fetcher library (twitterFetcher_min.js) for various features and functionalities.                        |
+| **🧩 Modularity**      | The codebase appears to have separate files for different functionalities like variable handling (vargetset.js), error handling, and Twitter post fetching. Each file seems to have its own specific role, promoting modularity.             |
+| **✔️ Testing**          | There is no specific information about testing strategies and tools in the repository. |
+| **⚡️ Performance**      | Performance may be influenced by the efficiency of the cables.gl framework and how well the visual and interactive elements are optimized. Further performance analysis requires profiling and benchmarking.   |
+| **🔐 Security**        | Since the codebase primarily runs on the client-side, security measures may need to focus on ensuring that the loaded patch and any user-facing features do not expose vulnerabilities or lead to unauthorized access.    |
+| **🔀 Version Control** | The repository is based on Git version control. The specific version control strategies and tools used by the authors are not specifically mentioned in the information provided.               |
+| **🔌 Integrations**    | The code interacts with external systems and services through the usage of Twitter Post Fetcher library to fetch and display Twitter posts on the webpage. Additional integrations would require further exploration.    |
+| **📶 Scalability**     | The codebase does not provide specific information about its scalability. To determine its capacity for handling growth, factors like the scalability of the cables.gl framework and the resource utilization and optimization would need to be reviewed.   |
 
 ---
 
@@ -68,15 +76,15 @@ The Paiper project is a web-based platform that leverages cables.gl to display a
 
 <details closed><summary>Root</summary>
 
-| File                                                                                               | Summary                                                                                                                                                                                                                                                                                  |
-| ---                                                                                                | ---                                                                                                                                                                                                                                                                                      |
-| [index.html](https://github.com/alivemachine/Paiper/blob/main/index.html)                          | This code sets up a webpage using HTML and JavaScript to display a graphics patch created with cables.gl. The patch is loaded from a JSON file and rendered in a canvas element. The code also handles error handling and provides callbacks for patch initialization and asset loading. |
-| [cables.min.js](https://github.com/alivemachine/Paiper/blob/main/js\cables.min.js)                 | HTTPStatus Exception: 400                                                                                                                                                                                                                                                                |
-| [libs.core.min.js](https://github.com/alivemachine/Paiper/blob/main/js\libs.core.min.js)           | HTTPStatus Exception: 400                                                                                                                                                                                                                                                                |
-| [lottie_svg.js](https://github.com/alivemachine/Paiper/blob/main/js\lottie_svg.js)                 | Prompt exceeds max token limit: 36184.                                                                                                                                                                                                                                                   |
-| [ops.js](https://github.com/alivemachine/Paiper/blob/main/js\ops.js)                               | Prompt exceeds max token limit: 8271.                                                                                                                                                                                                                                                    |
-| [twitterFetcher_min.js](https://github.com/alivemachine/Paiper/blob/main/js\twitterFetcher_min.js) | The code is a Twitter post fetcher that retrieves and displays Twitter posts on a webpage. It allows customization of the number of posts, display options, and various other features.                                                                                                  |
-| [vargetset.js](https://github.com/alivemachine/Paiper/blob/main/js\vargetset.js)                   | The code provides functionalities for a varget (getting the value of a variable) and varset (setting the value of a variable) operation. It includes features such as creating/rename variables, updating variable names, and handling errors.                                           |
+| File                                                                                               | Summary                                                                                                                                                                                                                                                                                                                                                                          |
+| ---                                                                                                | ---                                                                                                                                                                                                                                                                                                                                                                              |
+| [index.html](https://github.com/alivemachine/Paiper/blob/main/index.html)                          | This code is an HTML page that loads and runs a patch created with the cables.gl framework. The patch contains visual and interactive elements that are rendered on a canvas element. It also handles error messages and provides initialization and loaded callbacks.                                                                                                           |
+| [cables.min.js](https://github.com/alivemachine/Paiper/blob/main/js\cables.min.js)                 | HTTPStatus Exception: 400                                                                                                                                                                                                                                                                                                                                                        |
+| [libs.core.min.js](https://github.com/alivemachine/Paiper/blob/main/js\libs.core.min.js)           | HTTPStatus Exception: 400                                                                                                                                                                                                                                                                                                                                                        |
+| [lottie_svg.js](https://github.com/alivemachine/Paiper/blob/main/js\lottie_svg.js)                 | Prompt exceeds max token limit: 36184.                                                                                                                                                                                                                                                                                                                                           |
+| [ops.js](https://github.com/alivemachine/Paiper/blob/main/js\ops.js)                               | HTTPStatus Exception: 400                                                                                                                                                                                                                                                                                                                                                        |
+| [twitterFetcher_min.js](https://github.com/alivemachine/Paiper/blob/main/js\twitterFetcher_min.js) | The code is a JavaScript library called "Twitter Post Fetcher" that allows developers to programmatically fetch and display Twitter posts on a webpage. It supports various customization options such as number of posts, displaying user information, timestamps, retweets, images, etc. The code can be used by adding a script tag and specifying the desired configuration. |
+| [vargetset.js](https://github.com/alivemachine/Paiper/blob/main/js\vargetset.js)                   | The code provides functionality for creating and getting variables in CABLES. It includes classes for variable set and variable get operations, with methods for creating, renaming, and updating variables. It also handles UI interactions and error handling.                                                                                                                 |
 
 </details>
 
@@ -122,13 +130,6 @@ npm test
 ---
 
 
-## 🗺 Roadmap
-
-> - [X] `ℹ️  Task 1: Implement X`
-> - [ ] `ℹ️  Task 2: Refactor Y`
-> - [ ] `ℹ️ ...`
-
-
 ---
 
 ## 🤝 Contributing
@@ -151,17 +152,5 @@ git push origin new-feature-branch
 ```
 7. Create a new pull request to the original project repository. In the pull request, describe the changes you've made and why they're necessary.
 The project maintainers will review your changes and provide feedback or merge them into the main branch.
-
----
-
-## 📄 License
-
-This project is licensed under the `ℹ️  INSERT-LICENSE-TYPE` License. See the [LICENSE](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/adding-a-license-to-a-repository) file for additional info.
-
----
-
-## 👏 Acknowledgments
-
-> - `ℹ️  List any resources, contributors, inspiration, etc.`
 
 ---
