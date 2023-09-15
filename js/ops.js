@@ -4,21 +4,22 @@ var CABLES=CABLES||{};
 CABLES.OPS=CABLES.OPS||{};
 
 var Ops=Ops || {};
-Ops.Gl=Ops.Gl || {};
 Ops.Ui=Ops.Ui || {};
+Ops.User=Ops.User || {};
 Ops.Date=Ops.Date || {};
 Ops.Anim=Ops.Anim || {};
 Ops.Html=Ops.Html || {};
 Ops.Json=Ops.Json || {};
-Ops.User=Ops.User || {};
 Ops.Time=Ops.Time || {};
 Ops.Math=Ops.Math || {};
 Ops.Array=Ops.Array || {};
+Ops.Debug=Ops.Debug || {};
 Ops.Value=Ops.Value || {};
 Ops.String=Ops.String || {};
-Ops.Lottie=Ops.Lottie || {};
 Ops.Trigger=Ops.Trigger || {};
 Ops.Boolean=Ops.Boolean || {};
+Ops.Sidebar=Ops.Sidebar || {};
+Ops.WebAudio=Ops.WebAudio || {};
 Ops.Math.Compare=Ops.Math.Compare || {};
 Ops.User.alivemachine=Ops.User.alivemachine || {};
 
@@ -75,99 +76,6 @@ function rebuild()
 
 Ops.Html.ElementChilds.prototype = new CABLES.Op();
 CABLES.OPS["65c535ef-70f0-47f6-bb82-5b6c8e6d9dd9"]={f:Ops.Html.ElementChilds,objName:"Ops.Html.ElementChilds"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.Array.ArraySetString
-// 
-// **************************************************************
-
-Ops.Array.ArraySetString = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const
-    exe = op.inTriggerButton("Execute"),
-    array = op.inArray("Array"),
-    index = op.inValueInt("Index"),
-    value = op.inString("String"),
-    values = op.outArray("Result");
-
-values.ignoreValueSerialize = true;
-exe.onTriggered = update;
-
-function updateIndex()
-{
-    if (exe.isLinked()) return;
-    update();
-}
-
-function update()
-{
-    const arr = array.get();
-    if (!arr) return;
-    arr[index.get()] = value.get();
-
-    values.set("");
-    values.set(arr);
-}
-
-
-};
-
-Ops.Array.ArraySetString.prototype = new CABLES.Op();
-CABLES.OPS["2752b35e-592d-41db-b8dd-cdc43a7ccbe2"]={f:Ops.Array.ArraySetString,objName:"Ops.Array.ArraySetString"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.Array.ArrayToString_v3
-// 
-// **************************************************************
-
-Ops.Array.ArrayToString_v3 = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const
-    inArr=op.inArray("Array"),
-    inSeperator=op.inString("Seperator",","),
-    inNewLine=op.inValueBool("New Line"),
-    outStr=op.outString("Result");
-
-inArr.onChange=
-    outStr.onChange=
-    inSeperator.onChange=
-    inNewLine.onChange=exec;
-
-
-function exec()
-{
-    var arr=inArr.get();
-    var result='';
-
-    var sep=inSeperator.get();
-    if(inNewLine.get())sep+='\n';
-
-    if(arr && arr.join)
-    {
-        result=arr.join(sep);
-    }
-
-    outStr.set(result);
-}
-
-};
-
-Ops.Array.ArrayToString_v3.prototype = new CABLES.Op();
-CABLES.OPS["7b539bb3-8e86-4367-9e00-a637d3cfd87a"]={f:Ops.Array.ArrayToString_v3,objName:"Ops.Array.ArrayToString_v3"};
 
 
 
@@ -355,135 +263,6 @@ function warning()
 
 Ops.Html.DivElement_v2.prototype = new CABLES.Op();
 CABLES.OPS["db36db6d-83e4-4d27-b84c-8a20067aaffc"]={f:Ops.Html.DivElement_v2,objName:"Ops.Html.DivElement_v2"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.Trigger.TriggerOnChangeString
-// 
-// **************************************************************
-
-Ops.Trigger.TriggerOnChangeString = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const
-    inval=op.inString("String"),
-    next=op.outTrigger("Changed"),
-    outStr=op.outString("Result");
-
-inval.onChange=function()
-{
-    outStr.set(inval.get());
-    next.trigger();
-};
-
-};
-
-Ops.Trigger.TriggerOnChangeString.prototype = new CABLES.Op();
-CABLES.OPS["319d07e0-5cbe-4bc1-89fb-a934fd41b0c4"]={f:Ops.Trigger.TriggerOnChangeString,objName:"Ops.Trigger.TriggerOnChangeString"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.Trigger.TriggerString
-// 
-// **************************************************************
-
-Ops.Trigger.TriggerString = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const
-    exec = op.inTriggerButton("Trigger"),
-    inString = op.inString("String", ""),
-    next = op.outTrigger("Next"),
-    outString = op.outString("Result");
-
-outString.changeAlways = true;
-exec.onTriggered = function ()
-{
-    outString.set(inString.get());
-    next.trigger();
-};
-
-
-};
-
-Ops.Trigger.TriggerString.prototype = new CABLES.Op();
-CABLES.OPS["217482b8-2ee6-4609-b7ad-4550e6aaa371"]={f:Ops.Trigger.TriggerString,objName:"Ops.Trigger.TriggerString"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.Math.MathExpression
-// 
-// **************************************************************
-
-Ops.Math.MathExpression = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const inA = op.inFloat("A", 0);
-const inB = op.inFloat("B", 1);
-const inC = op.inFloat("C", 2);
-const inD = op.inFloat("D", 3);
-op.setPortGroup("Parameters", [inA, inB, inC, inD]);
-const inExpression = op.inString("Expression", "a*(b+c+d)");
-op.setPortGroup("Expression", [inExpression]);
-const outResult = op.outNumber("Result");
-const outExpressionIsValid = op.outBool("Expression Valid");
-
-let currentFunction = inExpression.get();
-let functionValid = false;
-
-const createFunction = () =>
-{
-    try
-    {
-        currentFunction = new Function("m", "a", "b", "c", "d", `with(m) { return ${inExpression.get()} }`);
-        functionValid = true;
-        evaluateFunction();
-        outExpressionIsValid.set(functionValid);
-    }
-    catch (e)
-    {
-        functionValid = false;
-        outExpressionIsValid.set(functionValid);
-        if (e instanceof ReferenceError || e instanceof SyntaxError) return;
-    }
-};
-
-const evaluateFunction = () =>
-{
-    if (functionValid)
-    {
-        outResult.set(currentFunction(Math, inA.get(), inB.get(), inC.get(), inD.get()));
-        if (!inExpression.get()) outResult.set(0);
-    }
-
-    outExpressionIsValid.set(functionValid);
-};
-
-
-inA.onChange = inB.onChange = inC.onChange = inD.onChange = evaluateFunction;
-inExpression.onChange = createFunction;
-createFunction();
-
-
-};
-
-Ops.Math.MathExpression.prototype = new CABLES.Op();
-CABLES.OPS["d2343a1e-64ea-45b2-99ed-46e167bbdcd3"]={f:Ops.Math.MathExpression,objName:"Ops.Math.MathExpression"};
 
 
 
@@ -1009,42 +788,30 @@ CABLES.OPS["128f5b07-17f9-43fb-ab61-c170a9a9cd8d"]={f:Ops.Json.ObjectIterate,obj
 
 // **************************************************************
 // 
-// Ops.Gl.CanvasInfo
+// Ops.Trigger.TriggerOnChangeString
 // 
 // **************************************************************
 
-Ops.Gl.CanvasInfo = function()
+Ops.Trigger.TriggerOnChangeString = function()
 {
 CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={};
-
-
 const
-    width=op.outValue("width"),
-    height=op.outValue("height"),
-    pixelRatio=op.outValue("Pixel Ratio"),
-    aspect=op.outValue("Aspect Ratio"),
-    landscape=op.outValueBool("Landscape");
+    inval=op.inString("String"),
+    next=op.outTrigger("Changed"),
+    outStr=op.outString("Result");
 
-var cgl=op.patch.cgl;
-cgl.addEventListener("resize",update);
-update();
-
-function update()
+inval.onChange=function()
 {
-    height.set(cgl.canvasHeight);
-    width.set(cgl.canvasWidth);
-    pixelRatio.set(window.devicePixelRatio);
-    aspect.set(cgl.canvasWidth/cgl.canvasHeight);
-    landscape.set(cgl.canvasWidth>cgl.canvasHeight);
-}
-
+    outStr.set(inval.get());
+    next.trigger();
+};
 
 };
 
-Ops.Gl.CanvasInfo.prototype = new CABLES.Op();
-CABLES.OPS["94e499e5-b4ee-4861-ab48-6ab5098b2cc3"]={f:Ops.Gl.CanvasInfo,objName:"Ops.Gl.CanvasInfo"};
+Ops.Trigger.TriggerOnChangeString.prototype = new CABLES.Op();
+CABLES.OPS["319d07e0-5cbe-4bc1-89fb-a934fd41b0c4"]={f:Ops.Trigger.TriggerOnChangeString,objName:"Ops.Trigger.TriggerOnChangeString"};
 
 
 
@@ -1448,92 +1215,33 @@ CABLES.OPS["17bc01d7-04ad-4aab-b88b-bb09744c4a69"]={f:Ops.Value.Integer,objName:
 
 // **************************************************************
 // 
-// Ops.User.alivemachine.MyCustomEventListener
+// Ops.Trigger.TriggerString
 // 
 // **************************************************************
 
-Ops.User.alivemachine.MyCustomEventListener = function()
+Ops.Trigger.TriggerString = function()
 {
 CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={};
-// constants
-var EVENT_NAME_DEFAULT = '';
-var USE_CAPTURE_DEFAULT = false;
-var PREVENT_DEFAULT_DEFAULT  = true;
-var STOP_PROPAGATION_DEFAULT  = true;
+const
+    exec = op.inTriggerButton("Trigger"),
+    inString = op.inString("String", ""),
+    next = op.outTrigger("Next"),
+    outString = op.outString("Result");
 
-// variables
-var lastElement = null; // stores the last connected element, so we can remove prior event listeners
-var lastEventName = EVENT_NAME_DEFAULT;
-var lastUseCapture = USE_CAPTURE_DEFAULT;
+outString.changeAlways = true;
+exec.onTriggered = function ()
+{
+    outString.set(inString.get());
+    next.trigger();
+};
 
-// inputs
-var elementPort = op.inObject('Element');
-var eventNamePort = op.inValueString('Event Name', EVENT_NAME_DEFAULT);
-var useCapturePort = op.inValueBool('Use Capture', USE_CAPTURE_DEFAULT);
-var preventDefaultPort = op.inValueBool('Prevent Default', PREVENT_DEFAULT_DEFAULT);
-var stopPropagationPort = op.inValueBool('Stop Propagation', STOP_PROPAGATION_DEFAULT);
-
-// outputs
-var triggerPort = op.outTrigger('Event Trigger');
-var eventObjPort = op.outObject('Event Object');
-var selectedImg = op.outString('selectedImg');
-var selectedText = op.outString('selectedText');
-var selectedID = op.outString('selectedID');
-var msg = op.outString('Message');
-
-// change listeners
-elementPort.onChange = update;
-eventNamePort.onChange = update;
-useCapturePort.onChange = update;
-
-function update() {
-    var element = elementPort.get();
-    var eventName = eventNamePort.get();
-    var useCapture = useCapturePort.get();
-    removeListener();
-    addListener(element, eventName, useCapture);
-    lastElement = element;
-    lastEventName = eventName;
-    lastUseCapture = useCapture;
-}
-
-function removeListener() {
-    if(lastElement && lastEventName) {
-        lastElement.removeEventListener(lastEventName, handleEvent, lastUseCapture);
-    }
-}
-
-function addListener(el, name, useCapture) {
-    if(el && name) {
-        addEventListener(name, handleEvent, useCapture);
-    }
-}
-function handleEvent(ev) {
-    eventObjPort.set(ev);
-    if(ev.srcElement.tagName=='IMG'){
-        selectedImg.set(ev.srcElement.src.toString());
-    }else if(ev.srcElement.tagName=='TEXTAREA'){
-        selectedText.set(ev.srcElement.value.toString());
-    }else if(eventNamePort.get()=='message'){
-        msg.set(ev.data);
-    }
-    var id = ev.srcElement.id;
-    if(ev.srcElement.id!==undefined){
-    selectedID.set(id.toString());
-    }
-
-
-    if(preventDefaultPort.get()) { ev.preventDefault(); }
-    if(stopPropagationPort.get()) { ev.stopPropagation(); }
-    triggerPort.trigger();
-}
 
 };
 
-Ops.User.alivemachine.MyCustomEventListener.prototype = new CABLES.Op();
-
+Ops.Trigger.TriggerString.prototype = new CABLES.Op();
+CABLES.OPS["217482b8-2ee6-4609-b7ad-4550e6aaa371"]={f:Ops.Trigger.TriggerString,objName:"Ops.Trigger.TriggerString"};
 
 
 
@@ -1606,349 +1314,6 @@ reset.onTriggered= function()
 
 Ops.Trigger.TriggerCounter.prototype = new CABLES.Op();
 CABLES.OPS["e640619f-235c-4543-bbf8-b358e0283180"]={f:Ops.Trigger.TriggerCounter,objName:"Ops.Trigger.TriggerCounter"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.User.alivemachine.Image2b64
-// 
-// **************************************************************
-
-Ops.User.alivemachine.Image2b64 = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-
-const urlIn = op.inString("URL");
-const outPath=op.outString("URI");
-
-var img = new Image();
-urlIn.onChange=reload;
-
-
-img.crossOrigin = 'Anonymous';
-
-img.onload = function () {
-
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d');
-
-  canvas.height = "512";
-  canvas.width = "512";
-  //canvas.width = img.naturalWidth;
-  ctx.drawImage(img, 0, 0, 512, 512);
-
-  var uri = canvas.toDataURL('image/png');
-  outPath.set(uri);
-
-}
-function reload(){
-    //if(urlIn.get().indexOf("data:") ==='0'){
-        img.src = urlIn.get();
-        outPath.set('');
-    //}else{
-        //outPath.set(urlIn.get());
-    //}
-}
-
-
-
-};
-
-Ops.User.alivemachine.Image2b64.prototype = new CABLES.Op();
-
-
-
-
-
-// **************************************************************
-// 
-// Ops.Array.ArrayReverse
-// 
-// **************************************************************
-
-Ops.Array.ArrayReverse = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-var inArr=op.inArray("Input");
-var outArr=op.outArray("Result");
-
-inArr.onChange=function()
-{
-    var arr=inArr.get();
-    if(arr) {
-        var arrCopy = arr.slice();
-        outArr.set(arrCopy.reverse());
-    }
-};
-
-};
-
-Ops.Array.ArrayReverse.prototype = new CABLES.Op();
-CABLES.OPS["88d8662f-2c01-42e6-943d-4d3cf90657b0"]={f:Ops.Array.ArrayReverse,objName:"Ops.Array.ArrayReverse"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.Array.Array_v2
-// 
-// **************************************************************
-
-Ops.Array.Array_v2 = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const
-    inLength=op.inValueInt("Array length",10),
-    modeSelect = op.inSwitch("Mode select",['Number','1,2,3,4',"0-1","1-0"],'Number'),
-    inDefaultValue=op.inValueFloat("Default Value"),
-    outArr=op.outArray("Array"),
-    outArrayLength = op.outNumber("Array length out");
-
-var arr=[];
-
-var selectIndex = 0;
-const MODE_NUMBER = 0;
-const MODE_1_TO_4 = 1;
-const MODE_0_TO_1 = 2;
-const MODE_1_TO_0 = 3;
-
-onFilterChange();
-function onFilterChange()
-{
-    var selectedMode = modeSelect.get();
-    if(selectedMode === 'Number') selectIndex = MODE_NUMBER;
-    else if(selectedMode === '1,2,3,4') selectIndex = MODE_1_TO_4;
-    else if(selectedMode === '0-1') selectIndex = MODE_0_TO_1;
-    else if(selectedMode === '1-0') selectIndex = MODE_1_TO_0;
-
-    if( selectIndex === MODE_NUMBER)
-    {
-        inDefaultValue.setUiAttribs({greyout:false});
-    }
-    else if(selectIndex === MODE_1_TO_4)
-    {
-        inDefaultValue.setUiAttribs({greyout:true});
-    }
-    else if(selectIndex === MODE_0_TO_1)
-    {
-        inDefaultValue.setUiAttribs({greyout:true});
-    }
-    else if(selectIndex === MODE_1_TO_0)
-    {
-        inDefaultValue.setUiAttribs({greyout:true});
-    }
-    op.setUiAttrib({"extendTitle":modeSelect.get()});
-
-    reset();
-}
-
-function reset()
-{
-    arr.length = 0;
-
-    var arrLength = inLength.get();
-    var valueForArray = inDefaultValue.get();
-    var i;
-
-    //mode 0 - fill all array values with one number
-    if( selectIndex === MODE_NUMBER)
-    {
-        for(i=0;i<arrLength;i++)
-        {
-            arr[i]=valueForArray;
-        }
-    }
-    //mode 1 Continuous number array - increments up to array length
-    else if(selectIndex === MODE_1_TO_4)
-    {
-        for(i = 0;i < arrLength; i++)
-        {
-            arr[i] = i;
-        }
-    }
-    //mode 2 Normalized array
-    else if(selectIndex === MODE_0_TO_1)
-    {
-        for(i = 0;i < arrLength; i++)
-        {
-            arr[i] = i / arrLength;
-        }
-    }
-    //mode 3 reversed Normalized array
-    else if(selectIndex === MODE_1_TO_0)
-    {
-        for(i = 0;i < arrLength; i++)
-        {
-            arr[i] = 1-i / arrLength;
-        }
-    }
-
-    outArr.set(null);
-    outArr.set(arr);
-    outArrayLength.set(arr.length);
-}
-
-inDefaultValue.onChange = inLength.onChange = function ()
-{
-    reset();
-}
-modeSelect.onChange = onFilterChange;
-reset();
-
-
-};
-
-Ops.Array.Array_v2.prototype = new CABLES.Op();
-CABLES.OPS["ca9219d2-9f06-4516-9cf2-98e61f84d4bb"]={f:Ops.Array.Array_v2,objName:"Ops.Array.Array_v2"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.User.alivemachine.MyFilterValidString
-// 
-// **************************************************************
-
-Ops.User.alivemachine.MyFilterValidString = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-
-const
-    inStr=op.inString("String",""),
-    infilter=op.inString("Filter","null"),
-    checkNull=op.inBool("Invalid if null",true),
-    checkUndefined=op.inBool("Invalid if undefined",true),
-    checkEmpty=op.inBool("Invalid if empty",true),
-    checkZero=op.inBool("Invalid if 0",true),
-    outStr=op.outString("Last Valid String"),
-    result=op.outBool("Is Valid");
-
-inStr.onChange=
-infilter.onChange=
-checkNull.onChange=
-checkUndefined.onChange=
-checkEmpty.onChange=
-function()
-{
-    const str=inStr.get();
-    var r=true;
-
-    if(r===false)r=false;
-    if(r && checkZero.get() && (str===0 || str==="0")) r=false;
-    if(r && checkNull.get() && str===null) r=false;
-    if(r && checkUndefined.get() && str===undefined) r=false;
-    if(r && checkEmpty.get() && str==="") r=false;
-    if(r && infilter.get()!=="" && str.includes(infilter.get())) r=false;
-    if(r)outStr.set(str);
-    //if(r && str.includes(infilter.get())) r=false;
-    //alert(str.includes(infilter.get()));
-    result.set(r);
-
-};
-
-
-};
-
-Ops.User.alivemachine.MyFilterValidString.prototype = new CABLES.Op();
-
-
-
-
-
-// **************************************************************
-// 
-// Ops.String.SwitchString
-// 
-// **************************************************************
-
-Ops.String.SwitchString = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const
-    idx=op.inValueInt("Index"),
-    result=op.outString("Result");
-
-const valuePorts=[];
-
-idx.onChange=update;
-
-for(var i=0;i<10;i++)
-{
-    var p=op.inString("String "+i);
-    valuePorts.push( p );
-    p.onChange=update;
-}
-
-function update()
-{
-    if(idx.get()>=0 && valuePorts[idx.get()])
-    {
-        result.set( valuePorts[idx.get()].get() );
-    }
-}
-
-};
-
-Ops.String.SwitchString.prototype = new CABLES.Op();
-CABLES.OPS["2a7a0c68-f7c9-4249-b19a-d2de5cb4862c"]={f:Ops.String.SwitchString,objName:"Ops.String.SwitchString"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.Math.TriggerRandomNumber_v2
-// 
-// **************************************************************
-
-Ops.Math.TriggerRandomNumber_v2 = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const
-    exe=op.inTriggerButton('Generate'),
-    min=op.inValue("min",0),
-    max=op.inValue("max",1),
-    outTrig = op.outTrigger("next"),
-    result=op.outValue("result"),
-    inInteger=op.inValueBool("Integer",false);
-
-exe.onTriggered=genRandom;
-max.onChange=genRandom;
-min.onChange=genRandom;
-inInteger.onChange=genRandom;
-
-op.setPortGroup("Value Range",[min,max]);
-genRandom();
-
-function genRandom()
-{
-    var r=(Math.random()*(max.get()-min.get()))+min.get();
-    if(inInteger.get())r=Math.floor((Math.random()*((max.get()-min.get()+1)))+min.get());
-    result.set(r);
-    outTrig.trigger();
-}
-
-
-};
-
-Ops.Math.TriggerRandomNumber_v2.prototype = new CABLES.Op();
-CABLES.OPS["26f446cc-9107-4164-8209-5254487fa132"]={f:Ops.Math.TriggerRandomNumber_v2,objName:"Ops.Math.TriggerRandomNumber_v2"};
 
 
 
@@ -2170,35 +1535,6 @@ CABLES.OPS["b250d606-f7f8-44d3-b099-c29efff2608a"]={f:Ops.Math.Compare.GreaterTh
 
 // **************************************************************
 // 
-// Ops.Boolean.BoolToNumber
-// 
-// **************************************************************
-
-Ops.Boolean.BoolToNumber = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const
-    bool=op.inValueBool("bool"),
-    number=op.outValue("number");
-
-bool.onChange=function()
-{
-    if(bool.get()) number.set(1);
-    else number.set(0);
-};
-
-};
-
-Ops.Boolean.BoolToNumber.prototype = new CABLES.Op();
-CABLES.OPS["2591c495-fceb-4f6e-937f-11b190c72ee5"]={f:Ops.Boolean.BoolToNumber,objName:"Ops.Boolean.BoolToNumber"};
-
-
-
-
-// **************************************************************
-// 
 // Ops.String.StringEditor
 // 
 // **************************************************************
@@ -2409,6 +1745,77 @@ CABLES.OPS["beff95ec-7b50-4b6e-80b8-a7e4ab97d8cc"]={f:Ops.Date.DateAndTime,objNa
 
 // **************************************************************
 // 
+// Ops.Boolean.BoolToNumber
+// 
+// **************************************************************
+
+Ops.Boolean.BoolToNumber = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const
+    bool=op.inValueBool("bool"),
+    number=op.outValue("number");
+
+bool.onChange=function()
+{
+    if(bool.get()) number.set(1);
+    else number.set(0);
+};
+
+};
+
+Ops.Boolean.BoolToNumber.prototype = new CABLES.Op();
+CABLES.OPS["2591c495-fceb-4f6e-937f-11b190c72ee5"]={f:Ops.Boolean.BoolToNumber,objName:"Ops.Boolean.BoolToNumber"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.String.SwitchString
+// 
+// **************************************************************
+
+Ops.String.SwitchString = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const
+    idx=op.inValueInt("Index"),
+    result=op.outString("Result");
+
+const valuePorts=[];
+
+idx.onChange=update;
+
+for(var i=0;i<10;i++)
+{
+    var p=op.inString("String "+i);
+    valuePorts.push( p );
+    p.onChange=update;
+}
+
+function update()
+{
+    if(idx.get()>=0 && valuePorts[idx.get()])
+    {
+        result.set( valuePorts[idx.get()].get() );
+    }
+}
+
+};
+
+Ops.String.SwitchString.prototype = new CABLES.Op();
+CABLES.OPS["2a7a0c68-f7c9-4249-b19a-d2de5cb4862c"]={f:Ops.String.SwitchString,objName:"Ops.String.SwitchString"};
+
+
+
+
+// **************************************************************
+// 
 // Ops.Html.CSSPropertyString
 // 
 // **************************************************************
@@ -2470,301 +1877,6 @@ function update()
 
 Ops.Html.CSSPropertyString.prototype = new CABLES.Op();
 CABLES.OPS["a7abdfb9-4c2a-4ddb-8fc6-55b3fdfbdaf3"]={f:Ops.Html.CSSPropertyString,objName:"Ops.Html.CSSPropertyString"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.Trigger.TriggerOnce
-// 
-// **************************************************************
-
-Ops.Trigger.TriggerOnce = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const
-    exe=op.inTriggerButton("Exec"),
-    reset=op.inTriggerButton("Reset"),
-    next=op.outTrigger("Next");
-var outTriggered=op.outValue("Was Triggered");
-
-var triggered=false;
-
-op.toWorkPortsNeedToBeLinked(exe);
-
-reset.onTriggered=function()
-{
-    triggered=false;
-    outTriggered.set(triggered);
-};
-
-exe.onTriggered=function()
-{
-    if(triggered)return;
-
-    triggered=true;
-    next.trigger();
-    outTriggered.set(triggered);
-
-};
-
-};
-
-Ops.Trigger.TriggerOnce.prototype = new CABLES.Op();
-CABLES.OPS["cf3544e4-e392-432b-89fd-fcfb5c974388"]={f:Ops.Trigger.TriggerOnce,objName:"Ops.Trigger.TriggerOnce"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.Trigger.Threshold
-// 
-// **************************************************************
-
-Ops.Trigger.Threshold = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-//this op will send one trigger out if the threshold has been crossed
-// but will not send another until the incoming inValue
-//drops below the threshold and go's above it again
-
-const inValue = op.inValue("Input"),
-    inThreshold = op.inValue("Threshold"),
-    output = op.outTrigger("Output");
-
-var hasThresholdBeenExceeded = false;
-
-inValue.onChange = update;
-function update()
-{
-	if(!hasThresholdBeenExceeded && inValue.get() >= inThreshold.get())
-	{
-		hasThresholdBeenExceeded = true;
-		output.trigger();
-	}
-	else if(hasThresholdBeenExceeded && inValue.get() <= inThreshold.get())
-	{
-		hasThresholdBeenExceeded = false;
-	}
-}
-
-
-
-
-};
-
-Ops.Trigger.Threshold.prototype = new CABLES.Op();
-CABLES.OPS["ef0891db-6053-42ba-b7d5-29c7cf6d8208"]={f:Ops.Trigger.Threshold,objName:"Ops.Trigger.Threshold"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.Html.CSSProperty_v2
-// 
-// **************************************************************
-
-Ops.Html.CSSProperty_v2 = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const
-    inEle = op.inObject("Element"),
-    inProperty = op.inString("Property"),
-    inValue = op.inFloat("Value"),
-    inValueSuffix = op.inString("Value Suffix", "px"),
-    outEle = op.outObject("HTML Element");
-
-op.setPortGroup("Element", [inEle]);
-op.setPortGroup("Attributes", [inProperty, inValue, inValueSuffix]);
-
-inProperty.onChange = updateProperty;
-inValue.onChange = update;
-inValueSuffix.onChange = update;
-let ele = null;
-
-inEle.onChange = inEle.onLinkChanged = function ()
-{
-    if (ele && ele.style)
-    {
-        ele.style[inProperty.get()] = "initial";
-    }
-    update();
-};
-
-function updateProperty()
-{
-    update();
-    op.setUiAttrib({ "extendTitle": inProperty.get() + "" });
-}
-
-function update()
-{
-    ele = inEle.get();
-    if (ele && ele.style)
-    {
-        const str = inValue.get() + inValueSuffix.get();
-        try
-        {
-            // console.log("css",inProperty.get(),str);
-            if (ele.style[inProperty.get()] != str)
-                ele.style[inProperty.get()] = str;
-        }
-        catch (e)
-        {
-            console.log(e);
-        }
-    }
-
-    outEle.set(inEle.get());
-}
-
-
-};
-
-Ops.Html.CSSProperty_v2.prototype = new CABLES.Op();
-CABLES.OPS["c179aa0e-b558-4130-8c2d-2deab2919a07"]={f:Ops.Html.CSSProperty_v2,objName:"Ops.Html.CSSProperty_v2"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.Math.Clamp
-// 
-// **************************************************************
-
-Ops.Math.Clamp = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const val=op.inValueFloat("val",0.5);
-const min=op.inValueFloat("min",0);
-const max=op.inValueFloat("max",1);
-const ignore=op.inValueBool("ignore outside values");
-const result=op.outValue("result");
-
-val.onChange=min.onChange=max.onChange=clamp;
-
-function clamp()
-{
-    if(ignore.get())
-    {
-        if(val.get()>max.get()) return;
-        if(val.get()<min.get()) return;
-    }
-    result.set( Math.min(Math.max(val.get(), min.get()), max.get()));
-}
-
-
-
-};
-
-Ops.Math.Clamp.prototype = new CABLES.Op();
-CABLES.OPS["cda1a98e-5e16-40bd-9b18-a67e9eaad5a1"]={f:Ops.Math.Clamp,objName:"Ops.Math.Clamp"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.Boolean.TriggerBoolean
-// 
-// **************************************************************
-
-Ops.Boolean.TriggerBoolean = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-
-var inTriggerTrue=op.inTriggerButton("True");
-var inTriggerFalse=op.inTriggerButton("false");
-
-var outResult=op.outValueBool("Result");
-
-
-
-inTriggerTrue.onTriggered=function()
-{
-    outResult.set(true);
-};
-
-inTriggerFalse.onTriggered=function()
-{
-    outResult.set(false);
-};
-
-};
-
-Ops.Boolean.TriggerBoolean.prototype = new CABLES.Op();
-CABLES.OPS["31f65abe-9d6c-4ba6-a291-ef2de41d2087"]={f:Ops.Boolean.TriggerBoolean,objName:"Ops.Boolean.TriggerBoolean"};
-
-
-
-
-// **************************************************************
-// 
-// Ops.Lottie.LottieSVGPlayer
-// 
-// **************************************************************
-
-Ops.Lottie.LottieSVGPlayer = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const
-    inEle=op.inObject("HTML Element"),
-    inData=op.inObject("JSON Data"),
-    inPlay=op.inValueBool("Play",true),
-    inLoop=op.inValueBool("Loop",true);
-
-inPlay.onChange=inLoop.onChange=inEle.onChange=inData.onChange=updateData;
-
-var anim=null;
-
-function dispose()
-{
-    if(anim)
-    {
-        anim.destroy();
-        anim=null;
-    }
-}
-
-function updateData()
-{
-    if(anim)dispose();
-    if(!inEle.get() || !inData.get())return;
-
-    var params = {
-        container: inEle.get(),
-        renderer: 'svg',
-        loop: inLoop.get(),
-        autoplay: inPlay.get(),
-        animationData: inData.get()
-    };
-
-    anim = lottie.loadAnimation(params);
-}
-
-
-
-
-};
-
-Ops.Lottie.LottieSVGPlayer.prototype = new CABLES.Op();
-CABLES.OPS["c4ed075b-c897-4788-9cc0-2df638671f67"]={f:Ops.Lottie.LottieSVGPlayer,objName:"Ops.Lottie.LottieSVGPlayer"};
 
 
 
@@ -3225,80 +2337,6 @@ CABLES.OPS["9e74b275-a1ed-4d10-aba4-4b3311363a99"]={f:Ops.Html.IFrame_v3,objName
 
 // **************************************************************
 // 
-// Ops.User.alivemachine.StringAccumlator
-// 
-// **************************************************************
-
-Ops.User.alivemachine.StringAccumlator = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-const inString = op.inString("String");
-var inClean = op.inTrigger("Clean")
-//var inLink = op.inString("Liaison");
-var outText = op.outString("Text");
-
-inString.onChange=addUp;
-inClean.onTriggered=cleanUp;
-function addUp ()
-{
-    outText.set(outText.get()+"</br>"+inString.get());
-}
-function cleanUp(){
-    outText.set("");
-}
-
-};
-
-Ops.User.alivemachine.StringAccumlator.prototype = new CABLES.Op();
-
-
-
-
-
-// **************************************************************
-// 
-// Ops.Boolean.TriggerChangedTrue
-// 
-// **************************************************************
-
-Ops.Boolean.TriggerChangedTrue = function()
-{
-CABLES.Op.apply(this,arguments);
-const op=this;
-const attachments={};
-
-var val=op.inValueBool("Value",false);
-
-var next=op.outTrigger("Next");
-
-var oldVal=0;
-
-val.onChange=function()
-{
-    var newVal=val.get();
-    if(!oldVal && newVal)
-    {
-        oldVal=true;
-        next.trigger();
-    }
-    else
-    {
-        oldVal=false;
-    }
-};
-
-};
-
-Ops.Boolean.TriggerChangedTrue.prototype = new CABLES.Op();
-CABLES.OPS["385197e1-8b34-4d1c-897f-d1386d99e3b3"]={f:Ops.Boolean.TriggerChangedTrue,objName:"Ops.Boolean.TriggerChangedTrue"};
-
-
-
-
-// **************************************************************
-// 
 // Ops.Trigger.TriggerLimiter
 // 
 // **************************************************************
@@ -3339,6 +2377,46 @@ inTriggerPort.onTriggered = function()
 
 Ops.Trigger.TriggerLimiter.prototype = new CABLES.Op();
 CABLES.OPS["47641d85-9f81-4287-8aa2-35753b0727e0"]={f:Ops.Trigger.TriggerLimiter,objName:"Ops.Trigger.TriggerLimiter"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Boolean.TriggerChangedTrue
+// 
+// **************************************************************
+
+Ops.Boolean.TriggerChangedTrue = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+
+var val=op.inValueBool("Value",false);
+
+var next=op.outTrigger("Next");
+
+var oldVal=0;
+
+val.onChange=function()
+{
+    var newVal=val.get();
+    if(!oldVal && newVal)
+    {
+        oldVal=true;
+        next.trigger();
+    }
+    else
+    {
+        oldVal=false;
+    }
+};
+
+};
+
+Ops.Boolean.TriggerChangedTrue.prototype = new CABLES.Op();
+CABLES.OPS["385197e1-8b34-4d1c-897f-d1386d99e3b3"]={f:Ops.Boolean.TriggerChangedTrue,objName:"Ops.Boolean.TriggerChangedTrue"};
 
 
 
@@ -3422,201 +2500,71 @@ CABLES.OPS["3a4b0a78-4172-41c7-8248-95cb0856ecc8"]={f:Ops.Boolean.MonoFlop,objNa
 
 // **************************************************************
 // 
-// Ops.User.alivemachine.MyWebcam
+// Ops.Html.CSSProperty_v2
 // 
 // **************************************************************
 
-Ops.User.alivemachine.MyWebcam = function()
+Ops.Html.CSSProperty_v2 = function()
 {
 CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={};
-// todo: https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints/facingMode
-loadDaFun();
-function loadDaFun() {
-   var script = document.createElement('script');
-   script.src = 'https://webrtc.github.io/adapter/adapter-latest.js';
-   var head = document.getElementsByTagName("head")[0];
-   head.appendChild(script);
-}
 const
-    inFacing = op.inSwitch("Facing", ["environment", "user"], "user"),
-    flip = op.inValueBool("flip"),
-    fps = op.inValueInt("fps"),
-    width = op.inValueInt("Width", 640),
-    height = op.inValueInt("Height", 480),
-    inActive = op.inValueBool("Active", true),
-    inStyle = op.inValueEditor("Style", "position:absolute;z-index:9999;", "none"),
-    inCap = op.inTriggerButton("Capture"),
-    textureOut = op.outTexture("texture"),
-    outRatio = op.outValue("Ratio"),
-    available = op.outValue("Available"),
-    outWidth = op.outNumber("Width"),
-    outHeight = op.outNumber("Height"),
-    outEleId = op.outString("Element Id"),
-    outObj = op.outObject("Element"),
-    outClicked = op.outTrigger("Clicked"),
-    outCap = op.outString("Captured");
+    inEle = op.inObject("Element"),
+    inProperty = op.inString("Property"),
+    inValue = op.inFloat("Value"),
+    inValueSuffix = op.inString("Value Suffix", "px"),
+    outEle = op.outObject("HTML Element");
 
-width.onChange =
-    height.onChange =
-    inFacing.onChange = startWebcam;
-inStyle.onChange = updateStyle;
-inCap.onTriggered=onMouseClick;
-fps.set(30);
-flip.set(true);
+op.setPortGroup("Element", [inEle]);
+op.setPortGroup("Attributes", [inProperty, inValue, inValueSuffix]);
 
-const cgl = op.patch.cgl;
-const videoElement = document.createElement("video");
-const eleId = "webcam" + CABLES.uuid();
-if(inActive.get()===false){
-    videoElement.style.display = "none";
-}else{
-    videoElement.style.display = "block";
-}
-videoElement.setAttribute("id", eleId);
-videoElement.setAttribute("autoplay", "");
-videoElement.setAttribute("muted", "");
-videoElement.setAttribute("playsinline", "");
-videoElement.addEventListener("click", onMouseClick);
+inProperty.onChange = updateProperty;
+inValue.onChange = update;
+inValueSuffix.onChange = update;
+let ele = null;
 
-op.patch.cgl.canvas.parentElement.appendChild(videoElement);
-
-const tex = new CGL.Texture(cgl);
-tex.setSize(8, 8);
-textureOut.set(tex);
-let timeout = null;
-
-let canceled = false;
-
-op.onDelete = removeElement;
-
-function removeElement()
+inEle.onChange = inEle.onLinkChanged = function ()
 {
-    if (videoElement) videoElement.remove();
-    clearTimeout(timeout);
-}
-
-
-inActive.onChange = function ()
-{
-    if (inActive.get())
+    if (ele && ele.style)
     {
-        canceled = false;
-
-        videoElement.style.display = "block";
-        updateTexture();
+        ele.style[inProperty.get()] = "initial";
     }
-    else
-    {
-        videoElement.style.display = "none";
-        canceled = true;
-    }
+    update();
 };
 
-fps.onChange = function ()
+function updateProperty()
 {
-    if (fps.get() < 1)fps.set(1);
-    clearTimeout(timeout);
-    timeout = setTimeout(updateTexture, 1000 / fps.get());
-};
-
-function updateTexture()
-{
-    cgl.gl.bindTexture(cgl.gl.TEXTURE_2D, tex.tex);
-    cgl.gl.pixelStorei(cgl.gl.UNPACK_FLIP_Y_WEBGL, flip.get());
-
-    cgl.gl.texImage2D(cgl.gl.TEXTURE_2D, 0, cgl.gl.RGBA, cgl.gl.RGBA, cgl.gl.UNSIGNED_BYTE, videoElement);
-    cgl.gl.bindTexture(cgl.gl.TEXTURE_2D, null);
-
-    if (!canceled) timeout = setTimeout(updateTexture, 1000 / fps.get());
+    update();
+    op.setUiAttrib({ "extendTitle": inProperty.get() + "" });
 }
 
-function camInitComplete(stream)
+function update()
 {
-    tex.videoElement = videoElement;
-    // videoElement.src = window.URL.createObjectURL(stream);
-    videoElement.srcObject = stream;
-    // tex.videoElement=stream;
-    videoElement.onloadedmetadata = function (e)
+    ele = inEle.get();
+    if (ele && ele.style)
     {
-        available.set(true);
-
-        outHeight.set(videoElement.videoHeight);
-        outWidth.set(videoElement.videoWidth);
-
-        tex.setSize(videoElement.videoWidth, videoElement.videoHeight);
-
-        outRatio.set(videoElement.videoWidth / videoElement.videoHeight);
-
-        videoElement.play();
-        outObj.set(videoElement);
-        updateTexture();
-    };
-}
-
-function startWebcam()
-{
-    //removeElement();
-    const constraints = { "audio": false, "video": {} };
-
-    constraints.video.facingMode = inFacing.get();
-    constraints.video.width = width.get();
-    constraints.video.height = height.get();
-
-    //navigator.getUserMedia = navigator.getUserMedia || navigator.mediaDevices.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-/*
-    if (navigator.getUserMedia)
-    {
-        navigator.getUserMedia(constraints, camInitComplete,
-            function ()
-            {
-                available.set(false);
-                // console.log('error webcam');
-            });
+        const str = inValue.get() + inValueSuffix.get();
+        try
+        {
+            // console.log("css",inProperty.get(),str);
+            if (ele.style[inProperty.get()] != str)
+                ele.style[inProperty.get()] = str;
+        }
+        catch (e)
+        {
+            console.log(e);
+        }
     }
-    else
-    {
-        // the ios way...
-*/
-        navigator.mediaDevices.getUserMedia(constraints)
-            .then(camInitComplete)
-            .catch(function (error)
-            {
-                console.log(error.name + ": " + error.message);
-            });
-//    }
-}
-function updateStyle()
-{
-    if (inStyle.get() != videoElement.style)
-    {
-        videoElement.setAttribute("style", inStyle.get());
-        outObj.set(null);
-        outObj.set(videoElement);
-    }
-}
-function onMouseClick()
-{
-    var canvas = document.createElement('canvas');
-    canvas.width = 1024;
-    canvas.height = 1024;
-    canvas.getContext('2d').drawImage(videoElement, 0, 0, 1024,1024);
-    var b64webcam = canvas.toDataURL('image/png', .1);
-	outCap.set(b64webcam);
 
-    outClicked.trigger();
+    outEle.set(inEle.get());
 }
-
-
-updateStyle();
-startWebcam();
 
 
 };
 
-Ops.User.alivemachine.MyWebcam.prototype = new CABLES.Op();
-
+Ops.Html.CSSProperty_v2.prototype = new CABLES.Op();
+CABLES.OPS["c179aa0e-b558-4130-8c2d-2deab2919a07"]={f:Ops.Html.CSSProperty_v2,objName:"Ops.Html.CSSProperty_v2"};
 
 
 
@@ -4677,127 +3625,45 @@ Ops.User.alivemachine.EncodeURI.prototype = new CABLES.Op();
 
 // **************************************************************
 // 
-// Ops.User.alivemachine.MySpeech
+// Ops.Trigger.TriggerOnce
 // 
 // **************************************************************
 
-Ops.User.alivemachine.MySpeech = function()
+Ops.Trigger.TriggerOnce = function()
 {
 CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={};
 const
-    inLang=op.inString("Language","us-US"),
-    active=op.inBool("Active",true),
-    result=op.outString("Result"),
-    confidence=op.outNumber("Confidence"),
-    outSupported=op.outBool("Supported",false),
-    outResult=op.outTrigger("New Result",""),
-    outActive=op.outBool("Started",false);
+    exe=op.inTriggerButton("Exec"),
+    reset=op.inTriggerButton("Reset"),
+    next=op.outTrigger("Next");
+var outTriggered=op.outValue("Was Triggered");
 
+var triggered=false;
 
-active.onChange=startStop;
+op.toWorkPortsNeedToBeLinked(exe);
 
-window.SpeechRecognition = window.SpeechRecognition||window.webkitSpeechRecognition || window.mozSpeechRecognition;
-
-var recognition=null;
-
-inLang.onChange=changeLang;
-
-function startStop(){
-    if(!recognition) return;
-
-    try{
-
-        if(active.get()!=outActive.get())
-        {
-            if(active.get()) {
-                console.log("start");
-                recognition.start();
-                console.log("started");
-            }
-            else {
-                console.log("aborting");
-                recognition.stop();
-                outActive.set(false);
-                console.log("aborted");
-            }
-        }
-
-    }
-    catch(e)
-    {
-        console.log(e);
-    }
-}
-
-
-op.init=function()
+reset.onTriggered=function()
 {
-   // startStop();
+    triggered=false;
+    outTriggered.set(triggered);
 };
 
-function changeLang()
+exe.onTriggered=function()
 {
-    if(!recognition)return;
+    if(triggered)return;
 
-    recognition.lang = inLang.get();
-    recognition.stop();
-
-    setTimeout(function(){
-        try{recognition.start();}catch(e){}},500);
-
-
-
-}
-
-startAPI();
-
-function startAPI()
-{
-    if(window.SpeechRecognition)
-    {
-        outSupported.set(true);
-
-        if(recognition) recognition.abort();
-
-        recognition=new SpeechRecognition();
-
-        recognition.lang = inLang.get();
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 0;
-        recognition.continuous=true;
-        SpeechRecognition.interimResults=true;
-
-
-        recognition.onstart = function() { outActive.set(true); };
-        recognition.onstop = function() { outActive.set(false); };
-        recognition.onend = function() { outActive.set(false);if(active===true){startStop();} };
-
-        recognition.onresult = function(event) { op.log('recognition result'); };
-        //recognition.onerror = function(event) { op.log('recognition error',result); };
-
-
-        recognition.onresult = function(event)
-        {
-            const idx=event.results.length-1;
-
-            result.set(event.results[idx][0].transcript);
-            confidence.set(event.results[idx][0].confidence);
-            op.log('You said: ', event.results[idx][0].transcript);
-            outResult.trigger();
-        };
-
-    }
-
-}
-
-
+    triggered=true;
+    next.trigger();
+    outTriggered.set(triggered);
 
 };
 
-Ops.User.alivemachine.MySpeech.prototype = new CABLES.Op();
+};
 
+Ops.Trigger.TriggerOnce.prototype = new CABLES.Op();
+CABLES.OPS["cf3544e4-e392-432b-89fd-fcfb5c974388"]={f:Ops.Trigger.TriggerOnce,objName:"Ops.Trigger.TriggerOnce"};
 
 
 
@@ -5147,6 +4013,128 @@ Ops.User.alivemachine.Storymapr.prototype = new CABLES.Op();
 
 // **************************************************************
 // 
+// Ops.String.RouteString
+// 
+// **************************************************************
+
+Ops.String.RouteString = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const
+    NUM_PORTS = 10,
+    indexPort = op.inInt('Index'),
+    valuePort = op.inString('String in',"cables"),
+    defaultStringPort = op.inString('Default string', ""),
+    valuePorts = createOutPorts();
+
+indexPort.onChange = valuePort.onChange = defaultStringPort.onChange = update;
+
+setDefaultValues();
+update();
+
+function createOutPorts()
+{
+    var arr = [];
+    for(var i=0; i<NUM_PORTS; i++)
+    {
+        var port = op.outString('Index ' + i + ' string');
+        arr.push(port);
+    }
+    return arr;
+};
+
+function setDefaultValues()
+{
+    var defaultValue = defaultStringPort.get();
+    if(!defaultStringPort.get())
+    {
+        defaultValue = "";
+    }
+    valuePorts.forEach(port => port.set(defaultValue));
+};
+
+function update()
+{
+    setDefaultValues();
+    var index = indexPort.get();
+    var value = valuePort.get();
+    index = Math.round(index);
+    index = clamp(index, 0, NUM_PORTS-1);
+    valuePorts[index].set(value);
+};
+
+function clamp(value, min, max)
+{
+  return Math.min(Math.max(value, min), max);
+};
+
+
+};
+
+Ops.String.RouteString.prototype = new CABLES.Op();
+CABLES.OPS["9998ff83-335b-40cd-aa0e-4cae558cb551"]={f:Ops.String.RouteString,objName:"Ops.String.RouteString"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.Image2b64
+// 
+// **************************************************************
+
+Ops.User.alivemachine.Image2b64 = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+
+const urlIn = op.inString("URL");
+const outPath=op.outString("URI");
+
+var img = new Image();
+urlIn.onChange=reload;
+
+
+img.crossOrigin = 'Anonymous';
+
+img.onload = function () {
+
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+
+  canvas.height = "512";
+  canvas.width = "512";
+  //canvas.width = img.naturalWidth;
+  ctx.drawImage(img, 0, 0, 512, 512);
+
+  var uri = canvas.toDataURL('image/png');
+  outPath.set(uri);
+
+}
+function reload(){
+    //if(urlIn.get().indexOf("data:") ==='0'){
+        img.src = urlIn.get();
+        outPath.set('');
+    //}else{
+        //outPath.set(urlIn.get());
+    //}
+}
+
+
+
+};
+
+Ops.User.alivemachine.Image2b64.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
 // Ops.User.alivemachine.Runway
 // 
 // **************************************************************
@@ -5254,56 +4242,304 @@ Ops.User.alivemachine.Runway.prototype = new CABLES.Op();
 
 // **************************************************************
 // 
-// Ops.String.RouteString
+// Ops.User.alivemachine.Fetch
 // 
 // **************************************************************
 
-Ops.String.RouteString = function()
+Ops.User.alivemachine.Fetch = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const filename = op.inUrl("file"),
+    jsonp = op.inValueBool("JsonP", false),
+    headers = op.inObject("headers", {}),
+    inBody = op.inStringEditor("body", ""),
+    inMethod = op.inDropDown("HTTP Method", ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "CONNECT", "OPTIONS", "TRACE"], "GET"),
+    inContentType = op.inString("Content-Type", "application/json"),
+    inParseJson = op.inBool("parse json", true),
+    reloadTrigger = op.inTriggerButton("reload"),
+    outData = op.outObject("data"),
+    outString = op.outString("response"),
+    isLoading = op.outValue("Is Loading", false),
+    outTrigger = op.outTrigger("Loaded");
+
+filename.setUiAttribs({ "title": "URL" });
+
+outData.ignoreValueSerialize = true;
+
+filename.onChange = jsonp.onChange = headers.onChange = inMethod.onChange = inParseJson.onChange = delayedReload;
+
+reloadTrigger.onTriggered = function ()
+{
+    delayedReload();
+};
+
+let loadingId = 0;
+let reloadTimeout = 0;
+
+function delayedReload()
+{
+    clearTimeout(reloadTimeout);
+    reloadTimeout = setTimeout(reload, 100);
+}
+
+op.onFileChanged = function (fn)
+{
+    if (filename.get() && filename.get().indexOf(fn) > -1) reload(true);
+};
+
+function reload(addCachebuster)
+{
+    if (!filename.get()) return;
+
+    op.patch.loading.finished(loadingId);
+
+    loadingId = op.patch.loading.start("jsonFile", "" + filename.get());
+    isLoading.set(true);
+
+    op.setUiAttrib({ "extendTitle": CABLES.basename(filename.get()) });
+
+    op.setUiError("jsonerr", null);
+
+    let httpClient = CABLES.ajax;
+    if (jsonp.get()) httpClient = CABLES.jsonp;
+
+    let url = op.patch.getFilePath(filename.get());
+    if (addCachebuster)url += "?rnd=" + CABLES.generateUUID();
+
+    const body = inBody.get();
+    httpClient(
+        url,
+        (err, _data, xhr) =>
+        {
+            if (err)
+            {
+                op.error(err);
+                return;
+            }
+            try
+            {
+                let data = _data;
+                outData.set(null);
+                if (typeof data === "string" && inParseJson.get())
+                {
+                    data = JSON.parse(_data);
+                    outData.set(data);
+                }
+                outString.set(null);
+                outString.set(_data);
+                op.uiAttr({ "error": null });
+                op.patch.loading.finished(loadingId);
+                outTrigger.trigger();
+                isLoading.set(false);
+            }
+            catch (e)
+            {
+                op.error(e);
+                op.setUiError("jsonerr", "Problem while loading json:<br/>" + e);
+                op.patch.loading.finished(loadingId);
+                isLoading.set(false);
+            }
+        },
+        inMethod.get(),
+        (body && body.length > 0) ? body : null,
+        inContentType.get(),
+        null,
+        headers.get() || {}
+    );
+}
+
+
+};
+
+Ops.User.alivemachine.Fetch.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.Fetch02
+// 
+// **************************************************************
+
+Ops.User.alivemachine.Fetch02 = function()
 {
 CABLES.Op.apply(this,arguments);
 const op=this;
 const attachments={};
 const
-    NUM_PORTS = 10,
-    indexPort = op.inInt('Index'),
-    valuePort = op.inString('String in',"cables"),
-    defaultStringPort = op.inString('Default string', ""),
-    valuePorts = createOutPorts();
+    exec = op.inTriggerButton("Trigger"),
+    inString = op.inString("String", ""),
+    next = op.outTrigger("Next"),
+    outString = op.outString("Result");
 
-indexPort.onChange = valuePort.onChange = defaultStringPort.onChange = update;
+outString.changeAlways = true;
+exec.onTriggered = function ()
+{
+    fetch(inString.get())
+    .then(response => response.json())
+    .then(data => outString.set(data));
+
+    next.trigger();
+};
+
+
+};
+
+Ops.User.alivemachine.Fetch02.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.Html.AppendChild
+// 
+// **************************************************************
+
+Ops.Html.AppendChild = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+// constants
+var CANVAS_ELEMENT = op.patch.cgl.canvas;
+
+// variables
+var lastParent = null;
+var lastChild = null;
+
+// inputs
+var parentPort = op.inObject('Parent');
+var childPort = op.inObject('Child');
+
+// outputs
+var parentOutPort = op.outObject('Parent Out');
+var childOutPort = op.outObject('Child Out');
+
+// change listeners
+parentPort.onChange = update;
+childPort.onChange = update;
+
+// functions
+
+function update() {
+    var parent = parentPort.get();
+    var child = childPort.get();
+    if(parent !== lastParent) {
+        if(parent) {
+            handleParentConnect(parent, child);
+        } else {
+            handleParentDisconnect(parent, child);
+        }
+        lastParent = parent;
+    }
+    if(child !== lastChild) {
+        if(child) {
+            handleChildConnect(parent, child);
+        } else {
+            handleChildDisconnect(parent, child);
+        }
+        lastChild = child;
+    }
+    parentOutPort.set(parent);
+    childOutPort.set(child);
+}
+
+function handleParentConnect(parent, child) {
+    if(child) {
+        parent.appendChild(child);
+    }    
+}
+
+function handleParentDisconnect(parent, child) {
+    if(child) {
+        CANVAS_ELEMENT.appendChild(child); // if there is no parent, append to patch
+    }
+}
+
+function handleChildConnect(parent, child) {
+    if(parent) {
+        parent.appendChild(child);
+    }    
+}
+
+function handleChildDisconnect(parent, child) {
+    if(lastChild) {
+        CANVAS_ELEMENT.appendChild(lastChild);    
+    }
+}
+
+
+};
+
+Ops.Html.AppendChild.prototype = new CABLES.Op();
+CABLES.OPS["dbb2b232-3021-4eb7-bf9b-d194ae8918cb"]={f:Ops.Html.AppendChild,objName:"Ops.Html.AppendChild"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Json.RouteObject
+// 
+// **************************************************************
+
+Ops.Json.RouteObject = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+
+const
+    NUM_PORTS = 10,
+    DEFAULT_OBJECT = {},
+    indexPort = op.inInt('index'),
+    objectPort = op.inObject('Object in'),
+    defaultObjectPort = op.inObject('default object', DEFAULT_OBJECT),
+    objectPorts = createOutPorts(DEFAULT_OBJECT);
+
+indexPort.onChange = objectPort.onChange = defaultObjectPort.onChange = update;
 
 setDefaultValues();
 update();
 
 function createOutPorts()
 {
-    var arr = [];
+    var arrayObjects = [];
     for(var i=0; i<NUM_PORTS; i++)
     {
-        var port = op.outString('Index ' + i + ' string');
-        arr.push(port);
+        var port = op.outObject('Index ' + i + ' Object');
+        arrayObjects.push(port);
     }
-    return arr;
+    defaultObjectPort.set(null);
+    return arrayObjects;
 };
 
 function setDefaultValues()
 {
-    var defaultValue = defaultStringPort.get();
-    if(!defaultStringPort.get())
+    var defaultValue = defaultObjectPort.get();
+
+    objectPorts.forEach(port => port.set(null));
+    if(defaultObjectPort.get())
     {
-        defaultValue = "";
+        objectPorts.forEach(port => port.set(defaultValue));
     }
-    valuePorts.forEach(port => port.set(defaultValue));
 };
 
 function update()
 {
     setDefaultValues();
     var index = indexPort.get();
-    var value = valuePort.get();
-    index = Math.round(index);
+    var value = objectPort.get();
+
+    index = Math.floor(index);
     index = clamp(index, 0, NUM_PORTS-1);
-    valuePorts[index].set(value);
+    objectPorts[index].set(value);
 };
 
 function clamp(value, min, max)
@@ -5314,8 +4550,2522 @@ function clamp(value, min, max)
 
 };
 
-Ops.String.RouteString.prototype = new CABLES.Op();
-CABLES.OPS["9998ff83-335b-40cd-aa0e-4cae558cb551"]={f:Ops.String.RouteString,objName:"Ops.String.RouteString"};
+Ops.Json.RouteObject.prototype = new CABLES.Op();
+CABLES.OPS["bc969951-32b5-4226-9944-80a719a65497"]={f:Ops.Json.RouteObject,objName:"Ops.Json.RouteObject"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Ui.Comment_v2
+// 
+// **************************************************************
+
+Ops.Ui.Comment_v2 = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const
+    inTitle=op.inString("title",'New comment'),
+    inText=op.inTextarea("text")
+    ;
+
+op.init=
+    inTitle.onChange=
+    inText.onChange=
+    op.onLoaded=update;
+
+update();
+
+function update()
+{
+    if(CABLES.UI)
+    {
+        op.uiAttr(
+            {
+                'comment_title':inTitle.get(),
+                'comment_text':inText.get()
+            });
+
+        op.name=inTitle.get();
+    }
+}
+
+
+
+
+};
+
+Ops.Ui.Comment_v2.prototype = new CABLES.Op();
+CABLES.OPS["93492eeb-bf35-4a62-98f7-d85b0b79bfe5"]={f:Ops.Ui.Comment_v2,objName:"Ops.Ui.Comment_v2"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Sidebar.Sidebar
+// 
+// **************************************************************
+
+Ops.Sidebar.Sidebar = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={style_css:"/*\n * SIDEBAR\n  http://danielstern.ca/range.css/#/\n  https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-progress-value\n */\n\n\n.icon-chevron-down {\n    top: 2px;\n    right: 9px;\n}\n\n.iconsidebar-chevron-up {\n\tbackground-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM4ODg4ODgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0iZmVhdGhlciBmZWF0aGVyLWNoZXZyb24tdXAiPjxwb2x5bGluZSBwb2ludHM9IjE4IDE1IDEyIDkgNiAxNSI+PC9wb2x5bGluZT48L3N2Zz4=);\n    top: 2px;\n    right: 9px;\n}\n\n.sidebar-cables-right\n{\n    right: 0px;\n    left: initial !important;\n}\n\n.sidebar-cables {\n    position: absolute;\n    top: 15px;\n    left: 15px;\n    border-radius: 10px;\n    /*border:10px solid #1a1a1a;*/\n    z-index: 100000;\n    color: #BBBBBB;\n    width: 220px;\n    max-height: 100%;\n    box-sizing: border-box;\n    overflow-y: auto;\n    overflow-x: hidden;\n    font-size: 13px;\n    font-family: Arial;\n    line-height: 1em; /* prevent emojis from breaking height of the title */\n    --sidebar-border-radius: 4px;\n    --sidebar-monospace-font-stack: \"SFMono-Regular\", Consolas, \"Liberation Mono\", Menlo, Courier, monospace;\n    --sidebar-hover-transition-time: .2s;\n}\n\n.sidebar-cables::selection {\n    background-color: #24baa7;\n    color: #EEEEEE;\n}\n\n.sidebar-cables::-webkit-scrollbar {\n    background-color: transparent;\n    --cables-scrollbar-width: 8px;\n    width: var(--cables-scrollbar-width);\n}\n\n.sidebar-cables::-webkit-scrollbar-track {\n    background-color: transparent;\n    width: var(--cables-scrollbar-width);\n}\n\n.sidebar-cables::-webkit-scrollbar-thumb {\n    background-color: #333333;\n    border-radius: 4px;\n    width: var(--cables-scrollbar-width);\n}\n\n.sidebar-cables--closed {\n    width: auto;\n}\n\n.sidebar__close-button {\n    background-color: #222;\n    -webkit-user-select: none;  /* Chrome all / Safari all */\n    -moz-user-select: none;     /* Firefox all */\n    -ms-user-select: none;      /* IE 10+ */\n    user-select: none;          /* Likely future */\n    transition: background-color var(--sidebar-hover-transition-time);\n    color: #CCCCCC;\n    height: 12px;\n    box-sizing: border-box;\n    padding-top: 2px;\n    text-align: center;\n    cursor: pointer;\n    /*border-top: 1px solid #272727;*/\n    border-radius: 0 0 var(--sidebar-border-radius) var(--sidebar-border-radius);\n    opacity: 1.0;\n    transition: opacity 0.3s;\n    overflow: hidden;\n}\n\n.sidebar__close-button-icon {\n    display: inline-block;\n    /*opacity: 0;*/\n    width: 21px;\n    height: 20px;\n    position: relative;\n    top: -1px;\n    /*background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM4ODg4ODgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0iZmVhdGhlciBmZWF0aGVyLWNoZXZyb24tdXAiPjxwb2x5bGluZSBwb2ludHM9IjE4IDE1IDEyIDkgNiAxNSI+PC9wb2x5bGluZT48L3N2Zz4=);*/\n    /*background-size: cover;*/\n    /*background-repeat: no-repeat;*/\n    /*background-repeat: no-repeat;*/\n    /*background-position: 0 -1px;*/\n}\n\n.sidebar--closed {\n    width: auto;\n    margin-right: 20px;\n}\n\n.sidebar--closed .sidebar__close-button {\n    margin-top: 8px;\n    margin-left: 8px;\n    padding-top: 13px;\n    padding-left: 11px;\n    padding-right: 11px;\n    width: 46px;\n    height: 46px;\n    border-radius: 50%;\n    cursor: pointer;\n    opacity: 0.3;\n}\n\n.sidebar--closed .sidebar__group\n{\n    display:none;\n\n}\n.sidebar--closed .sidebar__close-button-icon {\n    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHdpZHRoPSIyMnB4IiBoZWlnaHQ9IjE3cHgiIHZpZXdCb3g9IjAgMCAyMiAxNyIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4gICAgICAgIDx0aXRsZT5Hcm91cCAzPC90aXRsZT4gICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+ICAgIDxkZWZzPjwvZGVmcz4gICAgPGcgaWQ9IkNhbnZhcy1TaWRlYmFyIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4gICAgICAgIDxnIGlkPSJEZXNrdG9wLWdyZWVuLWJsdWlzaC1Db3B5LTkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMC4wMDAwMDAsIC0yMi4wMDAwMDApIj4gICAgICAgICAgICA8ZyBpZD0iR3JvdXAtMyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjAuMDAwMDAwLCAyMi4wMDAwMDApIj4gICAgICAgICAgICAgICAgPHBhdGggZD0iTTAuNSwyLjUgTDIuNSwyLjUiIGlkPSJMaW5lLTIiIHN0cm9rZT0iIzk3OTc5NyIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSI+PC9wYXRoPiAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMTAuNSwyLjUgTDIxLjUsMi41IiBpZD0iTGluZS0yIiBzdHJva2U9IiM5Nzk3OTciIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiPjwvcGF0aD4gICAgICAgICAgICAgICAgPHBhdGggZD0iTTAuNSw4LjUgTDExLjUsOC41IiBpZD0iTGluZS0yIiBzdHJva2U9IiM5Nzk3OTciIHN0cm9rZS1saW5lY2FwPSJzcXVhcmUiPjwvcGF0aD4gICAgICAgICAgICAgICAgPHBhdGggZD0iTTE5LjUsOC41IEwyMS41LDguNSIgaWQ9IkxpbmUtMiIgc3Ryb2tlPSIjOTc5Nzk3IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIj48L3BhdGg+ICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0wLjUsMTQuNSBMNS41LDE0LjUiIGlkPSJMaW5lLTIiIHN0cm9rZT0iIzk3OTc5NyIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSI+PC9wYXRoPiAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMTMuNSwxNC41IEwyMS41LDE0LjUiIGlkPSJMaW5lLTIiIHN0cm9rZT0iIzk3OTc5NyIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSI+PC9wYXRoPiAgICAgICAgICAgICAgICA8Y2lyY2xlIGlkPSJPdmFsLTMiIGZpbGw9IiM5Nzk3OTciIGN4PSI2LjUiIGN5PSIyLjUiIHI9IjIuNSI+PC9jaXJjbGU+ICAgICAgICAgICAgICAgIDxjaXJjbGUgaWQ9Ik92YWwtMyIgZmlsbD0iIzk3OTc5NyIgY3g9IjE1LjUiIGN5PSI4LjUiIHI9IjIuNSI+PC9jaXJjbGU+ICAgICAgICAgICAgICAgIDxjaXJjbGUgaWQ9Ik92YWwtMyIgZmlsbD0iIzk3OTc5NyIgY3g9IjkuNSIgY3k9IjE0LjUiIHI9IjIuNSI+PC9jaXJjbGU+ICAgICAgICAgICAgPC9nPiAgICAgICAgPC9nPiAgICA8L2c+PC9zdmc+);\n    background-position: 0px 0px;\n}\n\n.sidebar__close-button:hover {\n    background-color: #111111;\n    opacity: 1.0 !important;\n}\n\n/*\n * SIDEBAR ITEMS\n */\n\n.sidebar__items {\n    /* max-height: 1000px; */\n    /* transition: max-height 0.5;*/\n    background-color: #222;\n}\n\n.sidebar--closed .sidebar__items {\n    /* max-height: 0; */\n    height: 0;\n    display: none;\n    pointer-interactions: none;\n}\n\n.sidebar__item__right {\n    float: right;\n}\n\n/*\n * SIDEBAR GROUP\n */\n\n.sidebar__group {\n    /*background-color: #1A1A1A;*/\n    overflow: hidden;\n    box-sizing: border-box;\n    animate: height;\n    /* max-height: 1000px; */\n    /* transition: max-height 0.5s; */\n    --sidebar-group-header-height: 28px;\n}\n\n.sidebar__group--closed {\n    /* max-height: 13px; */\n    height: var(--sidebar-group-header-height);\n}\n\n.sidebar__group-header {\n    box-sizing: border-box;\n    color: #EEEEEE;\n    background-color: #151515;\n    -webkit-user-select: none;  /* Chrome all / Safari all */\n    -moz-user-select: none;     /* Firefox all */\n    -ms-user-select: none;      /* IE 10+ */\n    user-select: none;          /* Likely future */\n    height: var(--sidebar-group-header-height);\n    padding-top: 7px;\n    text-transform: uppercase;\n    letter-spacing: 0.08em;\n    cursor: pointer;\n    transition: background-color var(--sidebar-hover-transition-time);\n    position: relative;\n}\n\n.sidebar__group-header:hover {\n  background-color: #111111;\n}\n\n.sidebar__group-header-title {\n  /*text-align: center;*/\n  overflow: hidden;\n  padding: 0 15px;\n  padding-top:2px;\n  font-weight:bold;\n}\n\n.sidebar__group-header-icon {\n    width: 17px;\n    height: 14px;\n    background-repeat: no-repeat;\n    display: inline-block;\n    position: absolute;\n    background-size: cover;\n\n    /* icon open */\n    /* feather icon: chevron up */\n    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM4ODg4ODgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0iZmVhdGhlciBmZWF0aGVyLWNoZXZyb24tdXAiPjxwb2x5bGluZSBwb2ludHM9IjE4IDE1IDEyIDkgNiAxNSI+PC9wb2x5bGluZT48L3N2Zz4=);\n    top: 4px;\n    right: 5px;\n    opacity: 0.0;\n    transition: opacity 0.3;\n}\n\n.sidebar__group-header:hover .sidebar__group-header-icon {\n    opacity: 1.0;\n}\n\n/* icon closed */\n.sidebar__group--closed .sidebar__group-header-icon {\n    /* feather icon: chevron down */\n    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM4ODg4ODgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0iZmVhdGhlciBmZWF0aGVyLWNoZXZyb24tZG93biI+PHBvbHlsaW5lIHBvaW50cz0iNiA5IDEyIDE1IDE4IDkiPjwvcG9seWxpbmU+PC9zdmc+);\n    top: 4px;\n    right: 5px;\n}\n\n/*\n * SIDEBAR ITEM\n */\n\n.sidebar__item\n{\n    box-sizing: border-box;\n    padding: 7px;\n    padding-left:15px;\n    padding-right:15px;\n\n    overflow: hidden;\n    position: relative;\n}\n\n.sidebar__item-label {\n    display: inline-block;\n    -webkit-user-select: none;  /* Chrome all / Safari all */\n    -moz-user-select: none;     /* Firefox all */\n    -ms-user-select: none;      /* IE 10+ */\n    user-select: none;          /* Likely future */\n    width: calc(50% - 7px);\n    margin-right: 7px;\n    margin-top: 2px;\n    text-overflow: ellipsis;\n    /* overflow: hidden; */\n}\n\n.sidebar__item-value-label {\n    font-family: var(--sidebar-monospace-font-stack);\n    display: inline-block;\n    text-overflow: ellipsis;\n    overflow: hidden;\n    white-space: nowrap;\n    max-width: 60%;\n}\n\n.sidebar__item-value-label::selection {\n    background-color: #24baa7;\n    color: #EEEEEE;\n}\n\n.sidebar__item + .sidebar__item,\n.sidebar__item + .sidebar__group,\n.sidebar__group + .sidebar__item,\n.sidebar__group + .sidebar__group {\n    border-top: 1px solid #272727;\n}\n\n/*\n * SIDEBAR ITEM TOGGLE\n */\n\n.sidebar__toggle {\n    cursor: pointer;\n}\n\n.sidebar__toggle-input {\n    --sidebar-toggle-input-color: #CCCCCC;\n    --sidebar-toggle-input-color-hover: #EEEEEE;\n    --sidebar-toggle-input-border-size: 2px;\n    display: inline;\n    float: right;\n    box-sizing: border-box;\n    border-radius: 50%;\n    cursor: pointer;\n    --toggle-size: 11px;\n    margin-top: 2px;\n    background-color: transparent !important;\n    border: var(--sidebar-toggle-input-border-size) solid var(--sidebar-toggle-input-color);\n    width: var(--toggle-size);\n    height: var(--toggle-size);\n    transition: background-color var(--sidebar-hover-transition-time);\n    transition: border-color var(--sidebar-hover-transition-time);\n}\n.sidebar__toggle:hover .sidebar__toggle-input {\n    border-color: var(--sidebar-toggle-input-color-hover);\n}\n\n.sidebar__toggle .sidebar__item-value-label {\n    -webkit-user-select: none;  /* Chrome all / Safari all */\n    -moz-user-select: none;     /* Firefox all */\n    -ms-user-select: none;      /* IE 10+ */\n    user-select: none;          /* Likely future */\n    max-width: calc(50% - 12px);\n}\n.sidebar__toggle-input::after { clear: both; }\n\n.sidebar__toggle--active .icon_toggle\n{\n\n    background-image: url(data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjE1cHgiIHdpZHRoPSIzMHB4IiBmaWxsPSIjMDZmNzhiIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTAwIDEwMCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PGcgZGlzcGxheT0ibm9uZSI+PGcgZGlzcGxheT0iaW5saW5lIj48Zz48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZmlsbD0iIzA2Zjc4YiIgZD0iTTMwLDI3QzE3LjM1LDI3LDcsMzcuMzUsNyw1MGwwLDBjMCwxMi42NSwxMC4zNSwyMywyMywyM2g0MCBjMTIuNjUsMCwyMy0xMC4zNSwyMy0yM2wwLDBjMC0xMi42NS0xMC4zNS0yMy0yMy0yM0gzMHogTTcwLDY3Yy05LjM4OSwwLTE3LTcuNjEtMTctMTdzNy42MTEtMTcsMTctMTdzMTcsNy42MSwxNywxNyAgICAgUzc5LjM4OSw2Nyw3MCw2N3oiPjwvcGF0aD48L2c+PC9nPjwvZz48Zz48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMwLDI3QzE3LjM1LDI3LDcsMzcuMzUsNyw1MGwwLDBjMCwxMi42NSwxMC4zNSwyMywyMywyM2g0MCAgIGMxMi42NSwwLDIzLTEwLjM1LDIzLTIzbDAsMGMwLTEyLjY1LTEwLjM1LTIzLTIzLTIzSDMweiBNNzAsNjdjLTkuMzg5LDAtMTctNy42MS0xNy0xN3M3LjYxMS0xNywxNy0xN3MxNyw3LjYxLDE3LDE3ICAgUzc5LjM4OSw2Nyw3MCw2N3oiPjwvcGF0aD48L2c+PGcgZGlzcGxheT0ibm9uZSI+PGcgZGlzcGxheT0iaW5saW5lIj48cGF0aCBmaWxsPSIjMDZmNzhiIiBzdHJva2U9IiMwNmY3OGIiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBkPSJNNyw1MGMwLDEyLjY1LDEwLjM1LDIzLDIzLDIzaDQwICAgIGMxMi42NSwwLDIzLTEwLjM1LDIzLTIzbDAsMGMwLTEyLjY1LTEwLjM1LTIzLTIzLTIzSDMwQzE3LjM1LDI3LDcsMzcuMzUsNyw1MEw3LDUweiI+PC9wYXRoPjwvZz48Y2lyY2xlIGRpc3BsYXk9ImlubGluZSIgZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGZpbGw9IiMwNmY3OGIiIHN0cm9rZT0iIzA2Zjc4YiIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIGN4PSI3MCIgY3k9IjUwIiByPSIxNyI+PC9jaXJjbGU+PC9nPjxnIGRpc3BsYXk9Im5vbmUiPjxwYXRoIGRpc3BsYXk9ImlubGluZSIgZD0iTTcwLDI1SDMwQzE2LjIxNSwyNSw1LDM2LjIxNSw1LDUwczExLjIxNSwyNSwyNSwyNWg0MGMxMy43ODUsMCwyNS0xMS4yMTUsMjUtMjVTODMuNzg1LDI1LDcwLDI1eiBNNzAsNzEgICBIMzBDMTguNDIxLDcxLDksNjEuNTc5LDksNTBzOS40MjEtMjEsMjEtMjFoNDBjMTEuNTc5LDAsMjEsOS40MjEsMjEsMjFTODEuNTc5LDcxLDcwLDcxeiBNNzAsMzFjLTEwLjQ3NywwLTE5LDguNTIzLTE5LDE5ICAgczguNTIzLDE5LDE5LDE5czE5LTguNTIzLDE5LTE5UzgwLjQ3NywzMSw3MCwzMXogTTcwLDY1Yy04LjI3MSwwLTE1LTYuNzI5LTE1LTE1czYuNzI5LTE1LDE1LTE1czE1LDYuNzI5LDE1LDE1Uzc4LjI3MSw2NSw3MCw2NXoiPjwvcGF0aD48L2c+PC9zdmc+);\n    opacity: 1;\n    transform: rotate(0deg);\n}\n\n\n.icon_toggle\n{\n    float: right;\n    width:40px;\n    height:18px;\n    background-image: url(data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjE1cHgiIHdpZHRoPSIzMHB4IiBmaWxsPSIjYWFhYWFhIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTAwIDEwMCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PGcgZGlzcGxheT0ibm9uZSI+PGcgZGlzcGxheT0iaW5saW5lIj48Zz48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZmlsbD0iI2FhYWFhYSIgZD0iTTMwLDI3QzE3LjM1LDI3LDcsMzcuMzUsNyw1MGwwLDBjMCwxMi42NSwxMC4zNSwyMywyMywyM2g0MCBjMTIuNjUsMCwyMy0xMC4zNSwyMy0yM2wwLDBjMC0xMi42NS0xMC4zNS0yMy0yMy0yM0gzMHogTTcwLDY3Yy05LjM4OSwwLTE3LTcuNjEtMTctMTdzNy42MTEtMTcsMTctMTdzMTcsNy42MSwxNywxNyAgICAgUzc5LjM4OSw2Nyw3MCw2N3oiPjwvcGF0aD48L2c+PC9nPjwvZz48Zz48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMwLDI3QzE3LjM1LDI3LDcsMzcuMzUsNyw1MGwwLDBjMCwxMi42NSwxMC4zNSwyMywyMywyM2g0MCAgIGMxMi42NSwwLDIzLTEwLjM1LDIzLTIzbDAsMGMwLTEyLjY1LTEwLjM1LTIzLTIzLTIzSDMweiBNNzAsNjdjLTkuMzg5LDAtMTctNy42MS0xNy0xN3M3LjYxMS0xNywxNy0xN3MxNyw3LjYxLDE3LDE3ICAgUzc5LjM4OSw2Nyw3MCw2N3oiPjwvcGF0aD48L2c+PGcgZGlzcGxheT0ibm9uZSI+PGcgZGlzcGxheT0iaW5saW5lIj48cGF0aCBmaWxsPSIjYWFhYWFhIiBzdHJva2U9IiNhYWFhYWEiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBkPSJNNyw1MGMwLDEyLjY1LDEwLjM1LDIzLDIzLDIzaDQwICAgIGMxMi42NSwwLDIzLTEwLjM1LDIzLTIzbDAsMGMwLTEyLjY1LTEwLjM1LTIzLTIzLTIzSDMwQzE3LjM1LDI3LDcsMzcuMzUsNyw1MEw3LDUweiI+PC9wYXRoPjwvZz48Y2lyY2xlIGRpc3BsYXk9ImlubGluZSIgZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGZpbGw9IiNhYWFhYWEiIHN0cm9rZT0iI2FhYWFhYSIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIGN4PSI3MCIgY3k9IjUwIiByPSIxNyI+PC9jaXJjbGU+PC9nPjxnIGRpc3BsYXk9Im5vbmUiPjxwYXRoIGRpc3BsYXk9ImlubGluZSIgZD0iTTcwLDI1SDMwQzE2LjIxNSwyNSw1LDM2LjIxNSw1LDUwczExLjIxNSwyNSwyNSwyNWg0MGMxMy43ODUsMCwyNS0xMS4yMTUsMjUtMjVTODMuNzg1LDI1LDcwLDI1eiBNNzAsNzEgICBIMzBDMTguNDIxLDcxLDksNjEuNTc5LDksNTBzOS40MjEtMjEsMjEtMjFoNDBjMTEuNTc5LDAsMjEsOS40MjEsMjEsMjFTODEuNTc5LDcxLDcwLDcxeiBNNzAsMzFjLTEwLjQ3NywwLTE5LDguNTIzLTE5LDE5ICAgczguNTIzLDE5LDE5LDE5czE5LTguNTIzLDE5LTE5UzgwLjQ3NywzMSw3MCwzMXogTTcwLDY1Yy04LjI3MSwwLTE1LTYuNzI5LTE1LTE1czYuNzI5LTE1LDE1LTE1czE1LDYuNzI5LDE1LDE1Uzc4LjI3MSw2NSw3MCw2NXoiPjwvcGF0aD48L2c+PC9zdmc+);\n    background-size: 50px 37px;\n    background-position: -6px -10px;\n    transform: rotate(180deg);\n    opacity: 0.4;\n}\n\n\n\n/*.sidebar__toggle--active .sidebar__toggle-input {*/\n/*    transition: background-color var(--sidebar-hover-transition-time);*/\n/*    background-color: var(--sidebar-toggle-input-color);*/\n/*}*/\n/*.sidebar__toggle--active .sidebar__toggle-input:hover*/\n/*{*/\n/*    background-color: var(--sidebar-toggle-input-color-hover);*/\n/*    border-color: var(--sidebar-toggle-input-color-hover);*/\n/*    transition: background-color var(--sidebar-hover-transition-time);*/\n/*    transition: border-color var(--sidebar-hover-transition-time);*/\n/*}*/\n\n/*\n * SIDEBAR ITEM BUTTON\n */\n\n.sidebar__button {}\n\n.sidebar__button-input {\n    -webkit-user-select: none;  /* Chrome all / Safari all */\n    -moz-user-select: none;     /* Firefox all */\n    -ms-user-select: none;      /* IE 10+ */\n    user-select: none;          /* Likely future */\n    height: 24px;\n    background-color: transparent;\n    color: #CCCCCC;\n    box-sizing: border-box;\n    padding-top: 3px;\n    text-align: center;\n    border-radius: 125px;\n    border:2px solid #555;\n    cursor: pointer;\n}\n\n.sidebar__button-input.plus, .sidebar__button-input.minus {\n    display: inline-block;\n    min-width: 20px;\n}\n\n.sidebar__button-input:hover {\n  background-color: #333;\n  border:2px solid #07f78c;\n}\n\n/*\n * VALUE DISPLAY (shows a value)\n */\n\n.sidebar__value-display {}\n\n/*\n * SLIDER\n */\n\n.sidebar__slider {\n    --sidebar-slider-input-height: 3px;\n}\n\n.sidebar__slider-input-wrapper {\n    width: 100%;\n    margin-top: 8px;\n    position: relative;\n}\n\n.sidebar__slider-input {\n    -webkit-appearance: none;\n    appearance: none;\n    margin: 0;\n    width: 100%;\n    height: var(--sidebar-slider-input-height);\n    background: #555;\n    cursor: pointer;\n    outline: 0;\n\n    -webkit-transition: .2s;\n    transition: background-color .2s;\n    border: none;\n}\n\n.sidebar__slider-input:focus, .sidebar__slider-input:hover {\n    border: none;\n}\n\n.sidebar__slider-input-active-track {\n    user-select: none;\n    position: absolute;\n    z-index: 11;\n    top: 0;\n    left: 0;\n    background-color: #07f78c;\n    pointer-events: none;\n    height: var(--sidebar-slider-input-height);\n\n    /* width: 10px; */\n}\n\n/* Mouse-over effects */\n.sidebar__slider-input:hover {\n    /*background-color: #444444;*/\n}\n\n/*.sidebar__slider-input::-webkit-progress-value {*/\n/*    background-color: green;*/\n/*    color:green;*/\n\n/*    }*/\n\n/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */\n\n.sidebar__slider-input::-moz-range-thumb\n{\n    position: absolute;\n    height: 15px;\n    width: 15px;\n    z-index: 900 !important;\n    border-radius: 20px !important;\n    cursor: pointer;\n    background: #07f78c !important;\n    user-select: none;\n\n}\n\n.sidebar__slider-input::-webkit-slider-thumb\n{\n    position: relative;\n    appearance: none;\n    -webkit-appearance: none;\n    user-select: none;\n    height: 15px;\n    width: 15px;\n    display: block;\n    z-index: 900 !important;\n    border: 0;\n    border-radius: 20px !important;\n    cursor: pointer;\n    background: #777 !important;\n}\n\n.sidebar__slider-input:hover ::-webkit-slider-thumb {\n    background-color: #EEEEEE !important;\n}\n\n/*.sidebar__slider-input::-moz-range-thumb {*/\n\n/*    width: 0 !important;*/\n/*    height: var(--sidebar-slider-input-height);*/\n/*    background: #EEEEEE;*/\n/*    cursor: pointer;*/\n/*    border-radius: 0 !important;*/\n/*    border: none;*/\n/*    outline: 0;*/\n/*    z-index: 100 !important;*/\n/*}*/\n\n.sidebar__slider-input::-moz-range-track {\n    background-color: transparent;\n    z-index: 11;\n}\n\n/*.sidebar__slider-input::-moz-range-thumb:hover {*/\n  /* background-color: #EEEEEE; */\n/*}*/\n\n\n/*.sidebar__slider-input-wrapper:hover .sidebar__slider-input-active-track {*/\n/*    background-color: #EEEEEE;*/\n/*}*/\n\n/*.sidebar__slider-input-wrapper:hover .sidebar__slider-input::-moz-range-thumb {*/\n/*    background-color: #fff !important;*/\n/*}*/\n\n/*.sidebar__slider-input-wrapper:hover .sidebar__slider-input::-webkit-slider-thumb {*/\n/*    background-color: #EEEEEE;*/\n/*}*/\n\n.sidebar__slider input[type=text] {\n    box-sizing: border-box;\n    /*background-color: #333333;*/\n    text-align: right;\n    color: #BBBBBB;\n    display: inline-block;\n    background-color: transparent !important;\n\n    width: 40%;\n    height: 18px;\n    outline: none;\n    border: none;\n    border-radius: 0;\n    padding: 0 0 0 4px !important;\n    margin: 0;\n}\n\n.sidebar__slider input[type=text]:active,\n.sidebar__slider input[type=text]:focus,\n.sidebar__slider input[type=text]:hover {\n\n    color: #EEEEEE;\n}\n\n/*\n * TEXT / DESCRIPTION\n */\n\n.sidebar__text .sidebar__item-label {\n    width: auto;\n    display: block;\n    max-height: none;\n    margin-right: 0;\n    line-height: 1.1em;\n}\n\n/*\n * SIDEBAR INPUT\n */\n.sidebar__text-input textarea,\n.sidebar__text-input input[type=text] {\n    box-sizing: border-box;\n    background-color: #333333;\n    color: #BBBBBB;\n    display: inline-block;\n    width: 50%;\n    height: 18px;\n    outline: none;\n    border: none;\n    border-radius: 0;\n    border:1px solid #666;\n    padding: 0 0 0 4px !important;\n    margin: 0;\n}\n\n.sidebar__color-picker .sidebar__item-label\n{\n    width:45%;\n}\n\n.sidebar__text-input textarea,\n.sidebar__text-input input[type=text]:active,\n.sidebar__text-input input[type=text]:focus,\n.sidebar__text-input input[type=text]:hover {\n    background-color: transparent;\n    color: #EEEEEE;\n}\n\n.sidebar__text-input textarea\n{\n    margin-top:10px;\n    height:60px;\n    width:100%;\n}\n\n/*\n * SIDEBAR SELECT\n */\n\n\n\n .sidebar__select {}\n .sidebar__select-select {\n    color: #BBBBBB;\n    /*-webkit-appearance: none;*/\n    /*-moz-appearance: none;*/\n    appearance: none;\n    /*box-sizing: border-box;*/\n    width: 50%;\n    height: 20px;\n    background-color: #333333;\n    /*background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM4ODg4ODgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0iZmVhdGhlciBmZWF0aGVyLWNoZXZyb24tZG93biI+PHBvbHlsaW5lIHBvaW50cz0iNiA5IDEyIDE1IDE4IDkiPjwvcG9seWxpbmU+PC9zdmc+);*/\n    background-repeat: no-repeat;\n    background-position: right center;\n    background-size: 16px 16px;\n    margin: 0;\n    /*padding: 0 2 2 6px;*/\n    border-radius: 5px;\n    border: 1px solid #777;\n    background-color: #444;\n    cursor: pointer;\n    outline: none;\n\n }\n\n.sidebar__select-select:hover,\n.sidebar__select-select:active,\n.sidebar__select-select:active {\n    background-color: #444444;\n    color: #EEEEEE;\n}\n\n/*\n * COLOR PICKER\n */\n\n .sidebar__color-picker-color-input {}\n\n .sidebar__color-picker input[type=text] {\n    box-sizing: border-box;\n    background-color: #333333;\n    color: #BBBBBB;\n    display: inline-block;\n    width: calc(50% - 21px); /* 50% minus space of picker circle */\n    height: 18px;\n    outline: none;\n    border: none;\n    border-radius: 0;\n    padding: 0 0 0 4px !important;\n    margin: 0;\n    margin-right: 7px;\n}\n\n.sidebar__color-picker input[type=text]:active,\n.sidebar__color-picker input[type=text]:focus,\n.sidebar__color-picker input[type=text]:hover {\n    background-color: #444444;\n    color: #EEEEEE;\n}\n\n.sidebar__color-picker input[type=color],\n.sidebar__palette-picker input[type=color] {\n    display: inline-block;\n    border-radius: 100%;\n    height: 14px;\n    width: 14px;\n    padding: 0;\n    border: none;\n    border-color: transparent;\n    outline: none;\n    background: none;\n    appearance: none;\n    -moz-appearance: none;\n    -webkit-appearance: none;\n    cursor: pointer;\n    position: relative;\n    top: 3px;\n}\n.sidebar__color-picker input[type=color]:focus,\n.sidebar__palette-picker input[type=color]:focus {\n    outline: none;\n}\n.sidebar__color-picker input[type=color]::-moz-color-swatch,\n.sidebar__palette-picker input[type=color]::-moz-color-swatch {\n    border: none;\n}\n.sidebar__color-picker input[type=color]::-webkit-color-swatch-wrapper,\n.sidebar__palette-picker input[type=color]::-webkit-color-swatch-wrapper {\n    padding: 0;\n}\n.sidebar__color-picker input[type=color]::-webkit-color-swatch,\n.sidebar__palette-picker input[type=color]::-webkit-color-swatch {\n    border: none;\n    border-radius: 100%;\n}\n\n/*\n * Palette Picker\n */\n.sidebar__palette-picker .sidebar__palette-picker-color-input.first {\n    margin-left: 0;\n}\n.sidebar__palette-picker .sidebar__palette-picker-color-input.last {\n    margin-right: 0;\n}\n.sidebar__palette-picker .sidebar__palette-picker-color-input {\n    margin: 0 4px;\n}\n\n.sidebar__palette-picker .circlebutton {\n    width: 14px;\n    height: 14px;\n    border-radius: 1em;\n    display: inline-block;\n    top: 3px;\n    position: relative;\n}\n\n/*\n * Preset\n */\n.sidebar__item-presets-preset\n{\n    padding:4px;\n    cursor:pointer;\n    padding-left:8px;\n    padding-right:8px;\n    margin-right:4px;\n    background-color:#444;\n}\n\n.sidebar__item-presets-preset:hover\n{\n    background-color:#666;\n}\n\n.sidebar__greyout\n{\n    background: #222;\n    opacity: 0.8;\n    width: 100%;\n    height: 100%;\n    position: absolute;\n    z-index: 1000;\n    right: 0;\n    top: 0;\n}\n",};
+// vars
+const CSS_ELEMENT_CLASS = 'cables-sidebar-style'; /* class for the style element to be generated */
+const CSS_ELEMENT_DYNAMIC_CLASS = 'cables-sidebar-dynamic-style'; /* things which can be set via op-port, but not attached to the elements themselves, e.g. minimized opacity */
+const SIDEBAR_CLASS = 'sidebar-cables';
+const SIDEBAR_ID = 'sidebar'+CABLES.uuid();
+const SIDEBAR_ITEMS_CLASS = 'sidebar__items';
+const SIDEBAR_OPEN_CLOSE_BTN_CLASS = 'sidebar__close-button';
+const SIDEBAR_OPEN_CLOSE_BTN_ICON_CLASS = 'sidebar__close-button-icon';
+const BTN_TEXT_OPEN = ''; // 'Close';
+const BTN_TEXT_CLOSED = ''; // 'Show Controls';
+
+let openCloseBtn = null;
+let openCloseBtnIcon = null;
+var headerTitleText=null;
+
+// inputs
+var visiblePort = op.inValueBool("Visible", true);
+var opacityPort = op.inValueSlider('Opacity', 1);
+var defaultMinimizedPort = op.inValueBool('Default Minimized');
+var minimizedOpacityPort = op.inValueSlider('Minimized Opacity', 0.5);
+
+var inTitle = op.inString('Title','Sidebar');
+var side = op.inValueBool('Side');
+
+// outputs
+var childrenPort = op.outObject('childs');
+
+var sidebarEl = document.querySelector('.' + SIDEBAR_ID);
+if(!sidebarEl) {
+    sidebarEl = initSidebarElement();
+}
+// if(!sidebarEl) return;
+var sidebarItemsEl = sidebarEl.querySelector('.' + SIDEBAR_ITEMS_CLASS);
+childrenPort.set({
+    parentElement: sidebarItemsEl,
+    parentOp: op,
+});
+onDefaultMinimizedPortChanged();
+initSidebarCss();
+updateDynamicStyles();
+
+// change listeners
+visiblePort.onChange = onVisiblePortChange;
+opacityPort.onChange = onOpacityPortChange;
+defaultMinimizedPort.onChange = onDefaultMinimizedPortChanged;
+minimizedOpacityPort.onChange = onMinimizedOpacityPortChanged;
+op.onDelete = onDelete;
+
+// functions
+
+function onMinimizedOpacityPortChanged() {
+    updateDynamicStyles();
+}
+
+side.onChange=function()
+{
+    if(side.get()) sidebarEl.classList.add('sidebar-cables-right');
+        else sidebarEl.classList.remove('sidebar-cables-right');
+};
+
+
+function onDefaultMinimizedPortChanged() {
+    if(!openCloseBtn) { return; }
+    if(defaultMinimizedPort.get()) {
+        sidebarEl.classList.add('sidebar--closed');
+        // openCloseBtn.textContent = BTN_TEXT_CLOSED;
+    } else {
+        sidebarEl.classList.remove('sidebar--closed');
+        // openCloseBtn.textContent = BTN_TEXT_OPEN;
+    }
+}
+
+function onOpacityPortChange()
+{
+    var opacity = opacityPort.get();
+    sidebarEl.style.opacity = opacity;
+}
+
+function onVisiblePortChange() {
+    if(visiblePort.get()) {
+        sidebarEl.style.display = 'block';
+    } else {
+        sidebarEl.style.display = 'none';
+    }
+}
+
+side.onChanged=function()
+{
+
+};
+
+/**
+ * Some styles cannot be set directly inline, so a dynamic stylesheet is needed.
+ * Here hover states can be set later on e.g.
+ */
+function updateDynamicStyles()
+{
+    let dynamicStyles = document.querySelectorAll('.' + CSS_ELEMENT_DYNAMIC_CLASS);
+    if(dynamicStyles)
+    {
+        dynamicStyles.forEach(function(e)
+        {
+            e.parentNode.removeChild(e);
+        });
+    }
+    let newDynamicStyle = document.createElement('style');
+    newDynamicStyle.classList.add(CSS_ELEMENT_DYNAMIC_CLASS);
+    let cssText = '.sidebar--closed .sidebar__close-button { ';
+    cssText +=         'opacity: ' + minimizedOpacityPort.get();
+    cssText +=     '}';
+    let cssTextEl = document.createTextNode(cssText);
+    newDynamicStyle.appendChild(cssTextEl);
+    document.body.appendChild(newDynamicStyle);
+}
+
+function initSidebarElement()
+{
+    var element = document.createElement('div');
+    element.classList.add(SIDEBAR_CLASS);
+    element.classList.add(SIDEBAR_ID);
+    var canvasWrapper = op.patch.cgl.canvas.parentElement; /* maybe this is bad outside cables!? */
+
+    // header...
+    var headerGroup = document.createElement('div');
+    headerGroup.classList.add('sidebar__group');
+    element.appendChild(headerGroup);
+    var header = document.createElement('div');
+    header.classList.add('sidebar__group-header');
+    element.appendChild(header);
+    var headerTitle = document.createElement('div');
+    headerTitle.classList.add('sidebar__group-header-title');
+    headerTitleText = document.createElement('span');
+    headerTitleText.classList.add('sidebar__group-header-title-text');
+    headerTitleText.innerHTML=inTitle.get();
+    headerTitle.appendChild(headerTitleText);
+    header.appendChild(headerTitle);
+    headerGroup.appendChild(header);
+    element.appendChild(headerGroup);
+    headerGroup.addEventListener('click', onOpenCloseBtnClick);
+
+    if(!canvasWrapper)
+    {
+        console.warn("[sidebar] no canvas parentelement found...");
+        return;
+    }
+    canvasWrapper.appendChild(element);
+    var items = document.createElement('div');
+    items.classList.add(SIDEBAR_ITEMS_CLASS);
+    element.appendChild(items);
+    openCloseBtn = document.createElement('div');
+    openCloseBtn.classList.add(SIDEBAR_OPEN_CLOSE_BTN_CLASS);
+    openCloseBtn.addEventListener('click', onOpenCloseBtnClick);
+    // openCloseBtn.textContent = BTN_TEXT_OPEN;
+    element.appendChild(openCloseBtn);
+    openCloseBtnIcon = document.createElement('span');
+    openCloseBtnIcon.classList.add(SIDEBAR_OPEN_CLOSE_BTN_ICON_CLASS);
+    openCloseBtn.appendChild(openCloseBtnIcon);
+
+    return element;
+}
+
+inTitle.onChange=function()
+{
+    if(headerTitleText)headerTitleText.innerHTML=inTitle.get();
+
+};
+
+function setClosed(b)
+{
+
+}
+
+function onOpenCloseBtnClick(ev)
+{
+    ev.stopPropagation();
+    if(!sidebarEl) { console.error('Sidebar could not be closed...'); return; }
+    sidebarEl.classList.toggle('sidebar--closed');
+    const btn = ev.target;
+    let btnText = BTN_TEXT_OPEN;
+    if(sidebarEl.classList.contains('sidebar--closed')) btnText = BTN_TEXT_CLOSED;
+}
+
+function initSidebarCss() {
+    //var cssEl = document.getElementById(CSS_ELEMENT_ID);
+    var cssElements = document.querySelectorAll('.' + CSS_ELEMENT_CLASS);
+    // remove old script tag
+    if(cssElements) {
+        cssElements.forEach(function(e) {
+            e.parentNode.removeChild(e);
+        });
+    }
+    var newStyle = document.createElement('style');
+    newStyle.innerHTML = attachments.style_css;
+    newStyle.classList.add(CSS_ELEMENT_CLASS);
+    document.body.appendChild(newStyle);
+}
+
+function onDelete() {
+    removeElementFromDOM(sidebarEl);
+}
+
+function removeElementFromDOM(el) {
+    if(el && el.parentNode && el.parentNode.removeChild) el.parentNode.removeChild(el);
+}
+
+
+
+};
+
+Ops.Sidebar.Sidebar.prototype = new CABLES.Op();
+CABLES.OPS["5a681c35-78ce-4cb3-9858-bc79c34c6819"]={f:Ops.Sidebar.Sidebar,objName:"Ops.Sidebar.Sidebar"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Sidebar.Group
+// 
+// **************************************************************
+
+Ops.Sidebar.Group = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+// inputs
+var parentPort = op.inObject('link');
+var labelPort = op.inString('Text', 'Group');
+var defaultMinimizedPort = op.inValueBool('Default Minimized');
+const inVisible=op.inBool("Visible",true);
+
+// outputs
+var nextPort = op.outObject('next');
+var childrenPort = op.outObject('childs');
+
+
+inVisible.onChange=function()
+{
+    el.style.display= inVisible.get() ? "block" : "none";
+};
+
+
+// vars
+var el = document.createElement('div');
+el.classList.add('sidebar__group');
+onDefaultMinimizedPortChanged();
+var header = document.createElement('div');
+header.classList.add('sidebar__group-header');
+el.appendChild(header);
+header.addEventListener('click', onClick);
+var headerTitle = document.createElement('div');
+headerTitle.classList.add('sidebar__group-header-title');
+// headerTitle.textContent = labelPort.get();
+header.appendChild(headerTitle);
+var headerTitleText = document.createElement('span');
+headerTitleText.textContent = labelPort.get();
+headerTitleText.classList.add('sidebar__group-header-title-text');
+headerTitle.appendChild(headerTitleText);
+var icon = document.createElement('span');
+icon.classList.add('sidebar__group-header-icon');
+icon.classList.add('iconsidebar-chevron-up');
+headerTitle.appendChild(icon);
+var groupItems = document.createElement('div');
+groupItems.classList.add('sidebar__group-items');
+el.appendChild(groupItems);
+op.toWorkPortsNeedToBeLinked(parentPort);
+
+// events
+parentPort.onChange = onParentChanged;
+labelPort.onChange = onLabelTextChanged;
+defaultMinimizedPort.onChange = onDefaultMinimizedPortChanged;
+op.onDelete = onDelete;
+
+// functions
+
+function onDefaultMinimizedPortChanged() {
+    if(defaultMinimizedPort.get()) {
+        el.classList.add('sidebar__group--closed');
+    } else {
+        el.classList.remove('sidebar__group--closed');
+    }
+}
+
+function onClick(ev) {
+    ev.stopPropagation();
+    el.classList.toggle('sidebar__group--closed');
+}
+
+function onLabelTextChanged() {
+    var labelText = labelPort.get();
+    headerTitleText.textContent = labelText;
+    if(CABLES.UI) {
+        op.setTitle('Group: ' + labelText);
+    }
+}
+
+function onParentChanged() {
+    var parent = parentPort.get();
+    if(parent && parent.parentElement) {
+        parent.parentElement.appendChild(el);
+        childrenPort.set(null);
+        childrenPort.set({
+            parentElement: groupItems,
+            parentOp: op,
+        });
+        nextPort.set(parent);
+    } else { // detach
+        if(el.parentElement) {
+            el.parentElement.removeChild(el);
+        }
+    }
+}
+
+function showElement(el) {
+    if(el) {
+        el.style.display = 'block';
+    }
+}
+
+function hideElement(el) {
+    if(el) {
+        el.style.display = 'none';
+    }
+}
+
+function onDelete() {
+    removeElementFromDOM(el);
+}
+
+function removeElementFromDOM(el) {
+    if(el && el.parentNode && el.parentNode.removeChild) {
+        el.parentNode.removeChild(el);
+    }
+}
+
+
+};
+
+Ops.Sidebar.Group.prototype = new CABLES.Op();
+CABLES.OPS["86ea2333-b51c-48ed-94c2-8b7b6e9ff34c"]={f:Ops.Sidebar.Group,objName:"Ops.Sidebar.Group"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Sidebar.SidebarText_v2
+// 
+// **************************************************************
+
+Ops.Sidebar.SidebarText_v2 = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+// inputs
+var parentPort = op.inObject('link');
+var labelPort = op.inString('Text', 'Value');
+var inId = op.inValueString('Id', '');
+
+// outputs
+var siblingsPort = op.outObject('childs');
+
+// vars
+var el = document.createElement('div');
+el.classList.add('sidebar__item');
+el.classList.add('sidebar__text');
+var label = document.createElement('div');
+label.classList.add('sidebar__item-label');
+var labelText = document.createTextNode(labelPort.get());
+label.appendChild(labelText);
+el.appendChild(label);
+
+// events
+parentPort.onChange = onParentChanged;
+labelPort.onChange = onLabelTextChanged;
+inId.onChange = onIdChanged;
+op.onDelete = onDelete;
+
+op.toWorkNeedsParent('Ops.Sidebar.Sidebar');
+
+// functions
+
+function onIdChanged()
+{
+    el.id=inId.get();
+}
+
+function onLabelTextChanged() {
+    var labelText = labelPort.get();
+    label.textContent = labelText;
+    if(CABLES.UI) {
+        if(labelText && typeof labelText === 'string') {
+            op.setTitle('Text: ' + labelText.substring(0, 10)); // display first 10 characters of text in op title
+        } else {
+            op.setTitle('Text');
+        }
+    }
+}
+
+function onParentChanged() {
+    var parent = parentPort.get();
+    if(parent && parent.parentElement) {
+        parent.parentElement.appendChild(el);
+        siblingsPort.set(null);
+        siblingsPort.set(parent);
+    } else { // detach
+        if(el.parentElement) {
+            el.parentElement.removeChild(el);
+        }
+    }
+}
+
+function showElement(el) {
+    if(el) {
+        el.style.display = 'block';
+    }
+}
+
+function hideElement(el) {
+    if(el) {
+        el.style.display = 'none';
+    }
+}
+
+function onDelete() {
+    removeElementFromDOM(el);
+}
+
+function removeElementFromDOM(el) {
+    if(el && el.parentNode && el.parentNode.removeChild) {
+        el.parentNode.removeChild(el);
+    }
+}
+
+
+};
+
+Ops.Sidebar.SidebarText_v2.prototype = new CABLES.Op();
+CABLES.OPS["cc591cc3-ff23-4817-907c-e5be7d5c059d"]={f:Ops.Sidebar.SidebarText_v2,objName:"Ops.Sidebar.SidebarText_v2"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Sidebar.TextInput_v2
+// 
+// **************************************************************
+
+Ops.Sidebar.TextInput_v2 = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+// inputs
+const parentPort = op.inObject('Link');
+const labelPort = op.inString('Text', 'Text');
+const defaultValuePort = op.inString('Default', '');
+const inTextArea=op.inBool("TextArea",false);
+const inGreyOut=op.inBool("Grey Out",false);
+const inVisible=op.inBool("Visible",true);
+
+// outputs
+const siblingsPort = op.outObject('Children');
+const valuePort = op.outString('Result', defaultValuePort.get());
+
+// vars
+var el = document.createElement('div');
+el.classList.add('sidebar__item');
+el.classList.add('sidebar__text-input');
+var label = document.createElement('div');
+label.classList.add('sidebar__item-label');
+var labelText = document.createTextNode(labelPort.get());
+label.appendChild(labelText);
+el.appendChild(label);
+//var inputWrapper = document.createElement('div');
+//inputWrapper.classList.add('sidebar__text-input-input-wrapper');
+//el.appendChild(inputWrapper);
+
+var input=null;
+creatElement();
+
+//inputWrapper.appendChild(input);
+op.toWorkPortsNeedToBeLinked(parentPort);
+
+inTextArea.onChange=creatElement;
+
+function creatElement()
+{
+    if(input)input.remove();
+    if(!inTextArea.get())
+    {
+        input = document.createElement('input');
+    }
+    else
+    {
+        input = document.createElement('textarea');
+        onDefaultValueChanged();
+
+    }
+
+    input.classList.add('sidebar__text-input-input');
+    input.setAttribute('type', 'text');
+    input.setAttribute('value', defaultValuePort.get());
+    el.appendChild(input);
+    input.addEventListener('input', onInput);
+}
+
+var greyOut = document.createElement('div');
+greyOut.classList.add('sidebar__greyout');
+el.appendChild(greyOut);
+greyOut.style.display="none";
+
+inGreyOut.onChange=function()
+{
+    greyOut.style.display= inGreyOut.get() ? "block" : "none";
+};
+
+inVisible.onChange=function()
+{
+    el.style.display= inVisible.get() ? "block" : "none";
+};
+
+
+// events
+parentPort.onChange = onParentChanged;
+labelPort.onChange = onLabelTextChanged;
+defaultValuePort.onChange = onDefaultValueChanged;
+op.onDelete = onDelete;
+
+// functions
+
+function onInput(ev) {
+    valuePort.set(ev.target.value);
+}
+
+function onDefaultValueChanged() {
+    var defaultValue = defaultValuePort.get();
+    valuePort.set(defaultValue);
+    input.value = defaultValue;
+}
+
+function onLabelTextChanged() {
+    var labelText = labelPort.get();
+    label.textContent = labelText;
+    if(CABLES.UI) {
+        op.setTitle('Text Input: ' + labelText);
+    }
+}
+
+function onParentChanged() {
+    var parent = parentPort.get();
+    if(parent && parent.parentElement) {
+        parent.parentElement.appendChild(el);
+        siblingsPort.set(null);
+        siblingsPort.set(parent);
+    } else { // detach
+        if(el.parentElement) {
+            el.parentElement.removeChild(el);
+        }
+    }
+}
+
+function showElement(el) {
+    if(el) {
+        el.style.display = 'block';
+    }
+}
+
+function hideElement(el) {
+    if(el) {
+        el.style.display = 'none';
+    }
+}
+
+function onDelete() {
+    removeElementFromDOM(el);
+}
+
+function removeElementFromDOM(el) {
+    if(el && el.parentNode && el.parentNode.removeChild) {
+        el.parentNode.removeChild(el);
+    }
+}
+
+
+};
+
+Ops.Sidebar.TextInput_v2.prototype = new CABLES.Op();
+CABLES.OPS["6538a190-e73c-451b-964e-d010ee267aa9"]={f:Ops.Sidebar.TextInput_v2,objName:"Ops.Sidebar.TextInput_v2"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Sidebar.NumberInput_v2
+// 
+// **************************************************************
+
+Ops.Sidebar.NumberInput_v2 = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+// inputs
+const parentPort = op.inObject("Link");
+const labelPort = op.inString("Text", "Number");
+const inputValuePort = op.inValue("Input", 0);
+const setDefaultValueButtonPort = op.inTriggerButton("Set Default");
+const defaultValuePort = op.inValue("Default", 0);
+defaultValuePort.setUiAttribs({ "hidePort": true, "greyout": true });
+
+// outputs
+const siblingsPort = op.outObject("Children");
+const valuePort = op.outValue("Result", defaultValuePort.get());
+
+// vars
+const el = document.createElement("div");
+el.classList.add("sidebar__item");
+el.classList.add("sidebar__text-input");
+const label = document.createElement("div");
+label.classList.add("sidebar__item-label");
+const labelTextNode = document.createTextNode(labelPort.get());
+label.appendChild(labelTextNode);
+el.appendChild(label);
+// var inputWrapper = document.createElement('div');
+// inputWrapper.classList.add('sidebar__text-input-input-wrapper');
+// el.appendChild(inputWrapper);
+const input = document.createElement("input");
+input.classList.add("sidebar__text-input-input");
+input.setAttribute("type", "text");
+input.setAttribute("value", defaultValuePort.get());
+// inputWrapper.appendChild(input);
+el.appendChild(input);
+input.addEventListener("input", onInput);
+
+// events
+parentPort.onChange = onParentChanged;
+labelPort.onChange = onLabelTextChanged;
+defaultValuePort.onChange = onDefaultValueChanged;
+op.onDelete = onDelete;
+inputValuePort.onChange = onInputValuePortChanged;
+setDefaultValueButtonPort.onTriggered = setDefaultValue;
+
+// functions
+
+function setDefaultValue()
+{
+    defaultValuePort.set(parseFloat(inputValuePort.get()));
+    if (CABLES.UI && op.isCurrentUiOp())
+    {
+        gui.opParams.show(op); /* update DOM */
+    }
+}
+
+function onInputValuePortChanged()
+{
+    let val = parseFloat(inputValuePort.get());
+    if (isNaN(val)) { val = 0; }
+    input.value = val;
+    valuePort.set(val);
+}
+
+function onInput(ev)
+{
+    let newVal = parseFloat(ev.target.value);
+    if (isNaN(newVal)) { newVal = 0; }
+    valuePort.set(newVal);
+    inputValuePort.set(newVal);
+    if (CABLES.UI && op.isCurrentUiOp())
+    {
+        gui.opParams.show(op); /* update DOM */
+    }
+}
+
+function onDefaultValueChanged()
+{
+    /*
+    var defaultValue = defaultValuePort.get();
+    valuePort.set(defaultValue);
+    input.value = defaultValue;
+    */
+}
+
+function onLabelTextChanged()
+{
+    const labelText = labelPort.get();
+    label.textContent = labelText;
+    if (CABLES.UI)
+    {
+        op.setTitle("Number Input: " + labelText);
+    }
+}
+
+function onParentChanged()
+{
+    const parent = parentPort.get();
+    if (parent && parent.parentElement)
+    {
+        parent.parentElement.appendChild(el);
+        siblingsPort.set(null);
+        siblingsPort.set(parent);
+    }
+    else
+    { // detach
+        if (el.parentElement)
+        {
+            el.parentElement.removeChild(el);
+        }
+    }
+}
+
+function showElement(element)
+{
+    if (element)
+    {
+        element.style.display = "block";
+    }
+}
+
+function hideElement(element)
+{
+    if (element)
+    {
+        element.style.display = "none";
+    }
+}
+
+function onDelete()
+{
+    removeElementFromDOM(el);
+}
+
+function removeElementFromDOM(element)
+{
+    if (element && element.parentNode && element.parentNode.removeChild)
+    {
+        element.parentNode.removeChild(element);
+    }
+}
+
+
+};
+
+Ops.Sidebar.NumberInput_v2.prototype = new CABLES.Op();
+CABLES.OPS["c4f3f1d7-de07-4c06-921e-32baeef4fc68"]={f:Ops.Sidebar.NumberInput_v2,objName:"Ops.Sidebar.NumberInput_v2"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Sidebar.DropDown_v2
+// 
+// **************************************************************
+
+Ops.Sidebar.DropDown_v2 = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+// inputs
+const parentPort = op.inObject("Link");
+const labelPort = op.inString("Text", "Value");
+const valuesPort = op.inArray("Values");
+const defaultValuePort = op.inString("Default", "");
+const inGreyOut = op.inBool("Grey Out", false);
+const inVisible = op.inBool("Visible", true);
+
+
+// outputs
+const siblingsPort = op.outObject("Children");
+const valuePort = op.outString("Result", defaultValuePort.get());
+const outIndex = op.outNumber("Index");
+
+// vars
+const el = document.createElement("div");
+el.classList.add("sidebar__item");
+el.classList.add("sidebar__select");
+const label = document.createElement("div");
+label.classList.add("sidebar__item-label");
+const labelText = document.createTextNode(labelPort.get());
+label.appendChild(labelText);
+el.appendChild(label);
+const input = document.createElement("select");
+input.classList.add("sidebar__select-select");
+el.appendChild(input);
+input.addEventListener("input", onInput);
+
+const greyOut = document.createElement("div");
+greyOut.classList.add("sidebar__greyout");
+el.appendChild(greyOut);
+greyOut.style.display = "none";
+
+inGreyOut.onChange = function ()
+{
+    greyOut.style.display = inGreyOut.get() ? "block" : "none";
+};
+
+inVisible.onChange = function ()
+{
+    el.style.display = inVisible.get() ? "block" : "none";
+};
+
+
+// events
+parentPort.onChange = onParentChanged;
+labelPort.onChange = onLabelTextChanged;
+defaultValuePort.onChange = onDefaultValueChanged;
+op.onDelete = onDelete;
+valuesPort.onChange = onValuesPortChange;
+
+let options = [];
+// functions
+
+op.onLoaded = function ()
+{
+    valuePort.set(defaultValuePort.get());
+};
+
+function onValuesPortChange()
+{
+    // remove all children
+    while (input.lastChild)
+    {
+        input.removeChild(input.lastChild);
+    }
+    options = valuesPort.get();
+    const defaultValue = defaultValuePort.get();
+    if (options)
+    {
+        options.forEach(function (option)
+        {
+            const optionEl = document.createElement("option");
+            optionEl.setAttribute("value", option);
+            if (option === defaultValue)
+            {
+                optionEl.setAttribute("selected", "");
+            }
+            const textEl = document.createTextNode(option);
+            optionEl.appendChild(textEl);
+            input.appendChild(optionEl);
+        });
+    }
+    else
+    {
+        valuePort.set("");
+    }
+    setSelectedProperty(); /* set the selected property for the default value */
+}
+
+function setSelectedProperty()
+{
+    const defaultItem = defaultValuePort.get();
+    const optionElements = input.querySelectorAll("option");
+    optionElements.forEach(function (optionElement, index)
+    {
+        if (optionElement.value === defaultItem)
+        {
+            optionElement.setAttribute("selected", "");
+            outIndex.set(index);
+        }
+        else
+        {
+            optionElement.removeAttribute("selected");
+        }
+    });
+}
+
+function onInput(ev)
+{
+    valuePort.set(ev.target.value);
+    outIndex.set(options.indexOf(ev.target.value));
+}
+
+function onDefaultValueChanged()
+{
+    const defaultValue = defaultValuePort.get();
+    valuePort.set(defaultValue);
+    // input.value = defaultValue;
+    setSelectedProperty();
+}
+
+function onLabelTextChanged()
+{
+    const labelText = labelPort.get();
+    label.textContent = labelText;
+    if (CABLES.UI)
+    {
+        op.setTitle("Dropdown: " + labelText);
+    }
+}
+
+function onParentChanged()
+{
+    const parent = parentPort.get();
+    if (parent && parent.parentElement)
+    {
+        parent.parentElement.appendChild(el);
+        siblingsPort.set(null);
+        siblingsPort.set(parent);
+    }
+    else
+    { // detach
+        if (el.parentElement)
+        {
+            el.parentElement.removeChild(el);
+        }
+    }
+}
+
+function showElement(el)
+{
+    if (el)
+    {
+        el.style.display = "block";
+    }
+}
+
+function hideElement(el)
+{
+    if (el)
+    {
+        el.style.display = "none";
+    }
+}
+
+function onDelete()
+{
+    removeElementFromDOM(el);
+}
+
+function removeElementFromDOM(el)
+{
+    if (el && el.parentNode && el.parentNode.removeChild)
+    {
+        el.parentNode.removeChild(el);
+    }
+}
+
+
+};
+
+Ops.Sidebar.DropDown_v2.prototype = new CABLES.Op();
+CABLES.OPS["7b3f93d6-4de1-41fd-aa26-e74c8285c662"]={f:Ops.Sidebar.DropDown_v2,objName:"Ops.Sidebar.DropDown_v2"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.Array.ParseArray_v2
+// 
+// **************************************************************
+
+Ops.Array.ParseArray_v2 = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const text = op.inStringEditor("text", "1,2,3"),
+    separator = op.inString("separator", ","),
+    toNumber = op.inValueBool("Numbers", true),
+    parsed = op.outTrigger("Parsed"),
+    arr = op.outArray("array"),
+    len = op.outValue("length");
+
+text.onChange = separator.onChange = toNumber.onChange = parse;
+
+parse();
+
+function parse()
+{
+    if (!text.get())
+    {
+        arr.set(null);
+        arr.set([]);
+        len.set(0);
+        return;
+    }
+
+    const r = text.get().split(separator.get());
+
+    if (r[r.length - 1] === "") r.length -= 1;
+
+    len.set(r.length);
+
+    op.setUiError("notnum", null);
+    if (toNumber.get())
+    {
+        let hasStrings = false;
+        for (let i = 0; i < r.length; i++)
+        {
+            r[i] = Number(r[i]);
+            if (!CABLES.UTILS.isNumeric(r[i]))
+            {
+                hasStrings = true;
+            }
+        }
+        if (hasStrings)
+        {
+            op.setUiError("notnum", "Parse Error / Not all values numerical!");
+        }
+    }
+
+    arr.set(null);
+    arr.set(r);
+    parsed.trigger();
+}
+
+
+};
+
+Ops.Array.ParseArray_v2.prototype = new CABLES.Op();
+CABLES.OPS["c974de41-4ce4-4432-b94d-724741109c71"]={f:Ops.Array.ParseArray_v2,objName:"Ops.Array.ParseArray_v2"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.MyCustomEventListener
+// 
+// **************************************************************
+
+Ops.User.alivemachine.MyCustomEventListener = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+// constants
+var EVENT_NAME_DEFAULT = '';
+var USE_CAPTURE_DEFAULT = false;
+var PREVENT_DEFAULT_DEFAULT  = true;
+var STOP_PROPAGATION_DEFAULT  = true;
+
+// variables
+var lastElement = null; // stores the last connected element, so we can remove prior event listeners
+var lastEventName = EVENT_NAME_DEFAULT;
+var lastUseCapture = USE_CAPTURE_DEFAULT;
+
+// inputs
+var elementPort = op.inObject('Element');
+var eventNamePort = op.inValueString('Event Name', EVENT_NAME_DEFAULT);
+var useCapturePort = op.inValueBool('Use Capture', USE_CAPTURE_DEFAULT);
+var preventDefaultPort = op.inValueBool('Prevent Default', PREVENT_DEFAULT_DEFAULT);
+var stopPropagationPort = op.inValueBool('Stop Propagation', STOP_PROPAGATION_DEFAULT);
+
+// outputs
+var triggerPort = op.outTrigger('Event Trigger');
+var eventObjPort = op.outObject('Event Object');
+var selectedImg = op.outString('selectedImg');
+var selectedText = op.outString('selectedText');
+var selectedID = op.outString('selectedID');
+var msg = op.outString('Message');
+
+// change listeners
+elementPort.onChange = update;
+eventNamePort.onChange = update;
+useCapturePort.onChange = update;
+
+function update() {
+    var element = elementPort.get();
+    var eventName = eventNamePort.get();
+    var useCapture = useCapturePort.get();
+    removeListener();
+    addListener(element, eventName, useCapture);
+    lastElement = element;
+    lastEventName = eventName;
+    lastUseCapture = useCapture;
+}
+
+function removeListener() {
+    if(lastElement && lastEventName) {
+        lastElement.removeEventListener(lastEventName, handleEvent, lastUseCapture);
+    }
+}
+
+function addListener(el, name, useCapture) {
+    if(el && name) {
+        addEventListener(name, handleEvent, useCapture);
+    }
+}
+function handleEvent(ev) {
+    eventObjPort.set(ev);
+    if(ev.srcElement.tagName=='IMG'){
+        selectedImg.set(ev.srcElement.src.toString());
+    }else if(ev.srcElement.tagName=='TEXTAREA'){
+        selectedText.set(ev.srcElement.value.toString());
+    }else if(eventNamePort.get()=='message'){
+        msg.set(ev.data);
+    }
+    var id = ev.srcElement.id;
+    if(ev.srcElement.id!==undefined){
+    selectedID.set(id.toString());
+    }
+
+
+    if(preventDefaultPort.get()) { ev.preventDefault(); }
+    if(stopPropagationPort.get()) { ev.stopPropagation(); }
+    triggerPort.trigger();
+}
+
+};
+
+Ops.User.alivemachine.MyCustomEventListener.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.Math.Log
+// 
+// **************************************************************
+
+Ops.Math.Log = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const number=op.inValueFloat("number");
+const result=op.outValue("result");
+
+number.onChange=function()
+{
+    var r=Math.log( number.get() );
+    if(isNaN(r))r=0;
+    result.set(r);
+};
+
+};
+
+Ops.Math.Log.prototype = new CABLES.Op();
+CABLES.OPS["7440b1ca-71d9-42a3-a927-d7b45b8857f9"]={f:Ops.Math.Log,objName:"Ops.Math.Log"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.MyWebcam
+// 
+// **************************************************************
+
+Ops.User.alivemachine.MyWebcam = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+// todo: https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints/facingMode
+loadDaFun();
+function loadDaFun() {
+   var script = document.createElement('script');
+   script.src = 'https://webrtc.github.io/adapter/adapter-latest.js';
+   var head = document.getElementsByTagName("head")[0];
+   head.appendChild(script);
+}
+const
+    inFacing = op.inSwitch("Facing", ["environment", "user"], "user"),
+    flip = op.inValueBool("flip"),
+    fps = op.inValueInt("fps"),
+    width = op.inValueInt("Width", 640),
+    height = op.inValueInt("Height", 480),
+    inActive = op.inValueBool("Active", true),
+    inStyle = op.inValueEditor("Style", "position:absolute;z-index:9999;", "none"),
+    inCap = op.inTriggerButton("Capture"),
+    textureOut = op.outTexture("texture"),
+    outRatio = op.outValue("Ratio"),
+    available = op.outValue("Available"),
+    outWidth = op.outNumber("Width"),
+    outHeight = op.outNumber("Height"),
+    outEleId = op.outString("Element Id"),
+    outObj = op.outObject("Element"),
+    outClicked = op.outTrigger("Clicked"),
+    outCap = op.outString("Captured");
+
+width.onChange =
+    height.onChange =
+    inFacing.onChange = startWebcam;
+inStyle.onChange = updateStyle;
+inCap.onTriggered=onMouseClick;
+fps.set(30);
+flip.set(true);
+
+const cgl = op.patch.cgl;
+const videoElement = document.createElement("video");
+const eleId = "webcam" + CABLES.uuid();
+if(inActive.get()===false){
+    videoElement.style.display = "none";
+}else{
+    videoElement.style.display = "block";
+}
+videoElement.setAttribute("id", eleId);
+videoElement.setAttribute("autoplay", "");
+videoElement.setAttribute("muted", "");
+videoElement.setAttribute("playsinline", "");
+videoElement.addEventListener("click", onMouseClick);
+
+op.patch.cgl.canvas.parentElement.appendChild(videoElement);
+
+const tex = new CGL.Texture(cgl);
+tex.setSize(8, 8);
+textureOut.set(tex);
+let timeout = null;
+
+let canceled = false;
+
+op.onDelete = removeElement;
+
+function removeElement()
+{
+    if (videoElement) videoElement.remove();
+    clearTimeout(timeout);
+}
+
+
+inActive.onChange = function ()
+{
+    if (inActive.get())
+    {
+        canceled = false;
+        videoElement.style.display = "block";
+        updateTexture();
+    }
+    else
+    {
+        videoElement.style.display = "none";
+        canceled = true;
+    }
+};
+
+fps.onChange = function ()
+{
+    if (fps.get() < 1)fps.set(1);
+    clearTimeout(timeout);
+    timeout = setTimeout(updateTexture, 1000 / fps.get());
+};
+
+function updateTexture()
+{
+    cgl.gl.bindTexture(cgl.gl.TEXTURE_2D, tex.tex);
+    cgl.gl.pixelStorei(cgl.gl.UNPACK_FLIP_Y_WEBGL, flip.get());
+
+    cgl.gl.texImage2D(cgl.gl.TEXTURE_2D, 0, cgl.gl.RGBA, cgl.gl.RGBA, cgl.gl.UNSIGNED_BYTE, videoElement);
+    cgl.gl.bindTexture(cgl.gl.TEXTURE_2D, null);
+
+    if (!canceled) timeout = setTimeout(updateTexture, 1000 / fps.get());
+}
+
+function camInitComplete(stream)
+{
+    tex.videoElement = videoElement;
+    // videoElement.src = window.URL.createObjectURL(stream);
+    videoElement.srcObject = stream;
+    // tex.videoElement=stream;
+    videoElement.onloadedmetadata = function (e)
+    {
+        available.set(true);
+
+        outHeight.set(videoElement.videoHeight);
+        outWidth.set(videoElement.videoWidth);
+
+        tex.setSize(videoElement.videoWidth, videoElement.videoHeight);
+
+        outRatio.set(videoElement.videoWidth / videoElement.videoHeight);
+
+        videoElement.play();
+        outObj.set(videoElement);
+        updateTexture();
+    };
+}
+
+function startWebcam()
+{
+    //removeElement();
+    const constraints = { "audio": false, "video": {} };
+
+    constraints.video.facingMode = inFacing.get();
+    constraints.video.width = width.get();
+    constraints.video.height = height.get();
+
+    //navigator.getUserMedia = navigator.getUserMedia || navigator.mediaDevices.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+/*
+    if (navigator.getUserMedia)
+    {
+        navigator.getUserMedia(constraints, camInitComplete,
+            function ()
+            {
+                available.set(false);
+                // console.log('error webcam');
+            });
+    }
+    else
+    {
+        // the ios way...
+*/
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(camInitComplete)
+            .catch(function (error)
+            {
+                console.log(error.name + ": " + error.message);
+            });
+//    }
+}
+function updateStyle()
+{
+    if (inStyle.get() != videoElement.style)
+    {
+        videoElement.setAttribute("style", inStyle.get());
+        outObj.set(null);
+        outObj.set(videoElement);
+    }
+}
+var canvas = document.createElement('canvas');
+var ctx = canvas.getContext('2d');
+function onMouseClick()
+{
+   //if(inActive.get()){
+    canvas.width = width.get();
+    canvas.height = height.get();
+    ctx.drawImage(videoElement, 0, 0, width.get(),height.get());
+    var b64webcam = canvas.toDataURL('image/png', .1);
+	outCap.set(b64webcam);
+
+    outClicked.trigger();
+    //}else{
+    //    outCap.set('');
+    //}
+}
+
+
+updateStyle();
+startWebcam();
+
+
+};
+
+Ops.User.alivemachine.MyWebcam.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.StringAccumlator
+// 
+// **************************************************************
+
+Ops.User.alivemachine.StringAccumlator = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const inString = op.inString("String");
+var inClean = op.inTriggerButton("Clean");
+var invert = op.inBool("invert",false);
+var inLink = op.inString("Liaison");
+var outText = op.outString("Text");
+
+inString.onChange=addUp;
+inClean.onTriggered=cleanUp;
+function addUp ()
+{
+    if(invert.get()==true){
+        outText.set(inString.get()+inLink.get()+outText.get());
+    }else{
+        outText.set(outText.get()+inLink.get()+inString.get());
+    }
+}
+function cleanUp(){
+    outText.set("");
+}
+
+};
+
+Ops.User.alivemachine.StringAccumlator.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.Trigger.TriggerExtender
+// 
+// **************************************************************
+
+Ops.Trigger.TriggerExtender = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+// inputs
+var inTriggerPort = op.inTriggerButton('Execute');
+
+// outputs
+var outTriggerPort = op.outTrigger('Next');
+
+// trigger listener
+inTriggerPort.onTriggered = function() {
+    outTriggerPort.trigger();
+};
+
+};
+
+Ops.Trigger.TriggerExtender.prototype = new CABLES.Op();
+CABLES.OPS["7ef594f3-4907-47b0-a2d3-9854eda1679d"]={f:Ops.Trigger.TriggerExtender,objName:"Ops.Trigger.TriggerExtender"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.MyFilterValidString
+// 
+// **************************************************************
+
+Ops.User.alivemachine.MyFilterValidString = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+
+const
+    inStr=op.inString("String","A message"),
+    infilter=op.inString("Filter","null"),
+    checkNull=op.inBool("Invalid if null",true),
+    checkUndefined=op.inBool("Invalid if undefined",true),
+    checkEmpty=op.inBool("Invalid if empty",true),
+    checkZero=op.inBool("Invalid if 0",true),
+    checkguill=op.inBool("Remove '",true),
+    outStr=op.outString("Last Valid String"),
+    result=op.outBool("Is Valid");
+
+inStr.onChange=
+infilter.onChange=
+checkNull.onChange=
+checkUndefined.onChange=
+checkEmpty.onChange=
+checkguill.onChange=
+function()
+{
+    var str=inStr.get();
+    var r=true;
+
+    if(r===false)r=false;
+    if(r && checkZero.get() && (str===0 || str==="0")) r=false;
+    if(r && checkNull.get() && str===null) r=false;
+    if(r && checkUndefined.get() && str===undefined) r=false;
+    if(r && checkEmpty.get() && str==="") r=false;
+    if(r && infilter.get()!=="" && str.includes(infilter.get())) r=false;
+
+    if(r && checkguill.get()==true){
+        var nstr = str.replace('"','').replace("'",'');
+        outStr.set(nstr);
+    }else{
+        if(r)outStr.set(str);
+
+    }
+
+    //if(r && str.includes(infilter.get())) r=false;
+    //alert(str.includes(infilter.get()));
+    result.set(r);
+
+};
+
+
+};
+
+Ops.User.alivemachine.MyFilterValidString.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.Debug.Console
+// 
+// **************************************************************
+
+Ops.Debug.Console = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+var visible=op.inValueBool("visible",true);
+
+
+visible.onChange=function()
+{
+    if(visible.get()) logger.style.display="block";
+        else logger.style.display="none";
+};
+
+var logger = document.createElement('div');
+logger.style.padding="0px";
+logger.style.position="absolute";
+logger.style.overflow="scroll";
+if(CABLES.UI)
+{
+    logger.style.width="100%";
+    logger.style.height="50%";
+}
+else
+{
+    logger.style.width="100vw";
+    logger.style.height="50vh";
+}
+logger.style['background-color']="rgba(0,0,0,0.74)";
+logger.style['box-sizing']="border-box";
+logger.style.padding="5px";
+// logger.style['border-left']="1px solid grey";
+// logger.style['border-top']="1px solid grey";
+logger.style["z-index"]="9999";
+logger.style.color="#fff";
+
+
+var canvas = op.patch.cgl.canvas.parentElement;
+canvas.appendChild(logger);
+
+
+var oldLog = console.log;
+var oldLogError = console.error;
+var oldLogWarn = console.warn;
+// var logger = document.getElementById('log');
+console.log = thelog;
+console.error = thelog;
+console.warn = thelog;
+
+function thelog()
+{
+    oldLog(arguments);
+    var html='<code style="display:block;overflow:hidden;margin-top:3px;border-bottom:1px solid #000;padding:3px;">';
+    for (var i = 0; i < arguments.length; i++)
+    {
+        if (typeof arguments[i] == 'object') html += (JSON && JSON.stringify ? JSON.stringify(arguments[i], undefined, 2) : arguments[i]) + '';
+        else html += arguments[i] ;
+    }
+    logger.innerHTML+=html+ '</code>';
+    logger.scrollTop = logger.scrollHeight;
+}
+
+op.onDelete=function()
+{
+    logger.remove();
+    console.log=oldLog;
+    console.error=oldLogError;
+    console.warn=oldLogWarn;
+    
+};
+
+};
+
+Ops.Debug.Console.prototype = new CABLES.Op();
+CABLES.OPS["1e650a0b-672f-4dca-bcf0-5df281a2d31e"]={f:Ops.Debug.Console,objName:"Ops.Debug.Console"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.FocusDiv
+// 
+// **************************************************************
+
+Ops.User.alivemachine.FocusDiv = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const inButton = op.inTriggerButton("focus");
+const divID = op.inString("div ID");
+
+
+inButton.onTriggered= update;
+
+function update()
+{
+
+    var str = divID.get();
+    document.getElementById(str).focus();
+
+
+}
+
+};
+
+Ops.User.alivemachine.FocusDiv.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.Boolean.TriggerChangedFalse
+// 
+// **************************************************************
+
+Ops.Boolean.TriggerChangedFalse = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+
+var val=op.inValueBool("Value",false);
+
+var next=op.outTrigger("Next");
+
+var oldVal=0;
+
+val.onChange=function()
+{
+    var newVal=val.get();
+    if(oldVal && !newVal)
+    {
+        oldVal=false;
+        next.trigger();
+    }
+    else
+    {
+        oldVal=true;
+    }
+};
+
+};
+
+Ops.Boolean.TriggerChangedFalse.prototype = new CABLES.Op();
+CABLES.OPS["6387bcb0-6091-4199-8ab7-f96ad4aa3c7d"]={f:Ops.Boolean.TriggerChangedFalse,objName:"Ops.Boolean.TriggerChangedFalse"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.MySpeech
+// 
+// **************************************************************
+
+Ops.User.alivemachine.MySpeech = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const
+    inLang=op.inString("Language","us-US"),
+    active=op.inBool("Active",true),
+    result=op.outString("Result"),
+    confidence=op.outNumber("Confidence"),
+    outSupported=op.outBool("Supported",false),
+    outResult=op.outTrigger("New Result",""),
+    outActive=op.outBool("Started",false);
+
+
+active.onChange=startStop;
+
+window.SpeechRecognition = window.SpeechRecognition||window.webkitSpeechRecognition || window.mozSpeechRecognition;
+
+var recognition=null;
+
+inLang.onChange=changeLang;
+
+function startStop(){
+    if(!recognition) return;
+
+    try{
+
+        if(active.get()!=outActive.get())
+        {
+            if(active.get()) {
+                console.log("start");
+                recognition.start();
+                console.log("started");
+            }
+            else {
+                console.log("aborting");
+                recognition.stop();
+                outActive.set(false);
+                console.log("aborted");
+            }
+        }
+
+    }
+    catch(e)
+    {
+        console.log(e);
+    }
+}
+
+
+op.init=function()
+{
+   // startStop();
+};
+
+function changeLang()
+{
+    if(!recognition)return;
+
+    recognition.lang = inLang.get();
+    recognition.stop();
+
+    setTimeout(function(){
+        try{recognition.start();}catch(e){}},500);
+
+
+
+}
+
+startAPI();
+
+function startAPI()
+{
+    if(window.SpeechRecognition)
+    {
+        outSupported.set(true);
+
+        if(recognition) recognition.abort();
+
+        recognition=new SpeechRecognition();
+
+        recognition.lang = inLang.get();
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 0;
+        recognition.continuous=true;
+        SpeechRecognition.interimResults=true;
+
+
+        recognition.onstart = function() { outActive.set(true); console.log("Listenning to you");};
+        recognition.onstop = function() { outActive.set(false); };
+        recognition.onend = function() { outActive.set(false);console.log("Not listenning");recognition.stop(); /*if(active===true){startStop();}*/ };
+
+        recognition.onresult = function(event) { op.log('recognition result'); };
+        //recognition.onerror = function(event) { op.log('recognition error',result); };
+
+
+        recognition.onresult = function(event)
+        {
+            const idx=event.results.length-1;
+
+            result.set(event.results[idx][0].transcript);
+            confidence.set(event.results[idx][0].confidence);
+            op.log('', event.results[idx][0].transcript);
+            outResult.trigger();
+        };
+
+    }
+
+}
+
+
+
+};
+
+Ops.User.alivemachine.MySpeech.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.MyConsole
+// 
+// **************************************************************
+
+Ops.User.alivemachine.MyConsole = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+var visible=op.inValueBool("visible",true);
+var result=op.outString("log");
+
+visible.onChange=function()
+{
+    if(visible.get()) logger.style.display="block";
+        else logger.style.display="none";
+};
+
+var logger = document.createElement('div');
+logger.style.padding="0px";
+logger.style.position="absolute";
+logger.style.overflow="scroll";
+if(CABLES.UI)
+{
+    logger.style.width="100%";
+    logger.style.height="50%";
+}
+else
+{
+    logger.style.width="100vw";
+    logger.style.height="50vh";
+}
+logger.style['background-color']="rgba(0,0,0,0.74)";
+logger.style['box-sizing']="border-box";
+logger.style.padding="5px";
+// logger.style['border-left']="1px solid grey";
+// logger.style['border-top']="1px solid grey";
+logger.style["z-index"]="9999";
+logger.style.color="#fff";
+
+
+var canvas = op.patch.cgl.canvas.parentElement;
+canvas.appendChild(logger);
+
+
+var oldLog = console.log;
+var oldLogError = console.error;
+var oldLogWarn = console.warn;
+// var logger = document.getElementById('log');
+console.log = thelog;
+console.error = thelog;
+console.warn = thelog;
+
+function thelog()
+{
+    oldLog(arguments);
+    var html;
+    for (var i = 0; i < arguments.length; i++)
+    {
+        if (typeof arguments[i] == 'object') html += (JSON && JSON.stringify ? JSON.stringify(arguments[i], undefined, 2) : arguments[i]) + '';
+        else html += arguments[i] ;
+    }
+    logger.innerHTML+=html;
+    var ht;
+    if(html!=undefined){ht=html.replace("undefined","")}
+    if(visible.get()){
+        result.set(ht);
+    }
+    logger.scrollTop = logger.scrollHeight;
+}
+
+op.onDelete=function()
+{
+    logger.remove();
+    console.log=oldLog;
+    console.error=oldLogError;
+    console.warn=oldLogWarn;
+
+};
+
+};
+
+Ops.User.alivemachine.MyConsole.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.Trigger.Threshold
+// 
+// **************************************************************
+
+Ops.Trigger.Threshold = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+//this op will send one trigger out if the threshold has been crossed
+// but will not send another until the incoming inValue
+//drops below the threshold and go's above it again
+
+const inValue = op.inValue("Input"),
+    inThreshold = op.inValue("Threshold"),
+    output = op.outTrigger("Output");
+
+var hasThresholdBeenExceeded = false;
+
+inValue.onChange = update;
+function update()
+{
+	if(!hasThresholdBeenExceeded && inValue.get() >= inThreshold.get())
+	{
+		hasThresholdBeenExceeded = true;
+		output.trigger();
+	}
+	else if(hasThresholdBeenExceeded && inValue.get() <= inThreshold.get())
+	{
+		hasThresholdBeenExceeded = false;
+	}
+}
+
+
+
+
+};
+
+Ops.Trigger.Threshold.prototype = new CABLES.Op();
+CABLES.OPS["ef0891db-6053-42ba-b7d5-29c7cf6d8208"]={f:Ops.Trigger.Threshold,objName:"Ops.Trigger.Threshold"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.GetHighlighted
+// 
+// **************************************************************
+
+Ops.User.alivemachine.GetHighlighted = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const active = op.inBool('active',true);
+const outString = op.outString("String out");
+
+
+function getSelectionText() {
+    var text = "";
+    var activeEl = document.activeElement;
+    var activeElTagName = activeEl ? activeEl.tagName.toLowerCase() : null;
+    if (
+      (activeElTagName == "textarea") || (activeElTagName == "input" &&
+      /^(?:text|search|password|tel|url)$/i.test(activeEl.type)) &&
+      (typeof activeEl.selectionStart == "number")
+    ) {
+        text = activeEl.value.slice(activeEl.selectionStart, activeEl.selectionEnd);
+    } else if (window.getSelection) {
+        text = window.getSelection().toString();
+    }
+    return text;
+}
+
+document.onmouseup = document.onkeyup = function() {
+    if(active.get()){
+        outString.set(getSelectionText());
+    }
+};
+
+};
+
+Ops.User.alivemachine.GetHighlighted.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.Isotope
+// 
+// **************************************************************
+
+Ops.User.alivemachine.Isotope = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+/*!
+ * Isotope PACKAGED v3.0.6
+ *
+ * Licensed GPLv3 for open source use
+ * or Isotope Commercial License for commercial use
+ *
+ * https://isotope.metafizzy.co
+ * Copyright 2010-2018 Metafizzy
+ */
+
+!function(t,e){"function"==typeof define&&define.amd?define("jquery-bridget/jquery-bridget",["jquery"],function(i){return e(t,i)}):"object"==typeof module&&module.exports?module.exports=e(t,require("jquery")):t.jQueryBridget=e(t,t.jQuery)}(window,function(t,e){"use strict";function i(i,s,a){function u(t,e,o){var n,s="$()."+i+'("'+e+'")';return t.each(function(t,u){var h=a.data(u,i);if(!h)return void r(i+" not initialized. Cannot call methods, i.e. "+s);var d=h[e];if(!d||"_"==e.charAt(0))return void r(s+" is not a valid method");var l=d.apply(h,o);n=void 0===n?l:n}),void 0!==n?n:t}function h(t,e){t.each(function(t,o){var n=a.data(o,i);n?(n.option(e),n._init()):(n=new s(o,e),a.data(o,i,n))})}a=a||e||t.jQuery,a&&(s.prototype.option||(s.prototype.option=function(t){a.isPlainObject(t)&&(this.options=a.extend(!0,this.options,t))}),a.fn[i]=function(t){if("string"==typeof t){var e=n.call(arguments,1);return u(this,t,e)}return h(this,t),this},o(a))}function o(t){!t||t&&t.bridget||(t.bridget=i)}var n=Array.prototype.slice,s=t.console,r="undefined"==typeof s?function(){}:function(t){s.error(t)};return o(e||t.jQuery),i}),function(t,e){"function"==typeof define&&define.amd?define("ev-emitter/ev-emitter",e):"object"==typeof module&&module.exports?module.exports=e():t.EvEmitter=e()}("undefined"!=typeof window?window:this,function(){function t(){}var e=t.prototype;return e.on=function(t,e){if(t&&e){var i=this._events=this._events||{},o=i[t]=i[t]||[];return o.indexOf(e)==-1&&o.push(e),this}},e.once=function(t,e){if(t&&e){this.on(t,e);var i=this._onceEvents=this._onceEvents||{},o=i[t]=i[t]||{};return o[e]=!0,this}},e.off=function(t,e){var i=this._events&&this._events[t];if(i&&i.length){var o=i.indexOf(e);return o!=-1&&i.splice(o,1),this}},e.emitEvent=function(t,e){var i=this._events&&this._events[t];if(i&&i.length){i=i.slice(0),e=e||[];for(var o=this._onceEvents&&this._onceEvents[t],n=0;n<i.length;n++){var s=i[n],r=o&&o[s];r&&(this.off(t,s),delete o[s]),s.apply(this,e)}return this}},e.allOff=function(){delete this._events,delete this._onceEvents},t}),function(t,e){"function"==typeof define&&define.amd?define("get-size/get-size",e):"object"==typeof module&&module.exports?module.exports=e():t.getSize=e()}(window,function(){"use strict";function t(t){var e=parseFloat(t),i=t.indexOf("%")==-1&&!isNaN(e);return i&&e}function e(){}function i(){for(var t={width:0,height:0,innerWidth:0,innerHeight:0,outerWidth:0,outerHeight:0},e=0;e<h;e++){var i=u[e];t[i]=0}return t}function o(t){var e=getComputedStyle(t);return e||a("Style returned "+e+". Are you running this code in a hidden iframe on Firefox? See https://bit.ly/getsizebug1"),e}function n(){if(!d){d=!0;var e=document.createElement("div");e.style.width="200px",e.style.padding="1px 2px 3px 4px",e.style.borderStyle="solid",e.style.borderWidth="1px 2px 3px 4px",e.style.boxSizing="border-box";var i=document.body||document.documentElement;i.appendChild(e);var n=o(e);r=200==Math.round(t(n.width)),s.isBoxSizeOuter=r,i.removeChild(e)}}function s(e){if(n(),"string"==typeof e&&(e=document.querySelector(e)),e&&"object"==typeof e&&e.nodeType){var s=o(e);if("none"==s.display)return i();var a={};a.width=e.offsetWidth,a.height=e.offsetHeight;for(var d=a.isBorderBox="border-box"==s.boxSizing,l=0;l<h;l++){var f=u[l],c=s[f],m=parseFloat(c);a[f]=isNaN(m)?0:m}var p=a.paddingLeft+a.paddingRight,y=a.paddingTop+a.paddingBottom,g=a.marginLeft+a.marginRight,v=a.marginTop+a.marginBottom,_=a.borderLeftWidth+a.borderRightWidth,z=a.borderTopWidth+a.borderBottomWidth,I=d&&r,x=t(s.width);x!==!1&&(a.width=x+(I?0:p+_));var S=t(s.height);return S!==!1&&(a.height=S+(I?0:y+z)),a.innerWidth=a.width-(p+_),a.innerHeight=a.height-(y+z),a.outerWidth=a.width+g,a.outerHeight=a.height+v,a}}var r,a="undefined"==typeof console?e:function(t){console.error(t)},u=["paddingLeft","paddingRight","paddingTop","paddingBottom","marginLeft","marginRight","marginTop","marginBottom","borderLeftWidth","borderRightWidth","borderTopWidth","borderBottomWidth"],h=u.length,d=!1;return s}),function(t,e){"use strict";"function"==typeof define&&define.amd?define("desandro-matches-selector/matches-selector",e):"object"==typeof module&&module.exports?module.exports=e():t.matchesSelector=e()}(window,function(){"use strict";var t=function(){var t=window.Element.prototype;if(t.matches)return"matches";if(t.matchesSelector)return"matchesSelector";for(var e=["webkit","moz","ms","o"],i=0;i<e.length;i++){var o=e[i],n=o+"MatchesSelector";if(t[n])return n}}();return function(e,i){return e[t](i)}}),function(t,e){"function"==typeof define&&define.amd?define("fizzy-ui-utils/utils",["desandro-matches-selector/matches-selector"],function(i){return e(t,i)}):"object"==typeof module&&module.exports?module.exports=e(t,require("desandro-matches-selector")):t.fizzyUIUtils=e(t,t.matchesSelector)}(window,function(t,e){var i={};i.extend=function(t,e){for(var i in e)t[i]=e[i];return t},i.modulo=function(t,e){return(t%e+e)%e};var o=Array.prototype.slice;i.makeArray=function(t){if(Array.isArray(t))return t;if(null===t||void 0===t)return[];var e="object"==typeof t&&"number"==typeof t.length;return e?o.call(t):[t]},i.removeFrom=function(t,e){var i=t.indexOf(e);i!=-1&&t.splice(i,1)},i.getParent=function(t,i){for(;t.parentNode&&t!=document.body;)if(t=t.parentNode,e(t,i))return t},i.getQueryElement=function(t){return"string"==typeof t?document.querySelector(t):t},i.handleEvent=function(t){var e="on"+t.type;this[e]&&this[e](t)},i.filterFindElements=function(t,o){t=i.makeArray(t);var n=[];return t.forEach(function(t){if(t instanceof HTMLElement){if(!o)return void n.push(t);e(t,o)&&n.push(t);for(var i=t.querySelectorAll(o),s=0;s<i.length;s++)n.push(i[s])}}),n},i.debounceMethod=function(t,e,i){i=i||100;var o=t.prototype[e],n=e+"Timeout";t.prototype[e]=function(){var t=this[n];clearTimeout(t);var e=arguments,s=this;this[n]=setTimeout(function(){o.apply(s,e),delete s[n]},i)}},i.docReady=function(t){var e=document.readyState;"complete"==e||"interactive"==e?setTimeout(t):document.addEventListener("DOMContentLoaded",t)},i.toDashed=function(t){return t.replace(/(.)([A-Z])/g,function(t,e,i){return e+"-"+i}).toLowerCase()};var n=t.console;return i.htmlInit=function(e,o){i.docReady(function(){var s=i.toDashed(o),r="data-"+s,a=document.querySelectorAll("["+r+"]"),u=document.querySelectorAll(".js-"+s),h=i.makeArray(a).concat(i.makeArray(u)),d=r+"-options",l=t.jQuery;h.forEach(function(t){var i,s=t.getAttribute(r)||t.getAttribute(d);try{i=s&&JSON.parse(s)}catch(a){return void(n&&n.error("Error parsing "+r+" on "+t.className+": "+a))}var u=new e(t,i);l&&l.data(t,o,u)})})},i}),function(t,e){"function"==typeof define&&define.amd?define("outlayer/item",["ev-emitter/ev-emitter","get-size/get-size"],e):"object"==typeof module&&module.exports?module.exports=e(require("ev-emitter"),require("get-size")):(t.Outlayer={},t.Outlayer.Item=e(t.EvEmitter,t.getSize))}(window,function(t,e){"use strict";function i(t){for(var e in t)return!1;return e=null,!0}function o(t,e){t&&(this.element=t,this.layout=e,this.position={x:0,y:0},this._create())}function n(t){return t.replace(/([A-Z])/g,function(t){return"-"+t.toLowerCase()})}var s=document.documentElement.style,r="string"==typeof s.transition?"transition":"WebkitTransition",a="string"==typeof s.transform?"transform":"WebkitTransform",u={WebkitTransition:"webkitTransitionEnd",transition:"transitionend"}[r],h={transform:a,transition:r,transitionDuration:r+"Duration",transitionProperty:r+"Property",transitionDelay:r+"Delay"},d=o.prototype=Object.create(t.prototype);d.constructor=o,d._create=function(){this._transn={ingProperties:{},clean:{},onEnd:{}},this.css({position:"absolute"})},d.handleEvent=function(t){var e="on"+t.type;this[e]&&this[e](t)},d.getSize=function(){this.size=e(this.element)},d.css=function(t){var e=this.element.style;for(var i in t){var o=h[i]||i;e[o]=t[i]}},d.getPosition=function(){var t=getComputedStyle(this.element),e=this.layout._getOption("originLeft"),i=this.layout._getOption("originTop"),o=t[e?"left":"right"],n=t[i?"top":"bottom"],s=parseFloat(o),r=parseFloat(n),a=this.layout.size;o.indexOf("%")!=-1&&(s=s/100*a.width),n.indexOf("%")!=-1&&(r=r/100*a.height),s=isNaN(s)?0:s,r=isNaN(r)?0:r,s-=e?a.paddingLeft:a.paddingRight,r-=i?a.paddingTop:a.paddingBottom,this.position.x=s,this.position.y=r},d.layoutPosition=function(){var t=this.layout.size,e={},i=this.layout._getOption("originLeft"),o=this.layout._getOption("originTop"),n=i?"paddingLeft":"paddingRight",s=i?"left":"right",r=i?"right":"left",a=this.position.x+t[n];e[s]=this.getXValue(a),e[r]="";var u=o?"paddingTop":"paddingBottom",h=o?"top":"bottom",d=o?"bottom":"top",l=this.position.y+t[u];e[h]=this.getYValue(l),e[d]="",this.css(e),this.emitEvent("layout",[this])},d.getXValue=function(t){var e=this.layout._getOption("horizontal");return this.layout.options.percentPosition&&!e?t/this.layout.size.width*100+"%":t+"px"},d.getYValue=function(t){var e=this.layout._getOption("horizontal");return this.layout.options.percentPosition&&e?t/this.layout.size.height*100+"%":t+"px"},d._transitionTo=function(t,e){this.getPosition();var i=this.position.x,o=this.position.y,n=t==this.position.x&&e==this.position.y;if(this.setPosition(t,e),n&&!this.isTransitioning)return void this.layoutPosition();var s=t-i,r=e-o,a={};a.transform=this.getTranslate(s,r),this.transition({to:a,onTransitionEnd:{transform:this.layoutPosition},isCleaning:!0})},d.getTranslate=function(t,e){var i=this.layout._getOption("originLeft"),o=this.layout._getOption("originTop");return t=i?t:-t,e=o?e:-e,"translate3d("+t+"px, "+e+"px, 0)"},d.goTo=function(t,e){this.setPosition(t,e),this.layoutPosition()},d.moveTo=d._transitionTo,d.setPosition=function(t,e){this.position.x=parseFloat(t),this.position.y=parseFloat(e)},d._nonTransition=function(t){this.css(t.to),t.isCleaning&&this._removeStyles(t.to);for(var e in t.onTransitionEnd)t.onTransitionEnd[e].call(this)},d.transition=function(t){if(!parseFloat(this.layout.options.transitionDuration))return void this._nonTransition(t);var e=this._transn;for(var i in t.onTransitionEnd)e.onEnd[i]=t.onTransitionEnd[i];for(i in t.to)e.ingProperties[i]=!0,t.isCleaning&&(e.clean[i]=!0);if(t.from){this.css(t.from);var o=this.element.offsetHeight;o=null}this.enableTransition(t.to),this.css(t.to),this.isTransitioning=!0};var l="opacity,"+n(a);d.enableTransition=function(){if(!this.isTransitioning){var t=this.layout.options.transitionDuration;t="number"==typeof t?t+"ms":t,this.css({transitionProperty:l,transitionDuration:t,transitionDelay:this.staggerDelay||0}),this.element.addEventListener(u,this,!1)}},d.onwebkitTransitionEnd=function(t){this.ontransitionend(t)},d.onotransitionend=function(t){this.ontransitionend(t)};var f={"-webkit-transform":"transform"};d.ontransitionend=function(t){if(t.target===this.element){var e=this._transn,o=f[t.propertyName]||t.propertyName;if(delete e.ingProperties[o],i(e.ingProperties)&&this.disableTransition(),o in e.clean&&(this.element.style[t.propertyName]="",delete e.clean[o]),o in e.onEnd){var n=e.onEnd[o];n.call(this),delete e.onEnd[o]}this.emitEvent("transitionEnd",[this])}},d.disableTransition=function(){this.removeTransitionStyles(),this.element.removeEventListener(u,this,!1),this.isTransitioning=!1},d._removeStyles=function(t){var e={};for(var i in t)e[i]="";this.css(e)};var c={transitionProperty:"",transitionDuration:"",transitionDelay:""};return d.removeTransitionStyles=function(){this.css(c)},d.stagger=function(t){t=isNaN(t)?0:t,this.staggerDelay=t+"ms"},d.removeElem=function(){this.element.parentNode.removeChild(this.element),this.css({display:""}),this.emitEvent("remove",[this])},d.remove=function(){return r&&parseFloat(this.layout.options.transitionDuration)?(this.once("transitionEnd",function(){this.removeElem()}),void this.hide()):void this.removeElem()},d.reveal=function(){delete this.isHidden,this.css({display:""});var t=this.layout.options,e={},i=this.getHideRevealTransitionEndProperty("visibleStyle");e[i]=this.onRevealTransitionEnd,this.transition({from:t.hiddenStyle,to:t.visibleStyle,isCleaning:!0,onTransitionEnd:e})},d.onRevealTransitionEnd=function(){this.isHidden||this.emitEvent("reveal")},d.getHideRevealTransitionEndProperty=function(t){var e=this.layout.options[t];if(e.opacity)return"opacity";for(var i in e)return i},d.hide=function(){this.isHidden=!0,this.css({display:""});var t=this.layout.options,e={},i=this.getHideRevealTransitionEndProperty("hiddenStyle");e[i]=this.onHideTransitionEnd,this.transition({from:t.visibleStyle,to:t.hiddenStyle,isCleaning:!0,onTransitionEnd:e})},d.onHideTransitionEnd=function(){this.isHidden&&(this.css({display:"none"}),this.emitEvent("hide"))},d.destroy=function(){this.css({position:"",left:"",right:"",top:"",bottom:"",transition:"",transform:""})},o}),function(t,e){"use strict";"function"==typeof define&&define.amd?define("outlayer/outlayer",["ev-emitter/ev-emitter","get-size/get-size","fizzy-ui-utils/utils","./item"],function(i,o,n,s){return e(t,i,o,n,s)}):"object"==typeof module&&module.exports?module.exports=e(t,require("ev-emitter"),require("get-size"),require("fizzy-ui-utils"),require("./item")):t.Outlayer=e(t,t.EvEmitter,t.getSize,t.fizzyUIUtils,t.Outlayer.Item)}(window,function(t,e,i,o,n){"use strict";function s(t,e){var i=o.getQueryElement(t);if(!i)return void(u&&u.error("Bad element for "+this.constructor.namespace+": "+(i||t)));this.element=i,h&&(this.$element=h(this.element)),this.options=o.extend({},this.constructor.defaults),this.option(e);var n=++l;this.element.outlayerGUID=n,f[n]=this,this._create();var s=this._getOption("initLayout");s&&this.layout()}function r(t){function e(){t.apply(this,arguments)}return e.prototype=Object.create(t.prototype),e.prototype.constructor=e,e}function a(t){if("number"==typeof t)return t;var e=t.match(/(^\d*\.?\d*)(\w*)/),i=e&&e[1],o=e&&e[2];if(!i.length)return 0;i=parseFloat(i);var n=m[o]||1;return i*n}var u=t.console,h=t.jQuery,d=function(){},l=0,f={};s.namespace="outlayer",s.Item=n,s.defaults={containerStyle:{position:"relative"},initLayout:!0,originLeft:!0,originTop:!0,resize:!0,resizeContainer:!0,transitionDuration:"0.4s",hiddenStyle:{opacity:0,transform:"scale(0.001)"},visibleStyle:{opacity:1,transform:"scale(1)"}};var c=s.prototype;o.extend(c,e.prototype),c.option=function(t){o.extend(this.options,t)},c._getOption=function(t){var e=this.constructor.compatOptions[t];return e&&void 0!==this.options[e]?this.options[e]:this.options[t]},s.compatOptions={initLayout:"isInitLayout",horizontal:"isHorizontal",layoutInstant:"isLayoutInstant",originLeft:"isOriginLeft",originTop:"isOriginTop",resize:"isResizeBound",resizeContainer:"isResizingContainer"},c._create=function(){this.reloadItems(),this.stamps=[],this.stamp(this.options.stamp),o.extend(this.element.style,this.options.containerStyle);var t=this._getOption("resize");t&&this.bindResize()},c.reloadItems=function(){this.items=this._itemize(this.element.children)},c._itemize=function(t){for(var e=this._filterFindItemElements(t),i=this.constructor.Item,o=[],n=0;n<e.length;n++){var s=e[n],r=new i(s,this);o.push(r)}return o},c._filterFindItemElements=function(t){return o.filterFindElements(t,this.options.itemSelector)},c.getItemElements=function(){return this.items.map(function(t){return t.element})},c.layout=function(){this._resetLayout(),this._manageStamps();var t=this._getOption("layoutInstant"),e=void 0!==t?t:!this._isLayoutInited;this.layoutItems(this.items,e),this._isLayoutInited=!0},c._init=c.layout,c._resetLayout=function(){this.getSize()},c.getSize=function(){this.size=i(this.element)},c._getMeasurement=function(t,e){var o,n=this.options[t];n?("string"==typeof n?o=this.element.querySelector(n):n instanceof HTMLElement&&(o=n),this[t]=o?i(o)[e]:n):this[t]=0},c.layoutItems=function(t,e){t=this._getItemsForLayout(t),this._layoutItems(t,e),this._postLayout()},c._getItemsForLayout=function(t){return t.filter(function(t){return!t.isIgnored})},c._layoutItems=function(t,e){if(this._emitCompleteOnItems("layout",t),t&&t.length){var i=[];t.forEach(function(t){var o=this._getItemLayoutPosition(t);o.item=t,o.isInstant=e||t.isLayoutInstant,i.push(o)},this),this._processLayoutQueue(i)}},c._getItemLayoutPosition=function(){return{x:0,y:0}},c._processLayoutQueue=function(t){this.updateStagger(),t.forEach(function(t,e){this._positionItem(t.item,t.x,t.y,t.isInstant,e)},this)},c.updateStagger=function(){var t=this.options.stagger;return null===t||void 0===t?void(this.stagger=0):(this.stagger=a(t),this.stagger)},c._positionItem=function(t,e,i,o,n){o?t.goTo(e,i):(t.stagger(n*this.stagger),t.moveTo(e,i))},c._postLayout=function(){this.resizeContainer()},c.resizeContainer=function(){var t=this._getOption("resizeContainer");if(t){var e=this._getContainerSize();e&&(this._setContainerMeasure(e.width,!0),this._setContainerMeasure(e.height,!1))}},c._getContainerSize=d,c._setContainerMeasure=function(t,e){if(void 0!==t){var i=this.size;i.isBorderBox&&(t+=e?i.paddingLeft+i.paddingRight+i.borderLeftWidth+i.borderRightWidth:i.paddingBottom+i.paddingTop+i.borderTopWidth+i.borderBottomWidth),t=Math.max(t,0),this.element.style[e?"width":"height"]=t+"px"}},c._emitCompleteOnItems=function(t,e){function i(){n.dispatchEvent(t+"Complete",null,[e])}function o(){r++,r==s&&i()}var n=this,s=e.length;if(!e||!s)return void i();var r=0;e.forEach(function(e){e.once(t,o)})},c.dispatchEvent=function(t,e,i){var o=e?[e].concat(i):i;if(this.emitEvent(t,o),h)if(this.$element=this.$element||h(this.element),e){var n=h.Event(e);n.type=t,this.$element.trigger(n,i)}else this.$element.trigger(t,i)},c.ignore=function(t){var e=this.getItem(t);e&&(e.isIgnored=!0)},c.unignore=function(t){var e=this.getItem(t);e&&delete e.isIgnored},c.stamp=function(t){t=this._find(t),t&&(this.stamps=this.stamps.concat(t),t.forEach(this.ignore,this))},c.unstamp=function(t){t=this._find(t),t&&t.forEach(function(t){o.removeFrom(this.stamps,t),this.unignore(t)},this)},c._find=function(t){if(t)return"string"==typeof t&&(t=this.element.querySelectorAll(t)),t=o.makeArray(t)},c._manageStamps=function(){this.stamps&&this.stamps.length&&(this._getBoundingRect(),this.stamps.forEach(this._manageStamp,this))},c._getBoundingRect=function(){var t=this.element.getBoundingClientRect(),e=this.size;this._boundingRect={left:t.left+e.paddingLeft+e.borderLeftWidth,top:t.top+e.paddingTop+e.borderTopWidth,right:t.right-(e.paddingRight+e.borderRightWidth),bottom:t.bottom-(e.paddingBottom+e.borderBottomWidth)}},c._manageStamp=d,c._getElementOffset=function(t){var e=t.getBoundingClientRect(),o=this._boundingRect,n=i(t),s={left:e.left-o.left-n.marginLeft,top:e.top-o.top-n.marginTop,right:o.right-e.right-n.marginRight,bottom:o.bottom-e.bottom-n.marginBottom};return s},c.handleEvent=o.handleEvent,c.bindResize=function(){t.addEventListener("resize",this),this.isResizeBound=!0},c.unbindResize=function(){t.removeEventListener("resize",this),this.isResizeBound=!1},c.onresize=function(){this.resize()},o.debounceMethod(s,"onresize",100),c.resize=function(){this.isResizeBound&&this.needsResizeLayout()&&this.layout()},c.needsResizeLayout=function(){var t=i(this.element),e=this.size&&t;return e&&t.innerWidth!==this.size.innerWidth},c.addItems=function(t){var e=this._itemize(t);return e.length&&(this.items=this.items.concat(e)),e},c.appended=function(t){var e=this.addItems(t);e.length&&(this.layoutItems(e,!0),this.reveal(e))},c.prepended=function(t){var e=this._itemize(t);if(e.length){var i=this.items.slice(0);this.items=e.concat(i),this._resetLayout(),this._manageStamps(),this.layoutItems(e,!0),this.reveal(e),this.layoutItems(i)}},c.reveal=function(t){if(this._emitCompleteOnItems("reveal",t),t&&t.length){var e=this.updateStagger();t.forEach(function(t,i){t.stagger(i*e),t.reveal()})}},c.hide=function(t){if(this._emitCompleteOnItems("hide",t),t&&t.length){var e=this.updateStagger();t.forEach(function(t,i){t.stagger(i*e),t.hide()})}},c.revealItemElements=function(t){var e=this.getItems(t);this.reveal(e)},c.hideItemElements=function(t){var e=this.getItems(t);this.hide(e)},c.getItem=function(t){for(var e=0;e<this.items.length;e++){var i=this.items[e];if(i.element==t)return i}},c.getItems=function(t){t=o.makeArray(t);var e=[];return t.forEach(function(t){var i=this.getItem(t);i&&e.push(i)},this),e},c.remove=function(t){var e=this.getItems(t);this._emitCompleteOnItems("remove",e),e&&e.length&&e.forEach(function(t){t.remove(),o.removeFrom(this.items,t)},this)},c.destroy=function(){var t=this.element.style;t.height="",t.position="",t.width="",this.items.forEach(function(t){t.destroy()}),this.unbindResize();var e=this.element.outlayerGUID;delete f[e],delete this.element.outlayerGUID,h&&h.removeData(this.element,this.constructor.namespace)},s.data=function(t){t=o.getQueryElement(t);var e=t&&t.outlayerGUID;return e&&f[e]},s.create=function(t,e){var i=r(s);return i.defaults=o.extend({},s.defaults),o.extend(i.defaults,e),i.compatOptions=o.extend({},s.compatOptions),i.namespace=t,i.data=s.data,i.Item=r(n),o.htmlInit(i,t),h&&h.bridget&&h.bridget(t,i),i};var m={ms:1,s:1e3};return s.Item=n,s}),function(t,e){"function"==typeof define&&define.amd?define("isotope-layout/js/item",["outlayer/outlayer"],e):"object"==typeof module&&module.exports?module.exports=e(require("outlayer")):(t.Isotope=t.Isotope||{},t.Isotope.Item=e(t.Outlayer))}(window,function(t){"use strict";function e(){t.Item.apply(this,arguments)}var i=e.prototype=Object.create(t.Item.prototype),o=i._create;i._create=function(){this.id=this.layout.itemGUID++,o.call(this),this.sortData={}},i.updateSortData=function(){if(!this.isIgnored){this.sortData.id=this.id,this.sortData["original-order"]=this.id,this.sortData.random=Math.random();var t=this.layout.options.getSortData,e=this.layout._sorters;for(var i in t){var o=e[i];this.sortData[i]=o(this.element,this)}}};var n=i.destroy;return i.destroy=function(){n.apply(this,arguments),this.css({display:""})},e}),function(t,e){"function"==typeof define&&define.amd?define("isotope-layout/js/layout-mode",["get-size/get-size","outlayer/outlayer"],e):"object"==typeof module&&module.exports?module.exports=e(require("get-size"),require("outlayer")):(t.Isotope=t.Isotope||{},t.Isotope.LayoutMode=e(t.getSize,t.Outlayer))}(window,function(t,e){"use strict";function i(t){this.isotope=t,t&&(this.options=t.options[this.namespace],this.element=t.element,this.items=t.filteredItems,this.size=t.size)}var o=i.prototype,n=["_resetLayout","_getItemLayoutPosition","_manageStamp","_getContainerSize","_getElementOffset","needsResizeLayout","_getOption"];return n.forEach(function(t){o[t]=function(){return e.prototype[t].apply(this.isotope,arguments)}}),o.needsVerticalResizeLayout=function(){var e=t(this.isotope.element),i=this.isotope.size&&e;return i&&e.innerHeight!=this.isotope.size.innerHeight},o._getMeasurement=function(){this.isotope._getMeasurement.apply(this,arguments)},o.getColumnWidth=function(){this.getSegmentSize("column","Width")},o.getRowHeight=function(){this.getSegmentSize("row","Height")},o.getSegmentSize=function(t,e){var i=t+e,o="outer"+e;if(this._getMeasurement(i,o),!this[i]){var n=this.getFirstItemSize();this[i]=n&&n[o]||this.isotope.size["inner"+e]}},o.getFirstItemSize=function(){var e=this.isotope.filteredItems[0];return e&&e.element&&t(e.element)},o.layout=function(){this.isotope.layout.apply(this.isotope,arguments)},o.getSize=function(){this.isotope.getSize(),this.size=this.isotope.size},i.modes={},i.create=function(t,e){function n(){i.apply(this,arguments)}return n.prototype=Object.create(o),n.prototype.constructor=n,e&&(n.options=e),n.prototype.namespace=t,i.modes[t]=n,n},i}),function(t,e){"function"==typeof define&&define.amd?define("masonry-layout/masonry",["outlayer/outlayer","get-size/get-size"],e):"object"==typeof module&&module.exports?module.exports=e(require("outlayer"),require("get-size")):t.Masonry=e(t.Outlayer,t.getSize)}(window,function(t,e){var i=t.create("masonry");i.compatOptions.fitWidth="isFitWidth";var o=i.prototype;return o._resetLayout=function(){this.getSize(),this._getMeasurement("columnWidth","outerWidth"),this._getMeasurement("gutter","outerWidth"),this.measureColumns(),this.colYs=[];for(var t=0;t<this.cols;t++)this.colYs.push(0);this.maxY=0,this.horizontalColIndex=0},o.measureColumns=function(){if(this.getContainerWidth(),!this.columnWidth){var t=this.items[0],i=t&&t.element;this.columnWidth=i&&e(i).outerWidth||this.containerWidth}var o=this.columnWidth+=this.gutter,n=this.containerWidth+this.gutter,s=n/o,r=o-n%o,a=r&&r<1?"round":"floor";s=Math[a](s),this.cols=Math.max(s,1)},o.getContainerWidth=function(){var t=this._getOption("fitWidth"),i=t?this.element.parentNode:this.element,o=e(i);this.containerWidth=o&&o.innerWidth},o._getItemLayoutPosition=function(t){t.getSize();var e=t.size.outerWidth%this.columnWidth,i=e&&e<1?"round":"ceil",o=Math[i](t.size.outerWidth/this.columnWidth);o=Math.min(o,this.cols);for(var n=this.options.horizontalOrder?"_getHorizontalColPosition":"_getTopColPosition",s=this[n](o,t),r={x:this.columnWidth*s.col,y:s.y},a=s.y+t.size.outerHeight,u=o+s.col,h=s.col;h<u;h++)this.colYs[h]=a;return r},o._getTopColPosition=function(t){var e=this._getTopColGroup(t),i=Math.min.apply(Math,e);return{col:e.indexOf(i),y:i}},o._getTopColGroup=function(t){if(t<2)return this.colYs;for(var e=[],i=this.cols+1-t,o=0;o<i;o++)e[o]=this._getColGroupY(o,t);return e},o._getColGroupY=function(t,e){if(e<2)return this.colYs[t];var i=this.colYs.slice(t,t+e);return Math.max.apply(Math,i)},o._getHorizontalColPosition=function(t,e){var i=this.horizontalColIndex%this.cols,o=t>1&&i+t>this.cols;i=o?0:i;var n=e.size.outerWidth&&e.size.outerHeight;return this.horizontalColIndex=n?i+t:this.horizontalColIndex,{col:i,y:this._getColGroupY(i,t)}},o._manageStamp=function(t){var i=e(t),o=this._getElementOffset(t),n=this._getOption("originLeft"),s=n?o.left:o.right,r=s+i.outerWidth,a=Math.floor(s/this.columnWidth);a=Math.max(0,a);var u=Math.floor(r/this.columnWidth);u-=r%this.columnWidth?0:1,u=Math.min(this.cols-1,u);for(var h=this._getOption("originTop"),d=(h?o.top:o.bottom)+i.outerHeight,l=a;l<=u;l++)this.colYs[l]=Math.max(d,this.colYs[l])},o._getContainerSize=function(){this.maxY=Math.max.apply(Math,this.colYs);var t={height:this.maxY};return this._getOption("fitWidth")&&(t.width=this._getContainerFitWidth()),t},o._getContainerFitWidth=function(){for(var t=0,e=this.cols;--e&&0===this.colYs[e];)t++;return(this.cols-t)*this.columnWidth-this.gutter},o.needsResizeLayout=function(){var t=this.containerWidth;return this.getContainerWidth(),t!=this.containerWidth},i}),function(t,e){"function"==typeof define&&define.amd?define("isotope-layout/js/layout-modes/masonry",["../layout-mode","masonry-layout/masonry"],e):"object"==typeof module&&module.exports?module.exports=e(require("../layout-mode"),require("masonry-layout")):e(t.Isotope.LayoutMode,t.Masonry)}(window,function(t,e){"use strict";var i=t.create("masonry"),o=i.prototype,n={_getElementOffset:!0,layout:!0,_getMeasurement:!0};for(var s in e.prototype)n[s]||(o[s]=e.prototype[s]);var r=o.measureColumns;o.measureColumns=function(){this.items=this.isotope.filteredItems,r.call(this)};var a=o._getOption;return o._getOption=function(t){return"fitWidth"==t?void 0!==this.options.isFitWidth?this.options.isFitWidth:this.options.fitWidth:a.apply(this.isotope,arguments)},i}),function(t,e){"function"==typeof define&&define.amd?define("isotope-layout/js/layout-modes/fit-rows",["../layout-mode"],e):"object"==typeof exports?module.exports=e(require("../layout-mode")):e(t.Isotope.LayoutMode)}(window,function(t){"use strict";var e=t.create("fitRows"),i=e.prototype;return i._resetLayout=function(){this.x=0,this.y=0,this.maxY=0,this._getMeasurement("gutter","outerWidth")},i._getItemLayoutPosition=function(t){t.getSize();var e=t.size.outerWidth+this.gutter,i=this.isotope.size.innerWidth+this.gutter;0!==this.x&&e+this.x>i&&(this.x=0,this.y=this.maxY);var o={x:this.x,y:this.y};return this.maxY=Math.max(this.maxY,this.y+t.size.outerHeight),this.x+=e,o},i._getContainerSize=function(){return{height:this.maxY}},e}),function(t,e){"function"==typeof define&&define.amd?define("isotope-layout/js/layout-modes/vertical",["../layout-mode"],e):"object"==typeof module&&module.exports?module.exports=e(require("../layout-mode")):e(t.Isotope.LayoutMode)}(window,function(t){"use strict";var e=t.create("vertical",{horizontalAlignment:0}),i=e.prototype;return i._resetLayout=function(){this.y=0},i._getItemLayoutPosition=function(t){t.getSize();var e=(this.isotope.size.innerWidth-t.size.outerWidth)*this.options.horizontalAlignment,i=this.y;return this.y+=t.size.outerHeight,{x:e,y:i}},i._getContainerSize=function(){return{height:this.y}},e}),function(t,e){"function"==typeof define&&define.amd?define(["outlayer/outlayer","get-size/get-size","desandro-matches-selector/matches-selector","fizzy-ui-utils/utils","isotope-layout/js/item","isotope-layout/js/layout-mode","isotope-layout/js/layout-modes/masonry","isotope-layout/js/layout-modes/fit-rows","isotope-layout/js/layout-modes/vertical"],function(i,o,n,s,r,a){return e(t,i,o,n,s,r,a)}):"object"==typeof module&&module.exports?module.exports=e(t,require("outlayer"),require("get-size"),require("desandro-matches-selector"),require("fizzy-ui-utils"),require("isotope-layout/js/item"),require("isotope-layout/js/layout-mode"),require("isotope-layout/js/layout-modes/masonry"),require("isotope-layout/js/layout-modes/fit-rows"),require("isotope-layout/js/layout-modes/vertical")):t.Isotope=e(t,t.Outlayer,t.getSize,t.matchesSelector,t.fizzyUIUtils,t.Isotope.Item,t.Isotope.LayoutMode)}(window,function(t,e,i,o,n,s,r){function a(t,e){return function(i,o){for(var n=0;n<t.length;n++){var s=t[n],r=i.sortData[s],a=o.sortData[s];if(r>a||r<a){var u=void 0!==e[s]?e[s]:e,h=u?1:-1;return(r>a?1:-1)*h}}return 0}}var u=t.jQuery,h=String.prototype.trim?function(t){return t.trim()}:function(t){return t.replace(/^\s+|\s+$/g,"")},d=e.create("isotope",{layoutMode:"masonry",isJQueryFiltering:!0,sortAscending:!0});d.Item=s,d.LayoutMode=r;var l=d.prototype;l._create=function(){this.itemGUID=0,this._sorters={},this._getSorters(),e.prototype._create.call(this),this.modes={},this.filteredItems=this.items,this.sortHistory=["original-order"];for(var t in r.modes)this._initLayoutMode(t)},l.reloadItems=function(){this.itemGUID=0,e.prototype.reloadItems.call(this)},l._itemize=function(){for(var t=e.prototype._itemize.apply(this,arguments),i=0;i<t.length;i++){var o=t[i];o.id=this.itemGUID++}return this._updateItemsSortData(t),t},l._initLayoutMode=function(t){var e=r.modes[t],i=this.options[t]||{};this.options[t]=e.options?n.extend(e.options,i):i,this.modes[t]=new e(this)},l.layout=function(){return!this._isLayoutInited&&this._getOption("initLayout")?void this.arrange():void this._layout()},l._layout=function(){var t=this._getIsInstant();this._resetLayout(),this._manageStamps(),this.layoutItems(this.filteredItems,t),this._isLayoutInited=!0},l.arrange=function(t){this.option(t),this._getIsInstant();var e=this._filter(this.items);this.filteredItems=e.matches,this._bindArrangeComplete(),this._isInstant?this._noTransition(this._hideReveal,[e]):this._hideReveal(e),this._sort(),this._layout()},l._init=l.arrange,l._hideReveal=function(t){this.reveal(t.needReveal),this.hide(t.needHide)},l._getIsInstant=function(){var t=this._getOption("layoutInstant"),e=void 0!==t?t:!this._isLayoutInited;return this._isInstant=e,e},l._bindArrangeComplete=function(){function t(){e&&i&&o&&n.dispatchEvent("arrangeComplete",null,[n.filteredItems])}var e,i,o,n=this;this.once("layoutComplete",function(){e=!0,t()}),this.once("hideComplete",function(){i=!0,t()}),this.once("revealComplete",function(){o=!0,t()})},l._filter=function(t){var e=this.options.filter;e=e||"*";for(var i=[],o=[],n=[],s=this._getFilterTest(e),r=0;r<t.length;r++){var a=t[r];if(!a.isIgnored){var u=s(a);u&&i.push(a),u&&a.isHidden?o.push(a):u||a.isHidden||n.push(a)}}return{matches:i,needReveal:o,needHide:n}},l._getFilterTest=function(t){return u&&this.options.isJQueryFiltering?function(e){return u(e.element).is(t);
+}:"function"==typeof t?function(e){return t(e.element)}:function(e){return o(e.element,t)}},l.updateSortData=function(t){var e;t?(t=n.makeArray(t),e=this.getItems(t)):e=this.items,this._getSorters(),this._updateItemsSortData(e)},l._getSorters=function(){var t=this.options.getSortData;for(var e in t){var i=t[e];this._sorters[e]=f(i)}},l._updateItemsSortData=function(t){for(var e=t&&t.length,i=0;e&&i<e;i++){var o=t[i];o.updateSortData()}};var f=function(){function t(t){if("string"!=typeof t)return t;var i=h(t).split(" "),o=i[0],n=o.match(/^\[(.+)\]$/),s=n&&n[1],r=e(s,o),a=d.sortDataParsers[i[1]];return t=a?function(t){return t&&a(r(t))}:function(t){return t&&r(t)}}function e(t,e){return t?function(e){return e.getAttribute(t)}:function(t){var i=t.querySelector(e);return i&&i.textContent}}return t}();d.sortDataParsers={parseInt:function(t){return parseInt(t,10)},parseFloat:function(t){return parseFloat(t)}},l._sort=function(){if(this.options.sortBy){var t=n.makeArray(this.options.sortBy);this._getIsSameSortBy(t)||(this.sortHistory=t.concat(this.sortHistory));var e=a(this.sortHistory,this.options.sortAscending);this.filteredItems.sort(e)}},l._getIsSameSortBy=function(t){for(var e=0;e<t.length;e++)if(t[e]!=this.sortHistory[e])return!1;return!0},l._mode=function(){var t=this.options.layoutMode,e=this.modes[t];if(!e)throw new Error("No layout mode: "+t);return e.options=this.options[t],e},l._resetLayout=function(){e.prototype._resetLayout.call(this),this._mode()._resetLayout()},l._getItemLayoutPosition=function(t){return this._mode()._getItemLayoutPosition(t)},l._manageStamp=function(t){this._mode()._manageStamp(t)},l._getContainerSize=function(){return this._mode()._getContainerSize()},l.needsResizeLayout=function(){return this._mode().needsResizeLayout()},l.appended=function(t){var e=this.addItems(t);if(e.length){var i=this._filterRevealAdded(e);this.filteredItems=this.filteredItems.concat(i)}},l.prepended=function(t){var e=this._itemize(t);if(e.length){this._resetLayout(),this._manageStamps();var i=this._filterRevealAdded(e);this.layoutItems(this.filteredItems),this.filteredItems=i.concat(this.filteredItems),this.items=e.concat(this.items)}},l._filterRevealAdded=function(t){var e=this._filter(t);return this.hide(e.needHide),this.reveal(e.matches),this.layoutItems(e.matches,!0),e.matches},l.insert=function(t){var e=this.addItems(t);if(e.length){var i,o,n=e.length;for(i=0;i<n;i++)o=e[i],this.element.appendChild(o.element);var s=this._filter(e).matches;for(i=0;i<n;i++)e[i].isLayoutInstant=!0;for(this.arrange(),i=0;i<n;i++)delete e[i].isLayoutInstant;this.reveal(s)}};var c=l.remove;return l.remove=function(t){t=n.makeArray(t);var e=this.getItems(t);c.call(this,t);for(var i=e&&e.length,o=0;i&&o<i;o++){var s=e[o];n.removeFrom(this.filteredItems,s)}},l.shuffle=function(){for(var t=0;t<this.items.length;t++){var e=this.items[t];e.sortData.random=Math.random()}this.options.sortBy="random",this._sort(),this._layout()},l._noTransition=function(t,e){var i=this.options.transitionDuration;this.options.transitionDuration=0;var o=t.apply(this,e);return this.options.transitionDuration=i,o},l.getFilteredItemElements=function(){return this.filteredItems.map(function(t){return t.element})},d});
+
+
+
+
+const inArr   = op.inArray("Array in");
+const outArray  = op.outArray("Array out");
+var outContent = op.outString("last cell content");
+var parentin = op.inString("parent ID");
+var inMeta = op.inString("meta");
+var inImg = op.inString("img");
+var inTxt = op.inString("text");
+var metaGo = op.inBool("meta go",true);
+var imgGo = op.inBool("img go",true);
+var txtGo = op.inBool("text go",true);
+var pardiv;
+var iso;
+var order = op.inTriggerButton("order");
+var outTrig=op.outTrigger("new data");
+order.onTriggered=reorder;
+
+parentin.onChange= update;
+
+var boards = [];
+inMeta.onChange=function(){if(metaGo.get()){update(inMeta.get(),'meta');}};
+inImg.onChange=function(){if(imgGo.get()){update(inImg.get(),'img');}};
+inTxt.onChange=function(){if(txtGo.get()){update(inTxt.get(),'text');}};
+
+metaGo.onChange=imgGo.onChange=txtGo.onChange=filter;
+function update(data, typ)
+{
+    if(pardiv==null){
+        pardiv = document.getElementById(parentin.get());
+        iso = new Isotope(pardiv,{
+        itemSelector: '.cell',
+        layoutMode: 'fitRows',
+        getSortData: {
+            weight: function( itemElem ) {
+            var weight = itemElem.innerHTML.length;
+            return parseFloat( weight );
+            }
+        }
+        });
+    }
+    if(pardiv!=null && data!=null && data!=''){
+        outContent.set(data);
+        let element = document.createElement("div");
+        addClass(element, 'cell');
+        addClass(element, typ);
+        if(typ=='meta'){
+            element.innerHTML = '<textarea style="font-size:50px;" id="'+getRandomInt()+'">'+data+'</textarea>';
+        }else if(typ=='text'){
+            if(data.substring(0,4)=="<div"){
+                element.innerHTML = data;
+            }else{
+                element.innerHTML = '<textarea style="font-size:50px;" id="'+getRandomInt()+'">'+data+'</textarea>';
+            }
+        }else if(typ=='img'){
+            element.innerHTML = '<img class="imgclass" id="'+getRandomInt()+'" src="'+data+'"/>';
+
+        }
+        if(element.innerHTML!=''){
+            boards.push(element);
+            pardiv.appendChild(element);
+            iso.appended( element );
+            iso.layout();
+            var ta = element.getElementsByTagName("textarea")[0];
+            if(ta!=null){
+            resize(ta);
+        }
+        }
+        outTrig.trigger();
+    }
+
+}
+
+function resize(el){
+    let fontSize = parseInt(el.style.fontSize);
+        for (let i = fontSize; i >= 4; i--) {
+            if (isOverflown(el)) {
+                fontSize--;
+                el.style.fontSize = fontSize + "px";
+            }
+        }
+
+}
+function isOverflown(element) {
+    return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
+}
+var sorts = ['weight','original-order','random'];
+var sortindex=0;
+function reorder(){
+    if(sortindex>=sorts.length){sortindex=0;}
+    iso.arrange({ sortBy : sorts[sortindex] });
+    sortindex++;
+
+}
+
+function filter(){
+    var str = '';
+
+    if(imgGo.get()==true){str += '.img';}
+    if(metaGo.get()==true){if(str!=''){str+=', '}str += '.meta';}
+    if(txtGo.get()==true){if(str!=''){str+=', '}str += '.text';}
+    iso.arrange({ filter: str });
+}
+function getRandomInt() {
+  return Math.floor(Math.random() * Math.floor(999999999999));
+}
+function addClass(elem, str) {
+  var arr;
+  arr = elem.className.split(" ");
+  if (arr.indexOf(str) == -1) {
+    elem.className += " " + str;
+  }
+}
+
+};
+
+Ops.User.alivemachine.Isotope.prototype = new CABLES.Op();
+
+
+
+
+
+// **************************************************************
+// 
+// Ops.WebAudio.Output
+// 
+// **************************************************************
+
+Ops.WebAudio.Output = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+op.requirements=[CABLES.Requirements.WEBAUDIO];
+
+var audioCtx = CABLES.WEBAUDIO.createAudioContext(op);
+
+// constants
+var VOLUME_DEFAULT = 1.0;
+var VOLUME_MIN = 0;
+var VOLUME_MAX = 1;
+
+// vars
+var gainNode = audioCtx.createGain();
+var destinationNode = audioCtx.destination;
+gainNode.connect(destinationNode);
+var masterVolume = 1;
+
+// inputs
+var audioInPort = CABLES.WEBAUDIO.createAudioInPort(op, "Audio In", gainNode);
+var volumePort = op.inValueSlider("Volume", VOLUME_DEFAULT);
+var mutePort = op.inValueBool("Mute", false);
+
+// functions
+// sets the volume, multiplied by master volume
+function setVolume() {
+    var volume = volumePort.get() * masterVolume;
+    if(volume >= VOLUME_MIN && volume <= VOLUME_MAX) {
+        // gainNode.gain.value = volume;
+        gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+    } else {
+        // gainNode.gain.value = VOLUME_DEFAULT * masterVolume;
+        gainNode.gain.setValueAtTime(VOLUME_DEFAULT * masterVolume, audioCtx.currentTime);
+    }
+}
+
+function mute(b) {
+    if(b) {
+        // gainNode.gain.value = 0;
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+    } else {
+        setVolume();
+    }
+}
+
+// change listeners
+mutePort.onChange = function() {
+    mute(mutePort.get());
+};
+
+volumePort.onChange = function() {
+    if(mutePort.get()) {
+        return;
+    }
+    setVolume();
+};
+
+op.onMasterVolumeChanged = function(v) {
+    masterVolume = v;
+    setVolume();
+};
+
+
+
+
+};
+
+Ops.WebAudio.Output.prototype = new CABLES.Op();
+CABLES.OPS["53fdbf4a-bc8d-4c5d-a698-f34fdeb53827"]={f:Ops.WebAudio.Output,objName:"Ops.WebAudio.Output"};
+
+
+
+
+// **************************************************************
+// 
+// Ops.User.alivemachine.MyAudioPlayer02
+// 
+// **************************************************************
+
+Ops.User.alivemachine.MyAudioPlayer02 = function()
+{
+CABLES.Op.apply(this,arguments);
+const op=this;
+const attachments={};
+const self = this;
+const patch = this.patch;
+// todo: audio object: firefox does not support .loop=true
+//
+// myAudio = new Audio('someSound.ogg');
+// myAudio.addEventListener('ended', function() {
+//     this.currentTime = 0;
+//     this.play();
+// }, false);
+// myAudio.play();
+
+
+this.file = op.inFile("file", "audio");
+const play = op.addInPort(new CABLES.Port(this, "play", CABLES.OP_PORT_TYPE_VALUE, { "display": "bool" }));
+const autoPlay = op.addInPort(new CABLES.Port(this, "Autoplay", CABLES.OP_PORT_TYPE_VALUE, { "display": "bool" }));
+
+const volume = this.addInPort(new CABLES.Port(this, "volume", CABLES.OP_PORT_TYPE_VALUE, { "display": "range" }));
+const synchronizedPlayer = this.addInPort(new CABLES.Port(this, "Synchronized Player", CABLES.OP_PORT_TYPE_VALUE, { "display": "bool" }));
+
+this.audioOut = this.addOutPort(new CABLES.Port(this, "audio out", CABLES.OP_PORT_TYPE_OBJECT));
+const outPlaying = this.addOutPort(new CABLES.Port(this, "playing", CABLES.OP_PORT_TYPE_VALUE));
+const outEnded = this.addOutPort(new CABLES.Port(this, "ended", CABLES.OP_PORT_TYPE_FUNCTION));
+var triggeronce = op.inTriggerButton("play once");
+triggeronce.onTriggered=playonce;
+
+const doLoop = op.addInPort(new CABLES.Port(this, "Loop", CABLES.OP_PORT_TYPE_VALUE, { "display": "bool" }));
+
+autoPlay.set(true);
+volume.set(1.0);
+
+outPlaying.ignoreValueSerialize = true;
+outEnded.ignoreValueSerialize = true;
+
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+if (!window.audioContext) window.audioContext = new AudioContext();
+
+if (!window.audioContext)
+{
+    if (this.patch.config.onError) this.patch.config.onError("sorry, could not initialize WebAudio. Please check if your Browser supports WebAudio");
+}
+
+this.filter = audioContext.createGain();
+self.audio = null;
+let buffer = null;
+let playing = false;
+outPlaying.set(false);
+function playonce(){
+playing = true;
+        const prom = self.audio.play();
+        if (prom instanceof Promise)
+            prom.then(null, function (e) {});
+}
+
+play.onChange = function ()
+{
+    if (!self.audio)
+    {
+        op.uiAttr({ "error": "No audio file selected" });
+        return;
+    }
+    else op.uiAttr({ "error": null });
+
+
+    if (play.get())
+    {
+        playing = true;
+        const prom = self.audio.play();
+        if (prom instanceof Promise)
+            prom.then(null, function (e) {});
+    }
+    else
+    {
+        playing = false;
+        self.audio.pause();
+    }
+    outPlaying.set(playing);
+};
+
+
+this.onDelete = function ()
+{
+    if (self.audio) self.audio.pause();
+};
+
+
+doLoop.onChange = function ()
+{
+    if (self.audio) self.audio.loop = doLoop.get();
+    else if (self.media) self.media.loop = doLoop.get();
+};
+
+function seek()
+{
+    // if(!window.gui && CGL.getLoadingStatus()>=1.0)
+    // {
+    //     console.log('seek canceled',CGL.getLoadingStatus());
+    //     return;
+    // }
+
+    if (!synchronizedPlayer.get())
+    {
+        if (!self.audio) return;
+
+        let prom;
+        if (self.patch.timer.isPlaying() && self.audio.paused) prom = self.audio.play();
+        else if (!self.patch.timer.isPlaying() && !self.audio.paused) prom = self.audio.pause();
+
+        if (prom instanceof Promise)
+            prom.then(null, function (e) {});
+
+        self.audio.currentTime = self.patch.timer.getTime();
+    }
+    else
+    {
+        if (buffer === null) return;
+
+        const t = self.patch.timer.getTime();
+        if (!isFinite(t))
+        {
+            return;
+            // console.log('not finite time...',t);
+            // t=0.0;
+        }
+
+        playing = false;
+
+        // console.log('seek.....',self.patch.timer.isPlaying());
+
+        if (self.patch.timer.isPlaying())
+        {
+            console.log("play!");
+            outPlaying.set(true);
+
+            self.media.start(t);
+            playing = true;
+        }
+    }
+}
+
+function playPause()
+{
+    if (!self.audio) return;
+
+    let prom;
+    if (self.patch.timer.isPlaying()) prom = self.audio.play();
+    else prom = self.audio.pause();
+    if (prom instanceof Promise)
+        prom.then(null, function (e) {});
+}
+
+function updateVolume()
+{
+    // self.filter.gain.value=(volume.get() || 0)*op.patch.config.masterVolume;
+    self.filter.gain.setValueAtTime((volume.get() || 0) * op.patch.config.masterVolume, window.audioContext.currentTime);
+}
+
+volume.onChange = updateVolume;
+op.onMasterVolumeChanged = updateVolume;
+
+const firstTime = true;
+let loadingFilename = "";
+this.file.onChange = function ()
+{
+    if (!self.file.get()) return;
+    loadingFilename = op.patch.getFilePath(self.file.get());
+
+    const loadingId = patch.loading.start("audioplayer", self.file.get());
+
+
+    if (!synchronizedPlayer.get())
+    {
+        if (self.audio)
+        {
+            self.audio.pause();
+            outPlaying.set(false);
+        }
+        self.audio = new Audio();
+
+        console.log("load audio", self.file.get());
+
+        self.audio.crossOrigin = "anonymous";
+        self.audio.src = op.patch.getFilePath(self.file.get());
+        self.audio.loop = doLoop.get();
+        self.audio.crossOrigin = "anonymous";
+
+        var canplaythrough = function ()
+        {
+            if (autoPlay.get() || play.get())
+            {
+                const prom = self.audio.play();
+                if (prom instanceof Promise)
+                    prom.then(null, function (e) {});
+            }
+            outPlaying.set(true);
+            patch.loading.finished(loadingId);
+            self.audio.removeEventListener("canplaythrough", canplaythrough, false);
+        };
+
+        self.audio.addEventListener("stalled", (err) => { console.log("mediaplayer stalled...", err); patch.loading.finished(loadingId); });
+        self.audio.addEventListener("error", (err) => { console.log("mediaplayer error...", err); patch.loading.finished(loadingId); });
+        self.audio.addEventListener("abort", (err) => { console.log("mediaplayer abort...", err); patch.loading.finished(loadingId); });
+        self.audio.addEventListener("suspend", (err) => { console.log("mediaplayer suspend...", err); patch.loading.finished(loadingId); });
+
+
+        self.audio.addEventListener("canplaythrough", canplaythrough, false);
+
+        self.audio.addEventListener("ended", function ()
+        {
+            // console.log('audio player ended...');
+            outPlaying.set(false);
+            playing = false;
+            outEnded.trigger();
+        }, false);
+
+
+        self.media = audioContext.createMediaElementSource(self.audio);
+        self.media.connect(self.filter);
+        self.audioOut.val = self.filter;
+    }
+    else
+    {
+        self.media = audioContext.createBufferSource();
+        self.media.loop = doLoop.get();
+
+        const request = new XMLHttpRequest();
+
+        request.open("GET", op.patch.getFilePath(self.file.get()), true);
+        request.responseType = "arraybuffer";
+
+        request.onload = function ()
+        {
+            const audioData = request.response;
+
+            audioContext.decodeAudioData(audioData, function (res)
+            {
+                buffer = res;
+                // console.log('sound load complete');
+                self.media.buffer = res;
+                self.media.connect(self.filter);
+                self.audioOut.val = self.filter;
+                self.media.loop = doLoop.get();
+
+                patch.loading.finished(loadingId);
+
+                // if(!window.gui)
+                // {
+                //     self.media.start(0);
+                //     playing=true;
+                // }
+            });
+        };
+
+        request.send();
+
+        self.patch.timer.onPlayPause(seek);
+        self.patch.timer.onTimeChange(seek);
+    }
+};
+
+
+};
+
+Ops.User.alivemachine.MyAudioPlayer02.prototype = new CABLES.Op();
+
 
 
 window.addEventListener('load', function(event) {
